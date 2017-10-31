@@ -1,8 +1,8 @@
-import math
-
-from . import constants
+import logging
 import abc
+import math
 from enum import Enum
+from . import constants
 
 
 class Entity:
@@ -15,12 +15,12 @@ class Entity:
     :ivar x: The entity x-coordinate.
     :ivar y: The entity y-coordinate.
     :ivar radius: The radius of the entity (may be 0)
-    :ivar health: The planet's health.
+    :ivar health: The entity's health.
     :ivar owner: The player ID of the owner, if any. If None, Entity is not owned.
     """
     __metaclass__ = abc.ABCMeta
 
-    def _init__(self, x, y, radius, health, player, entity_id):
+    def __init__(self, x, y, radius, health, player, entity_id):
         self.x = x
         self.y = y
         self.radius = radius
@@ -245,7 +245,10 @@ class Ship(Entity):
         :return: The command string to be passed to the Halite engine.
         :rtype: str
         """
-        return "t {} {} {}".format(self.id, int(magnitude), int(angle))
+
+        # we want to round angle to nearest integer, but we want to round
+        # magnitude down to prevent overshooting and unintended collisions
+        return "t {} {} {}".format(self.id, int(magnitude), round(angle))
 
     def dock(self, planet):
         """

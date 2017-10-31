@@ -4,3 +4,5 @@ WILL CONTAIN ALGORITHM FOR SHIPS MOVEMENTS
 - RUNNING
 - SUICIDE?
 """
+
+from . import test_logs

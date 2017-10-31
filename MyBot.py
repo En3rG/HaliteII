@@ -1,71 +1,79 @@
 import hlt
 import logging
 from initialization.expansion import Exploration
-from testing.test_logs import log_players, log_planets, log_myShip
+from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions
+from multiprocessor.processors import MyProcesses
+from multiprocessing import freeze_support
 import time
 
-## Perform Initialization
-Expansion = Exploration()
+if __name__ == "__main__":
+    freeze_support()
 
-## GAME START
-## Initializes log
-game = hlt.Game("En3rG")
-logging.info("Starting my bot!")
+    ## GAME START
+    ## Initializes log
+    game = hlt.Game("En3rG")
+    logging.info("Starting my bot!")
 
-time.sleep(30)
+    ## Perform Initialization
+    Expansion = Exploration(game)
 
-while True:
+    ## Initialize processes
+    MP = MyProcesses(game)
 
-    ## TURN START
-    ## Update the map for the new turn and get the latest version
-    game_map = game.update_map()
+    logging.info("TESTING {}".format(MP.enemyIDs))
 
-    ## For testing only
-    log_planets(game_map)
-    log_players(game_map)
+    while True:
 
-    ## Here we define the set of commands to be sent to the Halite engine at the end of the turn
-    command_queue = []
+        ## TURN START
+        ## Update the map for the new turn and get the latest version
+        game_map = game.update_map()
 
-    ## For every ship that I control
-    for ship in game_map.get_me().all_ships():
+        ## For testing only
+        log_planets(game_map)
+        log_players(game_map)
 
-        log_myShip(ship)
+        ## Here we define the set of commands to be sent to the Halite engine at the end of the turn
+        command_queue = []
 
-        # If the ship is docked
-        if ship.docking_status != ship.DockingStatus.UNDOCKED:
-            ## Skip this ship
-            continue
+        ## For every ship that I control
+        for ship in game_map.get_me().all_ships():
 
-        ## For each planet in the game (only non-destroyed planets are included)
-        for planet in game_map.all_planets():
-            ## If the planet is owned
-            if planet.is_owned():
-                ## Skip this planet
+            log_myShip(ship)
+
+            # If the ship is docked
+            if ship.docking_status != ship.DockingStatus.UNDOCKED:
+                ## Skip this ship
                 continue
 
-            ## If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
-            if ship.can_dock(planet):
-                ## We add the command by appending it to the command_queue
-                command_queue.append(ship.dock(planet))
-            else:
-                ## If we can't dock, we move towards the closest empty point near this planet (by using closest_point_to)
-                ## with constant speed. Don't worry about pathfinding for now, as the command will do it for you.
-                ## We run this navigate command each turn until we arrive to get the latest move.
-                ## Here we move at half our maximum speed to better control the ships
-                ## In order to execute faster we also choose to ignore ship collision calculations during navigation.
-                ## This will mean that you have a higher probability of crashing into ships, but it also means you will
-                ## make move decisions much quicker. As your skill progresses and your moves turn more optimal you may
-                ## wish to turn that option off.
-                navigate_command = ship.navigate(ship.closest_point_to(planet), game_map, speed=hlt.constants.MAX_SPEED/2, ignore_ships=True)
-                ## If the move is possible, add it to the command_queue (if there are too many obstacles on the way
-                ## or we are trapped (or we reached our destination!), navigate_command will return null;
-                ## don't fret though, we can run the command again the next turn)
-                if navigate_command:
-                    command_queue.append(navigate_command)
-            break
+            ## For each planet in the game (only non-destroyed planets are included)
+            for planet in game_map.all_planets():
+                ## If the planet is owned
+                if planet.is_owned():
+                    ## Skip this planet
+                    continue
 
-    ## Send our set of commands to the Halite engine for this turn
-    game.send_command_queue(command_queue)
-    ## TURN END
-## GAME END
+                ## If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
+                if ship.can_dock(planet):
+                    ## We add the command by appending it to the command_queue
+                    command_queue.append(ship.dock(planet))
+                else:
+                    ## If we can't dock, we move towards the closest empty point near this planet (by using closest_point_to)
+                    ## with constant speed. Don't worry about pathfinding for now, as the command will do it for you.
+                    ## We run this navigate command each turn until we arrive to get the latest move.
+                    ## Here we move at half our maximum speed to better control the ships
+                    ## In order to execute faster we also choose to ignore ship collision calculations during navigation.
+                    ## This will mean that you have a higher probability of crashing into ships, but it also means you will
+                    ## make move decisions much quicker. As your skill progresses and your moves turn more optimal you may
+                    ## wish to turn that option off.
+                    navigate_command = ship.navigate(ship.closest_point_to(planet), game_map, speed=hlt.constants.MAX_SPEED/2, ignore_ships=True)
+                    ## If the move is possible, add it to the command_queue (if there are too many obstacles on the way
+                    ## or we are trapped (or we reached our destination!), navigate_command will return null;
+                    ## don't fret though, we can run the command again the next turn)
+                    if navigate_command:
+                        command_queue.append(navigate_command)
+                break
+
+        ## Send our set of commands to the Halite engine for this turn
+        game.send_command_queue(command_queue)
+        ## TURN END
+    ## GAME END

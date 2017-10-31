@@ -1,4 +1,3 @@
-
 import logging
 
 def log_players(game_map):
@@ -31,3 +30,16 @@ def log_planets(game_map):
 
 def log_myShip(ship):
     logging.info("My ship id: {}, x: {}, y: {}".format(ship.id, ship.x, ship.y))
+    logging.debug(" ")
+
+def log_dimensions(game_map):
+    logging.debug("Width: {} x Height: {}".format(game_map.width,game_map.height))
+    logging.debug(" ")
+
+def log_myID(game_map):
+    logging.debug("My ID: {}".format(game_map.my_id))
+    logging.debug(" ")
+
+def log_numPlayers(game_map):
+    logging.debug("Number of players: {}".format(len(game_map._players)))
+    logging.debug(" ")

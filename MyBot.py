@@ -6,6 +6,9 @@ from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support
 import time
 
+def delays():
+    time.sleep(1.5)
+
 if __name__ == "__main__":
     freeze_support()
 
@@ -20,9 +23,17 @@ if __name__ == "__main__":
     ## Initialize processes
     MP = MyProcesses(game)
 
-    logging.info("TESTING {}".format(MP.enemyIDs))
+    turn = 0
 
     while True:
+
+        for id in MP.enemyIDs:
+            args = ["pred_" + id + "_" + str(turn),2]
+            #MP.worker_predictor(id,args)
+            args = ["train_" + id + "_" + str(turn), 2]
+            MP.worker_trainer(id, args)
+        turn += 1
+
 
         ## TURN START
         ## Update the map for the new turn and get the latest version
@@ -76,4 +87,6 @@ if __name__ == "__main__":
         ## Send our set of commands to the Halite engine for this turn
         game.send_command_queue(command_queue)
         ## TURN END
+
+    MP.exit = True
     ## GAME END

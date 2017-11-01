@@ -67,61 +67,62 @@ class NN():
         sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
-
         return model
 
 
 
 
-def testing():
-    samples = 300
-    pred = 300
-    Y = 28     ## Its surrounding where it can go to
-    X = 28
-    Z = 10
-    """
-    - YxX (1 for ships, -1 for enemy)
-    - health of ships mentioned above
-    - where YxX is base on entire map,
-    - location of the planets on YxX map resolution
-    - radius of planets
-    - Planet ownership (1 yours, -1 enemy, 0.5 unowned?)
-    - Num of our ships in YxX resolution
-    - Total healths of above?
-    - Num of enemy ships in YxX resolution
-    - Total healths of above?
-    """
-    batch = 300
-    num_classes = 225  ## 15x15
+    def testing():
+        samples = 300
+        pred = 300
+        Y = 28     ## Its surrounding where it can go to
+        X = 28
+        Z = 10
+        """
+        - YxX (1 for ships, -1 for enemy)
+        - health of ships mentioned above
+        - where YxX is base on entire map,
+        - location of the planets on YxX map resolution
+        - radius of planets
+        - Planet ownership (1 yours, -1 enemy, 0.5 unowned?)
+        - Num of our ships in YxX resolution
+        - Total healths of above?
+        - Num of enemy ships in YxX resolution
+        - Total healths of above?
+        """
+        batch = 300
+        num_classes = 225  ## 15x15
 
-    # Generate dummy data
-    x_train = np.random.random((samples, Y, X, Z))
-    print(x_train.shape)
-    y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
-    print(y_train.shape)
-    x_test = np.random.random((pred, Y, X, Z))
-    y_test = keras.utils.to_categorical(np.random.randint(10, size=(pred, 1)), num_classes=num_classes)
-
-
-    model = neural_network_model(Y,X,Z,num_classes)
+        # Generate dummy data
+        x_train = np.random.random((samples, Y, X, Z))
+        print(x_train.shape)
+        y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+        print(y_train.shape)
+        x_test = np.random.random((pred, Y, X, Z))
+        y_test = keras.utils.to_categorical(np.random.randint(10, size=(pred, 1)), num_classes=num_classes)
 
 
-    start = time.clock()
-
-    model.fit(x_train, y_train, batch_size=batch, epochs=1)
-
-    print("elapse:", time.clock()-start)
-    start = time.clock()
-
-    score = model.evaluate(x_test, y_test, batch_size=batch)
+        model = neural_network_model(Y,X,Z,num_classes)
 
 
-    print("elapse:", time.clock()-start)
+        start = time.clock()
+
+        model.fit(x_train, y_train, batch_size=batch, epochs=1)
+
+        print("elapse:", time.clock()-start)
+        start = time.clock()
+
+        score = model.evaluate(x_test, y_test, batch_size=batch)
 
 
-    start = time.clock()
-
-    model.predict(x_test)
+        print("elapse:", time.clock()-start)
 
 
-    print("elapse:", time.clock()-start)
+        start = time.clock()
+
+        model.predict(x_test)
+
+
+        print("elapse:", time.clock()-start)
+
+

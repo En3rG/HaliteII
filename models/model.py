@@ -8,13 +8,25 @@ from keras import regularizers
 from keras.optimizers import SGD
 import numpy as np
 import keras
-
+import logging
 import time
 
 
-class NN():
-    def __init__(self):
-        self.model = self.neural_network_model()
+class NeuralNet():
+    def __init__(self,game):
+        #self.model = self.neural_network_model()
+        self.models = self.set_models(game)
+
+    def set_models(self,game):
+        ## Just an example
+        models = {}
+
+        for player in game.map.all_players():
+            player_id = str(player.id)
+            if game.map.my_id != player_id:
+                models[player_id] = [0]
+
+        return models
 
     def neural_network_model(self,Y,X,Z,num_classes):
         ## FROM CAPSTONE

@@ -4,10 +4,36 @@ from initialization.expansion import Exploration
 from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support
+from models.model import NeuralNet  ## using tensor flow gets sent to engine??
 import time
+from threading import Thread
+from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, Array, Pipe
 
-def delays():
-    time.sleep(1.5)
+## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
+
+
+def set_delay(num):
+    """
+    Delay to maximize 2 seconds per turn
+    Help multiprocesses complete its tasks
+    """
+    time.sleep(num)
+
+def model_handler(MP,turn):
+    """
+    Handles training and predicting enemy models, per enemy ID
+    """
+    for id in MP.enemyIDs:
+        # if not MP.queues[id].empty():
+        #     ## get new model from the queue
+        #     NN.models[id] = MP.queues[id].get()
+
+        args = ["pred_" + id + "_" + str(turn), 2]
+        #MP.worker_predictor(id,args)  ## When loading keras, causes an error? why?
+        args = ["train_" + id + "_" + str(turn), 2]
+        MP.worker_trainer(id, args)
+
+    return turn + 1
 
 if __name__ == "__main__":
     freeze_support()
@@ -17,8 +43,13 @@ if __name__ == "__main__":
     game = hlt.Game("En3rG")
     logging.info("Starting my bot!")
 
-    ## Perform Initialization
+    ## Perform Initialization Prep
     Expansion = Exploration(game)
+
+    ## Initialize Models
+    NN = NeuralNet(game)
+
+    #time.sleep(10)  ## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
 
     ## Initialize processes
     MP = MyProcesses(game)
@@ -27,12 +58,9 @@ if __name__ == "__main__":
 
     while True:
 
-        for id in MP.enemyIDs:
-            args = ["pred_" + id + "_" + str(turn),2]
-            #MP.worker_predictor(id,args)
-            args = ["train_" + id + "_" + str(turn), 2]
-            MP.worker_trainer(id, args)
-        turn += 1
+        start = time.clock()
+
+        turn = model_handler(MP,turn)
 
 
         ## TURN START
@@ -83,6 +111,10 @@ if __name__ == "__main__":
                     if navigate_command:
                         command_queue.append(navigate_command)
                 break
+
+        ## Set a delay per turn
+        end = time.clock()
+        set_delay(1.98 - (end - start))
 
         ## Send our set of commands to the Halite engine for this turn
         game.send_command_queue(command_queue)

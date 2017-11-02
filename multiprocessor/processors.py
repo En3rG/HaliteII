@@ -11,7 +11,7 @@ class MyProcesses():
         #log_myID(game.map)
         #log_numPlayers(game.map)
 
-        self.main_conn, self.sub_conn = Pipe()
+        self.main_conn, self.sub_conn = Pipe()  ## Not used
         self.game_map = game.map
         self.myID = self.get_myID()
         self.enemyIDs = self.get_enemyID()
@@ -20,20 +20,20 @@ class MyProcesses():
         self.set_predictors()
         self.set_trainers()
         self.exit = False
+        #self.queues = self.set_queues()
 
         self.trainer_handler()
 
-
-
     def get_myID(self):
         """
-        Get my ID
+        Get my ID, as string.
+        From the engine, player IDs are int
         """
         return str(self.game_map.my_id)  ## was int before
 
     def get_enemyID(self):
         """
-        Get IDs of the enemy players
+        Get IDs of the enemy players, as strings
         """
         IDs = []
 
@@ -46,7 +46,8 @@ class MyProcesses():
 
     def init_process(self):
         """
-        Initialize a process and terminate
+        Initialize a process and terminate.
+        Is this necessary? Should we just initialize to None?
         """
         p = Process()
         p.start()
@@ -58,34 +59,41 @@ class MyProcesses():
         thread.start()
         return thread
 
+    def set_queues(self):
+        """
+        Initialize queues for communicating with the main process.
+        One per enemy ID
+        """
+        q = {}
+        for player_id in self.enemyIDs:
+            q[player_id] = Queue()
+
+        return q
+
     def set_predictors(self):
         """
         Initialize predictor processes as Player IDs
         """
-        for player in self.game_map.all_players():
-            player_id = str(player.id)
-            if self.myID != player_id:
-                #self.predictor_processes[player.id] = self.init_process()  ## HAVING JUST THIS IS MUCH SLOWER, WHY?
+        for player_id in self.enemyIDs:
+            #self.predictor_processes[player.id] = self.init_process()  ## HAVING JUST THIS IS MUCH SLOWER, WHY?
 
-                self.predictor_processes[player_id] = {}
-                self.predictor_processes[player_id]["processor"] = self.init_process()
+            self.predictor_processes[player_id] = {}
+            self.predictor_processes[player_id]["processor"] = self.init_process()
 
     def set_trainers(self):
         """
         Initialize trainer processes as Player IDs
         """
-        for player in self.game_map.all_players():
-            player_id = str(player.id)
-            if self.myID != player_id:
-                self.trainer_processes[player_id] = {}
-                self.trainer_processes[player_id]["handler"] = None
-                self.trainer_processes[player_id]["processor"] = self.init_process()
-                self.trainer_processes[player_id]["thread"] = None ## self.init_thread() ## <-- errors?
-                self.trainer_processes[player_id]["args_queue"] = Queue()
+        for player_id in self.enemyIDs:
+            self.trainer_processes[player_id] = {}
+            self.trainer_processes[player_id]["handler"] = None
+            self.trainer_processes[player_id]["processor"] = self.init_process()
+            self.trainer_processes[player_id]["thread"] = None ## self.init_thread() ## <-- errors! why??
+            self.trainer_processes[player_id]["args_queue"] = Queue()
 
     def get_logger(self,name):
         """
-        Create a logger per processor (doesnt work for multithread??)
+        Create a logger per processor
         """
         ## Initialize logging
         fh = logging.FileHandler(name + '.log')
@@ -101,42 +109,58 @@ class MyProcesses():
 
     def worker_predictor(self,id,arguments):
         """
-        Start a process for predicting
+        Start a process for predicting.
+        Prediction should take 1 sec? Since we still need to perform our algorithm per ship's movement
         """
         if self.predictor_processes[id]["processor"].is_alive() == False:
             self.predictor_processes[id]["processor"] = Process(target=self.test_delay, args=arguments)
             self.predictor_processes[id]["processor"].start()
-
-    def handler(self,MP,id):
-        """
-        Handles the process for training
-        """
-        logger = self.get_logger(id)
-        logger.debug("Handler for {}".format(id))
-
-        while self.exit == False:
-            logger.debug("Queue Empty? {} Size: {}".format(self.trainer_processes[id]["args_queue"].empty(),self.trainer_processes[id]["args_queue"].qsize()))
-            if not self.trainer_processes[id]["args_queue"].empty():
-                logger.debug("Popping from Queue")
-                arguments = self.trainer_processes[id]["args_queue"].get()
-                self.trainer_processes[id]["thread"] = Thread(target=self.test_delay, args=arguments)
-                self.trainer_processes[id]["thread"].start()
-
-            time.sleep(0.0)
-
-        #logger.debug("Kiling")
-        self.trainer_processes[id]["processor"].terminate()
-        self.trainer_processes[id]["handler"].terminate()
 
     def trainer_handler(self):
         """
         Starts handler processes per enemy ID
         """
         for id in self.enemyIDs:
-            arguments = [self,id]
+            arguments = [self, id]
             self.trainer_processes[id]["handler"] = Process(target=self.handler, args=arguments)
             self.trainer_processes[id]["handler"].start()
 
+    def handler(self,MP,id):
+        """
+        Handles the process for training.
+        Training a model could take longer than 2 secs.
+        Avoid having the training take more than 2 secs though.
+        """
+        logger = self.get_logger(id)
+        logger.debug("Handler for {}".format(id))
+
+        ## Using Threads
+        while self.exit == False:
+            logger.debug("Queue Empty? {} Size: {}".format(self.trainer_processes[id]["args_queue"].empty(),self.trainer_processes[id]["args_queue"].qsize()))
+            #if not self.trainer_processes[id]["args_queue"].empty():
+            if not self.trainer_processes[id]["args_queue"].empty() and (self.trainer_processes[id]["thread"] == None or not self.trainer_processes[id]["thread"].isAlive()):
+                logger.debug("Popping from Queue")
+                arguments = self.trainer_processes[id]["args_queue"].get()
+                self.trainer_processes[id]["thread"] = Thread(target=self.test_delay, args=arguments)
+                self.trainer_processes[id]["thread"].start()
+
+        ## Using processors, not working right
+        # while self.exit == False:
+        #     logger.debug("Queue Empty? {} Size: {}".format(self.trainer_processes[id]["args_queue"].empty(),
+        #                                                    self.trainer_processes[id]["args_queue"].qsize()))
+        #     logger.debug("Process status: {}".format(self.trainer_processes[id]["processor"].is_alive() == False))
+        #     #if not self.trainer_processes[id]["args_queue"].empty():
+        #     if not self.trainer_processes[id]["args_queue"].empty() and not self.trainer_processes[id]["processor"].is_alive(): ## causes error??
+        #         logger.debug("Popping from Queue")
+        #         arguments = self.trainer_processes[id]["args_queue"].get()
+        #         self.trainer_processes[id]["processor"] = Process(target=self.test_delay, args=arguments)
+        #         self.trainer_processes[id]["processor"].start()
+
+            time.sleep(0.20)
+
+        #logger.debug("Kiling")
+        self.trainer_processes[id]["processor"].terminate()
+        self.trainer_processes[id]["handler"].terminate()
 
     def worker_trainer(self,id,arguments):
         """

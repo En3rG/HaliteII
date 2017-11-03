@@ -75,9 +75,11 @@ class MyProcesses():
         Initialize predictor processes as Player IDs
         """
         for id in self.enemyIDs:
-            #self.predictors[player.id] = self.init_process()  ## HAVING JUST THIS IS MUCH SLOWER, WHY?
-            self.predictors[id] = {}
-            self.predictors[id]["processor"] = self.init_process()
+            self.predictors[id] = None
+            #self.predictors[id] = self.init_process()  ## HAVING JUST THIS IS MUCH SLOWER, WHY?
+
+            # self.predictors[id] = {}
+            # self.predictors[id]["processor"] = self.init_process()
 
     def set_trainers(self):
         """
@@ -111,20 +113,29 @@ class MyProcesses():
         Start a process for predicting.
         Prediction should take 1 sec? Since we still need to perform our algorithm per ship's movement
         """
-        if self.predictors[id]["processor"].is_alive() == False:
-            self.predictors[id]["processor"] = Process(target=self.test_delay, args=arguments)
-            self.predictors[id]["processor"].start()
+        ## Making it a thread makes it pass the keras/mutiprocess issue
+        if self.predictors[id] is None or self.predictors[id].isAlive() == False:
+            self.predictors[id] = Thread(target=self.test_delay, args=arguments)
+            self.predictors[id].start()
+
+        # if self.predictors[id] is None or self.predictors[id].is_alive() == False:
+        #     self.predictors[id] = Process(target=self.test_delay, args=arguments)
+        #     self.predictors[id].start()
+
+        # if self.predictors[id]["processor"].is_alive() == False:
+        #     self.predictors[id]["processor"] = Process(target=self.test_delay, args=arguments)
+        #     self.predictors[id]["processor"].start()
 
     def trainer_handler(self):
         """
         Starts handler processes per enemy ID
         """
         for id in self.enemyIDs:
-            arguments = [self, id]
+            arguments = [id]
             self.trainers[id]["handler"] = Process(target=self.handler, args=arguments)
             self.trainers[id]["handler"].start()
 
-    def handler(self,MP,id):
+    def handler(self,id):
         """
         Handles the process for training.
         Training a model could take longer than 2 secs.

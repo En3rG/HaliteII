@@ -4,7 +4,7 @@ from initialization.expansion import Exploration
 from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support
-from models.model import NeuralNet  ## using tensor flow gets sent to engine??
+#from models.model import NeuralNet  ## using tensor flow gets sent to engine??
 import time
 from threading import Thread
 from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, Array, Pipe
@@ -29,9 +29,9 @@ def model_handler(MP,turn):
         #     NN.models[id] = MP.queues[id].get()
 
         args = ["pred_" + id + "_" + str(turn), 2]
-        #MP.worker_predictor(id,args)  ## When loading keras, causes an error? why?
-        args = ["train_" + id + "_" + str(turn), 2]
-        MP.worker_trainer(id, args)
+        MP.worker_predictor(id,args)  ## When loading keras, causes an error? why?
+        #args = ["train_" + id + "_" + str(turn), 2]
+        #MP.worker_trainer(id, args)
 
     return turn + 1
 
@@ -47,9 +47,7 @@ if __name__ == "__main__":
     Expansion = Exploration(game)
 
     ## Initialize Models
-    NN = NeuralNet(game)
-
-    #time.sleep(10)  ## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
+    #NN = NeuralNet(game)
 
     ## Initialize processes
     MP = MyProcesses(game)

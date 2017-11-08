@@ -8,6 +8,7 @@ from models.model import NeuralNet  ## using tensor flow gets sent to engine??
 import time
 from threading import Thread
 from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, Array, Pipe
+import copy
 
 ## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
 
@@ -19,18 +20,23 @@ def set_delay(num):
     """
     time.sleep(num)
 
-def model_handler(MP,turn):
+def model_handler(MP,NN,turn):
     """
     HANDLES TRAINING AND PREDICTING ENEMY MODELS, PER ENEMY ID
     """
     for id in MP.enemyIDs:
-        # if not MP.queues[id].empty():
-        #     ## GET NEW MODEL FROM THE QUEUE
-        #     NN.models[id] = MP.queues[id].get()
+        if not MP.queues[id].empty():
+            ## GET NEW MODEL FROM THE QUEUE
+            logging.info("Current model: {}".format(NN.models[id]))
+            NN.models[id] = MP.queues[id].get()
+            logging.info("TESTING!! at turn: {} with id: {}, getting model from queue: {}".format(turn,id,NN.models[id]))
 
-        args = ["pred_" + id + "_" + str(turn), 1.5]
-        MP.worker_predictor(id,args)  ## When loading keras, causes an error? why?
-        args = ["train_" + id + "_" + str(turn), 2]
+        #logging.info("Sending {}".format(NN.models[id]))
+        logging.info("Calling model: {}".format(NN.models[id]))
+
+        args = ["pred_" + id + "_" + str(turn), id, NN, 0.5]
+        MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
+        args = ["train_" + id + "_" + str(turn), id, NN, 0.5]
         MP.worker_trainer(id, args)
 
     return turn + 1
@@ -47,7 +53,7 @@ if __name__ == "__main__":
     Expansion = Exploration(game)
 
     ## INITIALIZE MODELS
-    #NN = NeuralNet(game)
+    NN = NeuralNet(game)
 
     ## INITIALIZE PROCESSES
     MP = MyProcesses(game)
@@ -58,15 +64,15 @@ if __name__ == "__main__":
 
         start = time.clock()
 
-        turn = model_handler(MP,turn)
+        turn = model_handler(MP,NN,turn)
 
         ## TURN START
         ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
         game_map = game.update_map()
 
         ## FOR TESTING ONLY
-        log_planets(game_map)
-        log_players(game_map)
+        #log_planets(game_map)
+        #log_players(game_map)
 
         ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
         command_queue = []
@@ -74,7 +80,7 @@ if __name__ == "__main__":
         ## FOR EVERY SHIP I CONTROL
         for ship in game_map.get_me().all_ships():
 
-            log_myShip(ship)
+            #log_myShip(ship)
 
             ## IF SHIP IS DOCKED
             if ship.docking_status != ship.DockingStatus.UNDOCKED:

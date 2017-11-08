@@ -4,6 +4,7 @@ from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, A
 import time
 from collections import deque
 from threading import Thread
+import copy
 
 class MyProcesses():
     def __init__(self,game):
@@ -88,7 +89,7 @@ class MyProcesses():
         for id in self.enemyIDs:
             self.trainers[id] = {}
             self.trainers[id]["handler"] = None
-            self.trainers[id]["processor"] = self.init_process()
+            #self.trainers[id]["processor"] = self.init_process()
             self.trainers[id]["thread"] = None ## self.init_thread() ## <-- errors! why??
             self.trainers[id]["args_queue"] = Queue()
 
@@ -115,7 +116,7 @@ class MyProcesses():
         """
         ## Making it a thread makes it pass the keras/mutiprocess issue
         if self.predictors[id] is None or self.predictors[id].isAlive() == False:
-            self.predictors[id] = Thread(target=self.test_delay, args=arguments)
+            self.predictors[id] = Thread(target=self.test_delay_predictor, args=arguments)
             self.predictors[id].start()
 
         # if self.predictors[id] is None or self.predictors[id].is_alive() == False:
@@ -137,7 +138,7 @@ class MyProcesses():
 
     def handler(self,id):
         """
-        HANDLES THE PROCESS FOR TRAINING
+        HANDLES THE PROCESS FOR TRAINING, PER ID
         TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
         AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
         """
@@ -148,10 +149,10 @@ class MyProcesses():
         while self.exit == False:
             logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
             #if not self.trainers[id]["args_queue"].empty():
-            if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or not self.trainers[id]["thread"].isAlive()):
+            if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
-                self.trainers[id]["thread"] = Thread(target=self.test_delay, args=arguments)
+                self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer, args=arguments)
                 self.trainers[id]["thread"].start()
 
         ## USING PROCESSORS, NOT WORKING RIGHT
@@ -166,7 +167,8 @@ class MyProcesses():
         #         self.trainers[id]["processor"] = Process(target=self.test_delay, args=arguments)
         #         self.trainers[id]["processor"].start()
 
-            time.sleep(0.20)
+
+            time.sleep(0.10)
 
         #logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
@@ -187,11 +189,20 @@ class MyProcesses():
         # else:
         #     self.trainers[id]["args_queue"].append(arguments)
 
-    def test_delay(self,name,num):
+    def test_delay_predictor(self, name, id, NN, num):
+        ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
+        logger = self.get_logger(name)
+        logger.info("At {} and sleeping at {}".format(name, time.clock()))
+        time.sleep(num)
+        logger.info("Time after sleep {}".format(time.clock()))
+
+    def test_delay_trainer(self,name,id,NN,num):
         ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
         logger = self.get_logger(name)
         logger.info("At {} and sleeping at {}".format(name,time.clock()))
         time.sleep(num)
         logger.info("Time after sleep {}".format(time.clock()))
+        logger.debug("Before: {} After: {}".format([NN.models[id][0]],[NN.models[id][0] + 1]))
+        self.queues[id].put([NN.models[id][0] + 1],block=True)
 
 

@@ -7,7 +7,7 @@ from threading import Thread
 
 class MyProcesses():
     def __init__(self,game):
-        ## For testing only
+        ## FOR TESTING ONLY
         #log_myID(game.map)
         #log_numPlayers(game.map)
 
@@ -26,14 +26,14 @@ class MyProcesses():
 
     def get_myID(self):
         """
-        Get my ID, as string.
-        From the engine, player IDs are int
+        GET MY ID, AS STRING
+        FORM THE ENGINE, PLAYER IDs ARE INTs
         """
-        return str(self.game_map.my_id)  ## was int before
+        return str(self.game_map.my_id)
 
     def get_enemyID(self):
         """
-        Get IDs of the enemy players, as strings
+        GET IDs OF THE ENEMY PLAYERS, AS STRINGS
         """
         IDs = []
 
@@ -46,8 +46,8 @@ class MyProcesses():
 
     def init_process(self):
         """
-        Initialize a process and terminate.
-        Is this necessary? Should we just initialize to None?
+        INITIALIZE A PROCESS AND TERMINATE.
+        IS THIS NECESSARY? SHOULD WE JUST INITIALIZE TO None?
         """
         p = Process()
         p.start()
@@ -61,8 +61,8 @@ class MyProcesses():
 
     def set_queues(self):
         """
-        Initialize queues for communicating with the main process.
-        One per enemy ID
+        INITIALIZE QUEUES FOR COMMUNICATING WITH THE MAIN PROCESS.
+        ONE PER ENEMY ID
         """
         q = {}
         for id in self.enemyIDs:
@@ -72,7 +72,7 @@ class MyProcesses():
 
     def set_predictors(self):
         """
-        Initialize predictor processes as Player IDs
+        INITIALIZE PREDICTOR PROCESSES AS PLAYER IDs
         """
         for id in self.enemyIDs:
             self.predictors[id] = None
@@ -83,7 +83,7 @@ class MyProcesses():
 
     def set_trainers(self):
         """
-        Initialize trainer processes as Player IDs
+        INITIALIZE TRAINER PROCESSES AS PLAYER IDs
         """
         for id in self.enemyIDs:
             self.trainers[id] = {}
@@ -94,9 +94,9 @@ class MyProcesses():
 
     def get_logger(self,name):
         """
-        Create a logger per processor
+        CREATE A LOGGER PER PROCESSOR
         """
-        ## Initialize logging
+        ## INITIALIZE LOGGING
         fh = logging.FileHandler(name + '.log')
         fmt = logging.Formatter("%(asctime)-6s: %(name)s - %(levelname)s - %(message)s)")
         fh.setFormatter(fmt)
@@ -110,8 +110,8 @@ class MyProcesses():
 
     def worker_predictor(self,id,arguments):
         """
-        Start a process for predicting.
-        Prediction should take 1 sec? Since we still need to perform our algorithm per ship's movement
+        START A PROCESS FOR PREDICTING
+        PREDICTION SHOULD TAKE 1 SEC? SINCE WE STILL NEED TO PERFORM OUR ALGORITHM PER SHIP'S MOVEMENT
         """
         ## Making it a thread makes it pass the keras/mutiprocess issue
         if self.predictors[id] is None or self.predictors[id].isAlive() == False:
@@ -128,7 +128,7 @@ class MyProcesses():
 
     def trainer_handler(self):
         """
-        Starts handler processes per enemy ID
+        STARTS HANDLER PROCESSES PER ENEMY ID
         """
         for id in self.enemyIDs:
             arguments = [id]
@@ -137,14 +137,14 @@ class MyProcesses():
 
     def handler(self,id):
         """
-        Handles the process for training.
-        Training a model could take longer than 2 secs.
-        Avoid having the training take more than 2 secs though.
+        HANDLES THE PROCESS FOR TRAINING
+        TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
+        AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
         """
         logger = self.get_logger(id)
         logger.debug("Handler for {}".format(id))
 
-        ## Using Threads
+        ## USING THREADS
         while self.exit == False:
             logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
             #if not self.trainers[id]["args_queue"].empty():
@@ -154,7 +154,7 @@ class MyProcesses():
                 self.trainers[id]["thread"] = Thread(target=self.test_delay, args=arguments)
                 self.trainers[id]["thread"].start()
 
-        ## Using processors, not working right
+        ## USING PROCESSORS, NOT WORKING RIGHT
         # while self.exit == False:
         #     logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),
         #                                                    self.trainers[id]["args_queue"].qsize()))
@@ -174,7 +174,7 @@ class MyProcesses():
 
     def worker_trainer(self,id,arguments):
         """
-        Populates the queue from the main process
+        POPULATES THE QUEUE FROM THE MAIN PROCESS
         """
         self.trainers[id]["args_queue"].put(arguments)
         #self.trainers[id]["args_queue"].append(arguments)
@@ -188,7 +188,7 @@ class MyProcesses():
         #     self.trainers[id]["args_queue"].append(arguments)
 
     def test_delay(self,name,num):
-        ## When generating logs, times out even at 0.5 per player
+        ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
         logger = self.get_logger(name)
         logger.info("At {} and sleeping at {}".format(name,time.clock()))
         time.sleep(num)

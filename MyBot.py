@@ -14,18 +14,18 @@ from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, A
 
 def set_delay(num):
     """
-    Delay to maximize 2 seconds per turn
-    Help multiprocesses complete its tasks
+    DELAY TO MAXIMIZE 2 SECONDS PER TURN
+    HELP MULTIPROCESSES COMPLETE ITS TASKS
     """
     time.sleep(num)
 
 def model_handler(MP,turn):
     """
-    Handles training and predicting enemy models, per enemy ID
+    HANDLES TRAINING AND PREDICTING ENEMY MODELS, PER ENEMY ID
     """
     for id in MP.enemyIDs:
         # if not MP.queues[id].empty():
-        #     ## get new model from the queue
+        #     ## GET NEW MODEL FROM THE QUEUE
         #     NN.models[id] = MP.queues[id].get()
 
         args = ["pred_" + id + "_" + str(turn), 1.5]
@@ -39,17 +39,17 @@ if __name__ == "__main__":
     freeze_support()
 
     ## GAME START
-    ## Initializes log
+    ## INITIALIZES LOG
     game = hlt.Game("En3rG")
     logging.info("Starting my bot!")
 
-    ## Perform Initialization Prep
+    ## PERFORM INITIALIZATION PREP
     Expansion = Exploration(game)
 
-    ## Initialize Models
+    ## INITIALIZE MODELS
     #NN = NeuralNet(game)
 
-    ## Initialize processes
+    ## INITIALIZE PROCESSES
     MP = MyProcesses(game)
 
     turn = 0
@@ -60,33 +60,32 @@ if __name__ == "__main__":
 
         turn = model_handler(MP,turn)
 
-
         ## TURN START
-        ## Update the map for the new turn and get the latest version
+        ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
         game_map = game.update_map()
 
-        ## For testing only
+        ## FOR TESTING ONLY
         log_planets(game_map)
         log_players(game_map)
 
-        ## Here we define the set of commands to be sent to the Halite engine at the end of the turn
+        ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
         command_queue = []
 
-        ## For every ship that I control
+        ## FOR EVERY SHIP I CONTROL
         for ship in game_map.get_me().all_ships():
 
             log_myShip(ship)
 
-            # If the ship is docked
+            ## IF SHIP IS DOCKED
             if ship.docking_status != ship.DockingStatus.UNDOCKED:
-                ## Skip this ship
+                ## SKIP THIS SHIP
                 continue
 
-            ## For each planet in the game (only non-destroyed planets are included)
+            ## FOR EACH PLANET IN THE GAME (ONLY NON-DESTROYED PLANETS ARE INCLUDED)
             for planet in game_map.all_planets():
-                ## If the planet is owned
+                ## IF THE PLANET IS OWNED
                 if planet.is_owned():
-                    ## Skip this planet
+                    ## SKIP THIS PLANET
                     continue
 
                 ## If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
@@ -110,13 +109,14 @@ if __name__ == "__main__":
                         command_queue.append(navigate_command)
                 break
 
-        ## Set a delay per turn
+        ## SET A DELAY PER TURN
         end = time.clock()
         set_delay(1.98 - (end - start))
 
-        ## Send our set of commands to the Halite engine for this turn
+        ## SEND OUR COMMANDS TO HALITE ENGINE THIS TURN
         game.send_command_queue(command_queue)
         ## TURN END
 
+    ## TERMINATE MULTIPROCESSES
     MP.exit = True
     ## GAME END

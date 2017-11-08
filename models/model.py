@@ -18,7 +18,7 @@ class NeuralNet():
         self.models = self.set_models(game)
 
     def set_models(self,game):
-        ## Just an example
+        ## JUST AN EXAMPLE
         models = {}
 
         for player in game.map.all_players():
@@ -30,13 +30,13 @@ class NeuralNet():
 
     def neural_network_model(self,Y,X,Z,num_classes):
         ## FROM CAPSTONE
-        ## create model
+        ## CREATE MODEL
         # model = Sequential()
         # model.add(Dense(300,input_dim=88,activation='tanh',kernel_regularizer=regularizers.l2(0.01)))
         # model.add(Dense(150,activation='tanh'))
         # model.add(Dense(3,activation='softmax'))
         #
-        # ## for binary classifier
+        # ## FOR BINARY CLASSIFIER
         # #model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
         # #model.compile(loss='mean_squared_error',optimizer='adam',metrics=['accuracy'])
         # #model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
@@ -53,14 +53,13 @@ class NeuralNet():
         # return model
 
 
-        ## Create Model
+        ## CREATE MODEL
         model = Sequential()
 
-        # input: 100x100 images with 3 channels -> (100, 100, 3) tensors.
-        # this applies 32 convolution filters of size 3x3 each.
+        ## INPUT: 100x100 IMAGES WITH 3 CHANNELS -> (100, 100, 3) TENSORS.
+        ## THIS APPLIES 32 CONVOLUTION FILTERS OF SIZE 3x3 EACH
         #model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(Y, X, Z)))
         model.add(Dense(200, input_shape=(Y, X, Z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
-
 
         # model.add(Conv2D(32, (3, 3), activation='relu'))
         # model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -85,6 +84,9 @@ class NeuralNet():
 
 
     def testing():
+        """
+        TESTING HOW LONG IT TAKES TO PREDICT/TRAIN A MODEL
+        """
         samples = 300
         pred = 300
         Y = 28     ## Its surrounding where it can go to
@@ -105,7 +107,7 @@ class NeuralNet():
         batch = 300
         num_classes = 225  ## 15x15
 
-        # Generate dummy data
+        # GENERATE DUMMY DATA
         x_train = np.random.random((samples, Y, X, Z))
         print(x_train.shape)
         y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)

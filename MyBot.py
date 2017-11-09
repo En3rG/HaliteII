@@ -25,18 +25,18 @@ def model_handler(MP,NN,turn):
     HANDLES TRAINING AND PREDICTING ENEMY MODELS, PER ENEMY ID
     """
     for id in MP.enemyIDs:
-        if not MP.queues[id].empty():
+        if MP.queues[id].empty() == False:
             ## GET NEW MODEL FROM THE QUEUE
             logging.info("Current model: {}".format(NN.models[id]))
             NN.models[id] = MP.queues[id].get()
             logging.info("TESTING!! at turn: {} with id: {}, getting model from queue: {}".format(turn,id,NN.models[id]))
 
-        #logging.info("Sending {}".format(NN.models[id]))
         logging.info("Calling model: {}".format(NN.models[id]))
+        logging.info("Calling model 2: {}".format(MP.get_model_queues(id)))
 
-        args = ["pred_" + id + "_" + str(turn), id, NN, 0.5]
+        args = ("pred_" + id + "_" + str(turn), id, NN.models[id], 0.5)
         MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
-        args = ["train_" + id + "_" + str(turn), id, NN, 0.5]
+        args = ("train_" + id + "_" + str(turn), id, NN.models[id], 1.5)
         MP.worker_trainer(id, args)
 
     return turn + 1

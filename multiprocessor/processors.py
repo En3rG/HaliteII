@@ -22,6 +22,7 @@ class MyProcesses():
         self.set_trainers()
         self.exit = False
         self.queues = self.set_queues()
+        self.model_queues = self.model_queues()
 
         self.trainer_handler()
 
@@ -70,6 +71,29 @@ class MyProcesses():
             q[id] = Queue()
 
         return q
+
+    def model_queues(self):
+        """
+
+        """
+        q = {}
+        for id in self.enemyIDs:
+            q[id] = Queue()
+            q[id].put([0])
+
+        return q
+
+    def get_model_queues(self,id):
+        model = self.model_queues[id].get()
+        self.model_queues[id].put(copy.deepcopy(model))
+
+        return model
+
+    def set_model_queues(self,id,model):
+        if not self.model_queues[id].empty():
+            test = self.model_queues[id].get()
+
+        self.model_queues[id].put(model)
 
     def set_predictors(self):
         """
@@ -132,7 +156,7 @@ class MyProcesses():
         STARTS HANDLER PROCESSES PER ENEMY ID
         """
         for id in self.enemyIDs:
-            arguments = [id]
+            arguments = (id)
             self.trainers[id]["handler"] = Process(target=self.handler, args=arguments)
             self.trainers[id]["handler"].start()
 
@@ -168,7 +192,7 @@ class MyProcesses():
         #         self.trainers[id]["processor"].start()
 
 
-            time.sleep(0.10)
+            time.sleep(0.1)
 
         #logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
@@ -196,13 +220,19 @@ class MyProcesses():
         time.sleep(num)
         logger.info("Time after sleep {}".format(time.clock()))
 
-    def test_delay_trainer(self,name,id,NN,num):
+    def test_delay_trainer(self,name,id,NN_,num):
         ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
         logger = self.get_logger(name)
         logger.info("At {} and sleeping at {}".format(name,time.clock()))
         time.sleep(num)
         logger.info("Time after sleep {}".format(time.clock()))
-        logger.debug("Before: {} After: {}".format([NN.models[id][0]],[NN.models[id][0] + 1]))
-        self.queues[id].put([NN.models[id][0] + 1],block=True)
+        #logger.debug("Before: {} After: {}".format([NN.models[id][0]],[NN.models[id][0] + 1]))
+        #self.queues[id].put([NN.models[id][0] + 1],block=True)
+        logger.debug("Before: {} After: {}".format(NN_[0], NN_[0] + 1))
+        self.queues[id].put([NN_[0]+1])
+
+        mod = self.get_model_queues(id)
+        self.set_model_queues(id,[mod[0]+1])
+
 
 

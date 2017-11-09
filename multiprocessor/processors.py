@@ -2,8 +2,11 @@ import logging
 from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, Array, Pipe ## recv waits until something??
 #from testing.test_logs import log_myID, log_numPlayers
 import time
+import sys
 from collections import deque
 from threading import Thread
+#sys.path.append("../models")
+from models.model import NeuralNet
 import copy
 
 class MyProcesses():
@@ -21,7 +24,6 @@ class MyProcesses():
         self.set_predictors()
         self.set_trainers()
         self.exit = False
-        self.queues = self.set_queues()
         self.model_queues = self.model_queues()
 
         self.trainer_handler()
@@ -61,7 +63,7 @@ class MyProcesses():
         thread.start()
         return thread
 
-    def set_queues(self):
+    def model_queues(self):
         """
         INITIALIZE QUEUES FOR COMMUNICATING WITH THE MAIN PROCESS.
         ONE PER ENEMY ID
@@ -70,26 +72,29 @@ class MyProcesses():
         for id in self.enemyIDs:
             q[id] = Queue()
 
-        return q
+            ## INITIALIZE MODELS
+            NN = NeuralNet()
 
-    def model_queues(self):
-        """
-
-        """
-        q = {}
-        for id in self.enemyIDs:
-            q[id] = Queue()
-            q[id].put([0])
+            q[id].put(NN.model)
 
         return q
 
     def get_model_queues(self,id):
+        """
+        RETURN THE MODEL IN THE QUEUE
+        MAKES A COPY JUST IN CASE ITS THE LAST ITEM IN THE QUEUE
+        """
         model = self.model_queues[id].get()
         self.model_queues[id].put(copy.deepcopy(model))
 
         return model
 
     def set_model_queues(self,id,model):
+        """
+        RESETS THE QUEUE WITH THE MODEL
+        FIRST REMOVE ALL ITEMS IN THE QUEUE
+        SETTING QUEUE TO NONE/QUEUE() DOESNT WORK
+        """
         if not self.model_queues[id].empty():
             test = self.model_queues[id].get()
 
@@ -166,7 +171,7 @@ class MyProcesses():
         TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
         AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
         """
-        logger = self.get_logger(id)
+        logger = self.get_logger(id + "_trainer_handler")
         logger.debug("Handler for {}".format(id))
 
         ## USING THREADS
@@ -213,26 +218,22 @@ class MyProcesses():
         # else:
         #     self.trainers[id]["args_queue"].append(arguments)
 
-    def test_delay_predictor(self, name, id, NN, num):
+    def test_delay_predictor(self, name, id, num):
         ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
-        logger = self.get_logger(name)
-        logger.info("At {} and sleeping at {}".format(name, time.clock()))
+        #logger = self.get_logger(name)
+        #logger.info("At {} and sleeping at {}".format(name, time.clock()))
         time.sleep(num)
-        logger.info("Time after sleep {}".format(time.clock()))
+        #logger.info("Time after sleep {}".format(time.clock()))
 
-    def test_delay_trainer(self,name,id,NN_,num):
+    def test_delay_trainer(self,name,id,num):
         ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
-        logger = self.get_logger(name)
-        logger.info("At {} and sleeping at {}".format(name,time.clock()))
+        #logger = self.get_logger(name)
+        #logger.info("At {} and sleeping at {}".format(name,time.clock()))
         time.sleep(num)
-        logger.info("Time after sleep {}".format(time.clock()))
-        #logger.debug("Before: {} After: {}".format([NN.models[id][0]],[NN.models[id][0] + 1]))
-        #self.queues[id].put([NN.models[id][0] + 1],block=True)
-        logger.debug("Before: {} After: {}".format(NN_[0], NN_[0] + 1))
-        self.queues[id].put([NN_[0]+1])
+        #logger.info("Time after sleep {}".format(time.clock()))
 
-        mod = self.get_model_queues(id)
-        self.set_model_queues(id,[mod[0]+1])
+        model = self.get_model_queues(id)
+        self.set_model_queues(id,[model[0]+1])
 
 
 

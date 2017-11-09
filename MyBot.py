@@ -20,23 +20,19 @@ def set_delay(num):
     """
     time.sleep(num)
 
-def model_handler(MP,NN,turn):
+def model_handler(MP,turn):
     """
     HANDLES TRAINING AND PREDICTING ENEMY MODELS, PER ENEMY ID
+    BEFORE WAS PASSING NN TO THE ARGUMENTS AND WAS CAUSING ISSUE
+    WHERE ITS TRAINING OLDER MODEL. NOW NO LONGER PASSING NN, GRAB NN
+    FROM THE MODEL QUEUES TO ENSURE ITS THE LATEST ONE
     """
     for id in MP.enemyIDs:
-        if MP.queues[id].empty() == False:
-            ## GET NEW MODEL FROM THE QUEUE
-            logging.info("Current model: {}".format(NN.models[id]))
-            NN.models[id] = MP.queues[id].get()
-            logging.info("TESTING!! at turn: {} with id: {}, getting model from queue: {}".format(turn,id,NN.models[id]))
+        logging.info("Calling model: {}".format(MP.get_model_queues(id)))
 
-        logging.info("Calling model: {}".format(NN.models[id]))
-        logging.info("Calling model 2: {}".format(MP.get_model_queues(id)))
-
-        args = ("pred_" + id + "_" + str(turn), id, NN.models[id], 0.5)
+        args = ("pred_" + id + "_" + str(turn), id, 0.5)
         MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
-        args = ("train_" + id + "_" + str(turn), id, NN.models[id], 1.5)
+        args = ("train_" + id + "_" + str(turn), id, 1.5)
         MP.worker_trainer(id, args)
 
     return turn + 1
@@ -52,9 +48,6 @@ if __name__ == "__main__":
     ## PERFORM INITIALIZATION PREP
     Expansion = Exploration(game)
 
-    ## INITIALIZE MODELS
-    NN = NeuralNet(game)
-
     ## INITIALIZE PROCESSES
     MP = MyProcesses(game)
 
@@ -64,7 +57,7 @@ if __name__ == "__main__":
 
         start = time.clock()
 
-        turn = model_handler(MP,NN,turn)
+        turn = model_handler(MP,turn)
 
         ## TURN START
         ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION

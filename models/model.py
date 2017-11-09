@@ -13,20 +13,10 @@ import time
 
 
 class NeuralNet():
-    def __init__(self,game):
+    def __init__(self):
         #self.model = self.neural_network_model()
-        self.models = self.set_models(game)
+        self.model = [0]
 
-    def set_models(self,game):
-        ## JUST AN EXAMPLE
-        models = {}
-
-        for player in game.map.all_players():
-            player_id = str(player.id)
-            if game.map.my_id != player_id:
-                models[player_id] = [0]
-
-        return models
 
     def neural_network_model(self,Y,X,Z,num_classes):
         ## FROM CAPSTONE

@@ -30,8 +30,8 @@ class MyProcesses():
 
     def get_myID(self):
         """
-        GET MY ID, AS STRING
-        FORM THE ENGINE, PLAYER IDs ARE INTs
+        GET MY ID
+        FROM THE ENGINE, PLAYER IDs ARE INTs
         """
         return str(self.game_map.my_id)
 
@@ -59,6 +59,10 @@ class MyProcesses():
         return p
 
     def init_thread(self):
+        """
+        INITIALIZE A THREAD
+        NOT USED.  THREADS ARE CURRENTLY INITIALIZED TO NONE
+        """
         thread = Thread()
         thread.start()
         return thread
@@ -171,8 +175,8 @@ class MyProcesses():
         TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
         AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
         """
-        logger = self.get_logger(id + "_trainer_handler")
-        logger.debug("Handler for {}".format(id))
+        logger = self.get_logger(str(id) + "_trainer_handler")
+        logger.debug("Handler for {}".format(str(id)))
 
         ## USING THREADS
         while self.exit == False:

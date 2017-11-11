@@ -4,11 +4,9 @@ from initialization.expansion import Exploration
 from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support
-from models.model import NeuralNet  ## using tensor flow gets sent to engine??
+from models.model import NeuralNet, MyMap
+from movement import moves
 import time
-from threading import Thread
-from multiprocessing import Process, Pool, freeze_support, Queue, Lock, Value, Array, Pipe
-import copy
 
 ## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
 
@@ -18,6 +16,7 @@ def set_delay(num):
     DELAY TO MAXIMIZE 2 SECONDS PER TURN
     HELP MULTIPROCESSES COMPLETE ITS TASKS
     """
+    logging.debug("Setting Delay for: {}".format(num))
     time.sleep(num)
 
 def model_handler(MP,turn):
@@ -29,7 +28,6 @@ def model_handler(MP,turn):
     """
     for id in MP.enemyIDs:
         logging.info("Calling model: {}".format(MP.get_model_queues(id)))
-
         args = ("pred_" + id + "_" + str(turn), id, 0.5)
         MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
         args = ("train_" + id + "_" + str(turn), id, 1.5)
@@ -46,7 +44,7 @@ if __name__ == "__main__":
     logging.info("Starting my bot!")
 
     ## PERFORM INITIALIZATION PREP
-    Expansion = Exploration(game)
+    EXP = Exploration(game)
 
     ## INITIALIZE PROCESSES
     MP = MyProcesses(game)
@@ -57,15 +55,19 @@ if __name__ == "__main__":
 
         start = time.clock()
 
-        turn = model_handler(MP,turn)
-
         ## TURN START
         ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
         game_map = game.update_map()
 
+        ## CONVERT game_map TO MY VERSION
+        myMap = MyMap(game_map)
+
+        ## FOR TRAINING/PREDICTING MODEL
+        turn = model_handler(MP,turn)
+
         ## FOR TESTING ONLY
-        #log_planets(game_map)
-        #log_players(game_map)
+        log_planets(game_map)
+        log_players(game_map)
 
         ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
         command_queue = []
@@ -73,7 +75,7 @@ if __name__ == "__main__":
         ## FOR EVERY SHIP I CONTROL
         for ship in game_map.get_me().all_ships():
 
-            #log_myShip(ship)
+            log_myShip(ship)
 
             ## IF SHIP IS DOCKED
             if ship.docking_status != ship.DockingStatus.UNDOCKED:

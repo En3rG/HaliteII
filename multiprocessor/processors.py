@@ -33,7 +33,7 @@ class MyProcesses():
         GET MY ID
         FROM THE ENGINE, PLAYER IDs ARE INTs
         """
-        return str(self.game_map.my_id)
+        return self.game_map.my_id
 
     def get_enemyID(self):
         """
@@ -42,7 +42,7 @@ class MyProcesses():
         IDs = []
 
         for player in self.game_map.all_players():
-            id = str(player.id)
+            id = player.id
             if self.myID != id:
                 IDs.append(id)
 
@@ -165,7 +165,7 @@ class MyProcesses():
         STARTS HANDLER PROCESSES PER ENEMY ID
         """
         for id in self.enemyIDs:
-            arguments = (id)
+            arguments = (id,)
             self.trainers[id]["handler"] = Process(target=self.handler, args=arguments)
             self.trainers[id]["handler"].start()
 

@@ -20,7 +20,6 @@ class MyMap():
     def __init__(self,game_map):
         self.game_map = game_map
         self.data = self.get_data()
-        self.matrix = self.get_matrix()
 
     def get_data(self):
         """
@@ -43,6 +42,12 @@ class MyMap():
                                             'dock_status': ship.docking_status.value}
 
         return data
+
+class MyMatrix():
+    def __init__(self, game_map, myMap_prev):
+        self.game_map = game_map
+        self.myMap_prev = myMap_prev
+        self.matrix = self.get_matrix()
 
     def get_matrix(self):
         """
@@ -296,5 +301,4 @@ class NeuralNet():
 # #d = a.get_4D([c1,c2])
 # print(d.shape)
 # print(d)
-
 

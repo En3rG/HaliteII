@@ -7,10 +7,16 @@ from keras import optimizers
 from keras import regularizers
 from keras.optimizers import SGD
 import numpy as np
-import keras
 import logging
 import time
 import copy
+import keras
+
+# import sys
+# stdout = sys.stdout
+# sys.stdout = open('/dev/null', 'w')
+# import keras
+# sys.stdout = stdout
 
 class MyMap():
     """
@@ -116,14 +122,19 @@ class MyMatrix():
 
 class NeuralNet():
     def __init__(self):
-        self.model = [0]
-        self.y = 42
-        self.x = 42
-        self.z = 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS
+        #self.model = [0]
+        self.y = 42 ## 42
+        self.x = 42 ## 42
+        self.z = 4 ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS
         self.num_classes = 225 ## 15x15
         self.batch = 300
-        #self.model = self.neural_network_model(self.y,self.x,self.z,self.num_classes)
+        self.epoch = 1
+        self.model = self.neural_network_model(self.y,self.x,self.z,self.num_classes)
 
+    def train_model(self, x_train, y_train):
+        self.model.fit(x_train, y_train, batch_size=self.batch, epochs=self.epoch,verbose=False)
+
+        return self.model
 
     def neural_network_model(self,y,x,z,num_classes):
         ## FROM CAPSTONE
@@ -174,7 +185,7 @@ class NeuralNet():
         ## SIMPLE VERSION!
         ## CREATE MODEL
         # model = Sequential()
-        # model.add(Dense(200, input_shape=(Y, X, Z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        # model.add(Dense(200, input_shape=(y, x, z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         # model.add(Flatten())
         # model.add(Dense(100, activation='relu'))
         # model.add(Dense(50, activation='relu'))
@@ -231,6 +242,7 @@ class NeuralNet():
 
         print(x_train.shape)
         y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=self.num_classes)
+
         print(y_train.shape)
         x_test = np.random.random((pred, self.y, self.x, self.z))
 
@@ -273,7 +285,17 @@ class NeuralNet():
 
 
 ## FOR TESTING ONLY
-#a = NeuralNet()
+# a = NeuralNet()
+# samples = 200
+# y = 42
+# x = 42
+# z = 4
+# num_classes = 225
+# x_train = np.random.random((samples, y, x, z))
+# y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+# a.train_model(x_train,y_train)
+
+
 #a.testing_time()
 #a.numpy_test()
 

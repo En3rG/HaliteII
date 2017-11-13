@@ -182,10 +182,13 @@ class MyProcesses():
         while self.exit == False:
             logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
             #if not self.trainers[id]["args_queue"].empty():
+
+            #if self.trainers[id]["args_queue"].qsize() > 1 and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
             if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
                 self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer, args=arguments)
+                #self.trainers[id]["thread"] = Thread(target=test_delay_trainer, args=arguments)
                 self.trainers[id]["thread"].start()
 
         ## USING PROCESSORS, NOT WORKING RIGHT
@@ -229,15 +232,41 @@ class MyProcesses():
         time.sleep(num)
         #logger.info("Time after sleep {}".format(time.clock()))
 
-    def test_delay_trainer(self,name,id,num):
-        ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
-        #logger = self.get_logger(name)
-        #logger.info("At {} and sleeping at {}".format(name,time.clock()))
-        time.sleep(num)
-        #logger.info("Time after sleep {}".format(time.clock()))
+    def test_delay_trainer(self,name,id,x_train,y_train):
+        logger = self.get_logger(name)
+        logger.info("At {} and sleeping at {}".format(name, time.clock()))
 
         model = self.get_model_queues(id)
-        self.set_model_queues(id,[model[0]+1])
+
+        logger.info("Got Model")
+
+        model = copy.deepcopy(model)
+
+        logger.info("Done copying {}".format(type(model)))
+
+        self.set_model_queues(id, model.train_model(x_train,y_train))
+        #self.set_model_queues(id, [model[0]+1])
+
+        logger.info("Time after training {}".format(time.clock()))
+
+
+# def test_delay_trainer(name, id, MP, x_train, y_train):
+#     logger = MP.get_logger(name)
+#     logger.info("At {} and sleeping at {}".format(name, time.clock()))
+#
+#     model = MP.get_model_queues(id)
+#
+#     logger.info("Got Model")
+#
+#     model = copy.deepcopy(model)
+#
+#     logger.info("Done copying {}".format(type(model)))
+#
+#     MP.set_model_queues(id, model.train_model(x_train, y_train))
+#     # self.set_model_queues(id, [model.model[0]+1])
+#
+#     logger.info("Time after training {}".format(time.clock()))
+
 
 
 

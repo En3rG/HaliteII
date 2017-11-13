@@ -8,8 +8,17 @@ from models.model import NeuralNet, MyMap, MyMatrix
 from movement import moves
 import time
 import copy
+import numpy as np
+import keras
 
 ## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
+
+
+NN = NeuralNet()
+
+
+
+
 
 
 def set_delay(num):
@@ -28,10 +37,21 @@ def model_handler(MP,turn):
     FROM THE MODEL QUEUES TO ENSURE ITS THE LATEST ONE
     """
     for id in MP.enemyIDs:
-        logging.info("Calling model: {}".format(MP.get_model_queues(id)))
+        #logging.info("Calling model: {}".format(MP.get_model_queues(id)))  ## ERRORING WHY????
         args = ("pred_" + str(id) + "_" + str(turn), id, 0.5)
-        MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
-        args = ("train_" + str(id) + "_" + str(turn), id, 1.5)
+        #MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
+
+        samples = 200
+        y = 42
+        x = 42
+        z = 4
+        num_classes = 225
+        x_train = np.random.random((samples, y, x, z))
+        y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+
+        #NN.train_model(x_train,y_train)
+
+        args = ("train_" + str(id) + "_" + str(turn), id, x_train,y_train)
         MP.worker_trainer(id, args)
 
     return turn + 1
@@ -57,6 +77,19 @@ if __name__ == "__main__":
     while True:
 
         start = time.clock()
+
+        ## FOR TESTING ONLY!!!
+        # samples = 10
+        # y = 30
+        # x = 30
+        # z = 2
+        # num_classes = 225
+        # x_train = np.random.random((samples, y, x, z))
+        # y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+        #
+        # NN.model = NN.train_model(x_train, y_train)
+
+
 
         ## TURN START
         ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION

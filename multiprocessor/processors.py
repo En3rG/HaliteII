@@ -8,6 +8,9 @@ from threading import Thread
 #sys.path.append("../models")
 from models.model import NeuralNet
 import copy
+import pickle
+from keras.models import model_from_json
+from keras.optimizers import SGD
 
 class MyProcesses():
     def __init__(self,game):
@@ -24,7 +27,7 @@ class MyProcesses():
         self.set_predictors()
         self.set_trainers()
         self.exit = False
-        self.model_queues = self.model_queues()
+        self.model_queues = self.init_model_queues()
 
         self.trainer_handler()
 
@@ -67,7 +70,7 @@ class MyProcesses():
         thread.start()
         return thread
 
-    def model_queues(self):
+    def init_model_queues(self):
         """
         INITIALIZE QUEUES FOR COMMUNICATING WITH THE MAIN PROCESS.
         ONE PER ENEMY ID
@@ -78,18 +81,90 @@ class MyProcesses():
 
             ## INITIALIZE MODELS
             NN = NeuralNet()
+            logging.info("NN: {}".format(NN.model))
 
-            q[id].put(NN.model)
+            ## PROBLEM IS KERAS OBJECT CANNOT BE SERIALIZED OUT OF THE BAT??
+            ## http://zachmoshe.com/2017/04/03/pickling-keras-models.html
+
+
+            #q[id].put(NN.model)
+            NN_model_pickled = pickle.dumps(NN.model)
+            q[id].put(NN_model_pickled)
+
+            logging.info("Q at init_model_queues empty?: {}".format(q[id].empty()))
 
         return q
 
-    def get_model_queues(self,id):
+    def init_save_models(self,id):
+        """
+        SAVE MODELS/WEIGHTS TO FILE
+        """
+        # for id in self.enemyIDs:
+        #     NN = NeuralNet()
+        #     logging.info("NN: {}".format(NN.model))
+        #     model_json = NN.model.to_json()
+        #     with open(str(id) + ".json", "w") as json_file:
+        #         json_file.write(model_json)
+        #
+        #     ## Serialize weights to HDF5
+        #     NN.model.save_weights(str(id) + ".h5")
+
+
+        NN = NeuralNet()
+        model_json = NN.model.to_json()
+        with open(str(id) + ".json", "w") as json_file:
+            json_file.write(model_json)
+
+        ## Serialize weights to HDF5
+        NN.model.save_weights(str(id) + ".h5")
+
+        return NN.model
+
+    def save_model(self,id,model):
+        """
+        SAVE MODELS/WEIGHTS TO FILE
+        """
+        model_json = model.to_json()
+        with open(str(id) + ".json", "w") as json_file:
+            json_file.write(model_json)
+
+        ## Serialize weights to HDF5
+        model.save_weights(str(id) + ".h5")
+
+    def load_model(self, id):
+        """
+        LOAD MODELS/WEIGHTS TO FILE
+        """
+        json_file = open(str(id) + ".json", "r")
+        loaded_model_json = json_file.read()
+        json_file.close()
+        model = model_from_json(loaded_model_json)
+        ## Load weights into new model
+        model.load_weights(str(id) + ".h5")
+        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+        return model
+
+    def get_model_queues(self,id,logger):
         """
         RETURN THE MODEL IN THE QUEUE
         MAKES A COPY JUST IN CASE ITS THE LAST ITEM IN THE QUEUE
         """
-        model = self.model_queues[id].get()
-        self.model_queues[id].put(copy.deepcopy(model))
+        if self.model_queues[id].empty():
+            model = None
+            logger.error("get_model_queues called but its empty!!!")
+        else:
+            #model = self.model_queues[id].get()
+            #self.model_queues[id].put(copy.deepcopy(model))
+
+            model_pickled = self.model_queues[id].get()
+            model = pickle.loads(model_pickled)
+            self.model_queues[id].put(model_pickled)
+
+        ## NEED TO COMPILE??
+        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
         return model
 
@@ -102,7 +177,11 @@ class MyProcesses():
         if not self.model_queues[id].empty():
             test = self.model_queues[id].get()
 
-        self.model_queues[id].put(model)
+        #self.model_queues[id].put(model)
+
+        model_pickled = pickle.dumps(model)
+        self.model_queues[id].put(model_pickled)
+
 
     def set_predictors(self):
         """
@@ -166,7 +245,8 @@ class MyProcesses():
         """
         for id in self.enemyIDs:
             arguments = (id,)
-            self.trainers[id]["handler"] = Process(target=self.handler, args=arguments)
+            #self.trainers[id]["handler"] = Process(target=self.handler, args=arguments)
+            self.trainers[id]["handler"] = Process(target=self.handler2, args=arguments)
             self.trainers[id]["handler"].start()
 
     def handler(self,id):
@@ -174,7 +254,10 @@ class MyProcesses():
         HANDLES THE PROCESS FOR TRAINING, PER ID
         TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
         AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
+
+        MODEL.FIT STILL NOT WORKING HERE. EVEN AFTER COMPILING AFTER UNPICKING
         """
+
         logger = self.get_logger(str(id) + "_trainer_handler")
         logger.debug("Handler for {}".format(str(id)))
 
@@ -187,9 +270,22 @@ class MyProcesses():
             if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
-                self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer, args=arguments)
-                #self.trainers[id]["thread"] = Thread(target=test_delay_trainer, args=arguments)
-                self.trainers[id]["thread"].start()
+
+                # self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer, args=arguments)
+                # #self.trainers[id]["thread"] = Thread(target=test_delay_trainer, args=arguments)
+                # self.trainers[id]["thread"].start()
+
+                ## DONT START THREADS ANYMORE, DO TRAINING IN THIS PROCESS
+                name, id, x_train, y_train = arguments
+                model = self.get_model_queues(id, logger)
+                logger.info("Got Model")
+                #model = copy.deepcopy(model)
+                logger.info("Done copying {}".format(type(model)))
+                model.fit(x_train, y_train, batch_size=200, epochs=1,verbose=1)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                logger.info("Trained")
+                self.set_model_queues(id, model)
+                logger.info("Time after training {}".format(time.clock()))
+
 
         ## USING PROCESSORS, NOT WORKING RIGHT
         # while self.exit == False:
@@ -207,6 +303,66 @@ class MyProcesses():
             time.sleep(0.1)
 
         #logger.debug("Kiling")
+        self.trainers[id]["processor"].terminate()
+        self.trainers[id]["handler"].terminate()
+
+    def handler2(self, id):
+        """
+        LOADING/SAVING THE MODEL IN JSON
+        WAS ERRORING BEFORE ON FIT SINCE I FORGOT TO COMPILE THE MODEL AFTER LOADING
+
+        HANDLES THE PROCESS FOR TRAINING, PER ID
+        TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
+        AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
+        """
+        from keras.models import Sequential
+        from keras.layers import Dense, Dropout, Flatten
+        from keras.layers import Conv2D, MaxPooling2D
+        from keras.models import model_from_json
+        from keras.utils import np_utils
+        from keras import optimizers
+        from keras import regularizers
+        from keras.optimizers import SGD
+        import keras
+
+        ## UPDATED SO MODEL WILL NEVER BE READ ON THIS THREAD
+        model = self.init_save_models(id)
+
+
+        logger = self.get_logger(str(id) + "_trainer_handler")
+        logger.debug("Handler for {}".format(str(id)))
+
+        ## USING THREADS
+        while self.exit == False:
+            logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
+
+            if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
+                logger.debug("Popping from Queue")
+                arguments = self.trainers[id]["args_queue"].get()
+
+
+                ## USING THREADS DOESNT WORK AT ALL
+                # self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer2, args=arguments+(model,))
+                # #self.trainers[id]["thread"] = Thread(target=test_delay_trainer, args=arguments)
+                # self.trainers[id]["thread"].start()
+
+
+                ## DONT START THREADS ANYMORE, DO TRAINING IN THIS PROCESS
+                ## WORKS BUT GETTING UPDATED MAP FROM HLT ENGINE SLOWS DOWN AND TIMES OUT
+                name, id, x_train, y_train = arguments
+                #model = self.load_model(id)
+                logger.info("Got Model")
+                # model = copy.deepcopy(model)
+                logger.info("Done copying {}".format(type(model)))
+                model.fit(x_train, y_train, batch_size=300, epochs=1,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                logger.info("Trained")
+                self.save_model(id, model)
+                logger.info("Time after training {}".format(time.clock()))
+
+
+            time.sleep(0.01)
+
+        # logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
         self.trainers[id]["handler"].terminate()
 
@@ -236,7 +392,7 @@ class MyProcesses():
         logger = self.get_logger(name)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
 
-        model = self.get_model_queues(id)
+        model = self.get_model_queues(id,logger)
 
         logger.info("Got Model")
 
@@ -244,28 +400,25 @@ class MyProcesses():
 
         logger.info("Done copying {}".format(type(model)))
 
-        self.set_model_queues(id, model.train_model(x_train,y_train))
+        model.fit(x_train, y_train, batch_size=200, epochs=1, verbose=0)    ## ERROR IS HERE. WHY? Sequential object has no attribute model
+        logger.info("Trained")
+        self.set_model_queues(id, model)
+        #self.set_model_queues(id, model.train_model(x_train,y_train))
         #self.set_model_queues(id, [model[0]+1])
 
         logger.info("Time after training {}".format(time.clock()))
 
+    def test_delay_trainer2(self, name, id, x_train, y_train,model):
+        logger = self.get_logger(name)
+        logger.info("At {} and sleeping at {}".format(name, time.clock()))
+        logger.info("Got Model")
+        logger.info("Done copying {}".format(type(model)))
+        model.fit(x_train, y_train, batch_size=200, epochs=1,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+        logger.info("Trained")
+        self.save_model(id, model)
+        logger.info("Time after training {}".format(time.clock()))
 
-# def test_delay_trainer(name, id, MP, x_train, y_train):
-#     logger = MP.get_logger(name)
-#     logger.info("At {} and sleeping at {}".format(name, time.clock()))
-#
-#     model = MP.get_model_queues(id)
-#
-#     logger.info("Got Model")
-#
-#     model = copy.deepcopy(model)
-#
-#     logger.info("Done copying {}".format(type(model)))
-#
-#     MP.set_model_queues(id, model.train_model(x_train, y_train))
-#     # self.set_model_queues(id, [model.model[0]+1])
-#
-#     logger.info("Time after training {}".format(time.clock()))
+
 
 
 

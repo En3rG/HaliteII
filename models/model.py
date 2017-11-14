@@ -1,22 +1,73 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
-from keras.models import model_from_json
-from keras.utils import np_utils
-from keras import optimizers
-from keras import regularizers
-from keras.optimizers import SGD
-import numpy as np
-import logging
-import time
-import copy
-import keras
 
 # import sys
 # stdout = sys.stdout
 # sys.stdout = open('/dev/null', 'w')
 # import keras
 # sys.stdout = stdout
+
+
+## IF I DO THIS THEN HALITE NEVER GET INFORMATION
+# import sys, os
+# stderr = sys.stderr
+# sys.stderr = open(os.devnull, 'w')
+# import keras.backend as K
+# import tensorflow as tf
+# from hyperdash import Experiment
+# from keras.models import Sequential, Model
+# from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, Reshape, InputLayer, Lambda, LSTM, Masking, TimeDistributed, Input, Embedding, Layer
+# from keras.layers.advanced_activations import LeakyReLU, PReLU
+# from keras.optimizers import Adam, Nadam, RMSprop, SGD
+# from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, TensorBoard, Callback, EarlyStopping
+# from keras.layers.normalization import BatchNormalization
+#
+# sys.stderr = stderr
+
+
+
+
+import numpy as np
+import logging
+import time
+import copy
+
+import tensorflow as tf
+import pickle
+from threading import Thread
+
+graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
+
+
+
+
+import types
+import tempfile
+import keras.models
+
+def make_keras_picklable():
+    def __getstate__(self):
+        model_str = ""
+        with tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False) as fd:
+            keras.models.save_model(self, fd.name, overwrite=True)
+            model_str = fd.read()
+        d = { 'model_str': model_str }
+        return d
+
+    def __setstate__(self, state):
+        with tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False) as fd:
+            fd.write(state['model_str'])
+            fd.flush()
+            model = keras.models.load_model(fd.name)
+        self.__dict__ = model.__dict__
+
+
+    cls = keras.models.Model
+    cls.__getstate__ = __getstate__
+    cls.__setstate__ = __setstate__
+
+
+
+
+
 
 class MyMap():
     """
@@ -122,77 +173,95 @@ class MyMatrix():
 
 class NeuralNet():
     def __init__(self):
+        """
+        42x42 MATRIX AT 300 SAMPLES CAUSES A TIME OUT IN HLT ENGINE
+
+        28x28 TIMES OUT WITH 4 PLAYERS
+        """
         #self.model = [0]
-        self.y = 42 ## 42
-        self.x = 42 ## 42
-        self.z = 4 ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS
+        self.y = 28 ## 42
+        self.x = 28 ## 42
+        self.z = 3 ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS (CAN BE TAKEN INTO ACCOUNT IN UNITS)
         self.num_classes = 225 ## 15x15
         self.batch = 300
         self.epoch = 1
         self.model = self.neural_network_model(self.y,self.x,self.z,self.num_classes)
 
-    def train_model(self, x_train, y_train):
-        self.model.fit(x_train, y_train, batch_size=self.batch, epochs=self.epoch,verbose=False)
-
-        return self.model
+    # def train_model(self, x_train, y_train):
+    #     self.model.fit(x_train, y_train, batch_size=self.batch, epochs=self.epoch,verbose=0)  # pickle_safe = True ## ONLY FOR FIT_GENERATOR?
+    #
+    #     return self.model
 
     def neural_network_model(self,y,x,z,num_classes):
-        ## FROM CAPSTONE
-        ## CREATE MODEL
-        # model = Sequential()
-        # model.add(Dense(300,input_dim=88,activation='tanh',kernel_regularizer=regularizers.l2(0.01)))
-        # model.add(Dense(150,activation='tanh'))
-        # model.add(Dense(3,activation='softmax'))
-        #
-        # ## FOR BINARY CLASSIFIER
-        # #model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-        # #model.compile(loss='mean_squared_error',optimizer='adam',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='adamax',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='nadam',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='rmsprop',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='adagrad',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='adadelta',metrics=['accuracy'])
-        # #model.compile(loss='categorical_crossentropy',optimizer='tfoptimizer',metrics=['accuracy'])
-        #
-        # opt = optimizers.SGD(lr=0.001,momentum=0.9,decay=1e-6,nesterov=True)
-        # model.compile(loss='categorical_crossentropy',optimizer=opt,metrics=['accuracy'])
-        #
-        # return model
+        from keras.models import Sequential
+        from keras.layers import Dense, Dropout, Flatten
+        from keras.layers import Conv2D, MaxPooling2D
+        from keras.models import model_from_json
+        from keras.utils import np_utils
+        from keras import optimizers
+        from keras import regularizers
+        from keras.optimizers import SGD
+        import keras
+
+        model = None
+        with graph.as_default():  ## ADDED FROM ONLINE FOR MULTITHREADING
+
+            ## FROM CAPSTONE
+            ## CREATE MODEL
+            # model = Sequential()
+            # model.add(Dense(300,input_dim=88,activation='tanh',kernel_regularizer=regularizers.l2(0.01)))
+            # model.add(Dense(150,activation='tanh'))
+            # model.add(Dense(3,activation='softmax'))
+            #
+            # ## FOR BINARY CLASSIFIER
+            # #model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+            # #model.compile(loss='mean_squared_error',optimizer='adam',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='adamax',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='nadam',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='rmsprop',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='adagrad',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='adadelta',metrics=['accuracy'])
+            # #model.compile(loss='categorical_crossentropy',optimizer='tfoptimizer',metrics=['accuracy'])
+            #
+            # opt = optimizers.SGD(lr=0.001,momentum=0.9,decay=1e-6,nesterov=True)
+            # model.compile(loss='categorical_crossentropy',optimizer=opt,metrics=['accuracy'])
+            #
+            # return model
 
 
-        ## NOT THAT SIMPLE
-        ## CREATE MODEL
-        model = Sequential()
-        # ## INPUT: 100x100 IMAGES WITH 3 CHANNELS -> (100, 100, 3) TENSORS.
-        # ## THIS APPLIES 32 CONVOLUTION FILTERS OF SIZE 3x3 EACH
-        model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
-        model.add(Conv2D(32, (3, 3), activation='relu'))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Dropout(0.25))
-        model.add(Conv2D(64, (3, 3), activation='relu'))
-        model.add(Conv2D(64, (3, 3), activation='relu'))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Dropout(0.25))
-        model.add(Flatten())
-        model.add(Dense(50, activation='relu'))
-        model.add(Dropout(0.5))
-        model.add(Dense(num_classes, activation='softmax'))
-        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-        model.compile(loss='categorical_crossentropy', optimizer=sgd)
+            ## NOT THAT SIMPLE
+            ## CREATE MODEL
+            model = Sequential()
+            # ## INPUT: 100x100 IMAGES WITH 3 CHANNELS -> (100, 100, 3) TENSORS.
+            # ## THIS APPLIES 32 CONVOLUTION FILTERS OF SIZE 3x3 EACH
+            model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
+            model.add(Conv2D(32, (3, 3), activation='relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            model.add(Dropout(0.25))
+            model.add(Conv2D(64, (3, 3), activation='relu'))
+            model.add(Conv2D(64, (3, 3), activation='relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            model.add(Dropout(0.25))
+            model.add(Flatten())
+            model.add(Dense(50, activation='relu'))
+            model.add(Dropout(0.5))
+            model.add(Dense(num_classes, activation='softmax'))
+            sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
 
-        ## SIMPLE VERSION!
-        ## CREATE MODEL
-        # model = Sequential()
-        # model.add(Dense(200, input_shape=(y, x, z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
-        # model.add(Flatten())
-        # model.add(Dense(100, activation='relu'))
-        # model.add(Dense(50, activation='relu'))
-        # model.add(Dense(num_classes, activation='softmax'))
-        #
-        # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-        # model.compile(loss='categorical_crossentropy', optimizer=sgd)
+            ## SIMPLE VERSION!
+            ## CREATE MODEL
+            # model = Sequential()
+            # model.add(Dense(200, input_shape=(y, x, z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+            # model.add(Flatten())
+            # model.add(Dense(100, activation='relu'))
+            # model.add(Dense(50, activation='relu'))
+            # model.add(Dense(num_classes, activation='softmax'))
+            #
+            # sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            # model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
 
         return model
@@ -284,6 +353,48 @@ class NeuralNet():
         print(new)
 
 
+# make_keras_picklable()
+#
+# samples = 200
+# y = 42
+# x = 42
+# z = 4
+# num_classes = 225
+# x_train = np.random.random((samples, y, x, z))
+# y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+#
+# a = NeuralNet()
+# b = NeuralNet()
+# a.model.fit(x_train, y_train, batch_size=a.batch, epochs=a.epoch,verbose=1)
+# print(type(a.model))
+# pick_a = pickle.dumps(a.model)
+# pick_b = pickle.dumps(b.model)
+# print(type(pick_a))
+#
+# unpick_a = pickle.loads(pick_a)
+# unpick_a.fit(x_train, y_train, batch_size=300, epochs=1, verbose=1)
+# print(type(unpick_a))
+# unpick_b = pickle.loads(pick_b)
+#
+#
+# def test_fit(x_train,y_train,batch_size,epochs,verbose):
+#     unpick_a.fit(x_train, y_train, batch_size=300, epochs=1, verbose=1)
+#
+# args = (x_train,y_train,300,1,1)
+# thread = Thread(target=test_fit,args=args)
+# thread.start()
+#
+#
+# args = (x_train,y_train,300,1,1)
+# thread2 = Thread(target=test_fit,args=args)
+# thread2.start()
+
+
+
+
+
+
+
 ## FOR TESTING ONLY
 # a = NeuralNet()
 # samples = 200
@@ -296,7 +407,8 @@ class NeuralNet():
 # a.train_model(x_train,y_train)
 
 
-#a.testing_time()
+# a = NeuralNet()
+# a.testing_time()
 #a.numpy_test()
 
 
@@ -323,4 +435,6 @@ class NeuralNet():
 # #d = a.get_4D([c1,c2])
 # print(d.shape)
 # print(d)
+
+
 

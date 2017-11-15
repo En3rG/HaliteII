@@ -29,7 +29,7 @@ class MyProcesses():
         self.exit = False
         self.model_queues = self.init_model_queues()
 
-        self.trainer_handler()
+        self.spawn_trainers()
 
     def get_myID(self):
         """
@@ -131,18 +131,26 @@ class MyProcesses():
         ## Serialize weights to HDF5
         model.save_weights(str(id) + ".h5")
 
-    def load_model(self, id):
+    def load_model(self, id,logger):
         """
         LOAD MODELS/WEIGHTS TO FILE
+
+        THIS TAKES ABOUT 0.4 SECS.  ALMOST SAME AS UNPICKLING A PICKLED MODEL
         """
         json_file = open(str(id) + ".json", "r")
+        logger.debug("Json file found")
         loaded_model_json = json_file.read()
+        logger.debug("Json file read")
         json_file.close()
+        logger.debug("Json file closed")
         model = model_from_json(loaded_model_json)
+        logger.debug("Model loaded")
         ## Load weights into new model
         model.load_weights(str(id) + ".h5")
+        logger.debug("Loaded weights")
         sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         model.compile(loss='categorical_crossentropy', optimizer=sgd)
+        logger.debug("Compiled model")
 
         return model
 
@@ -161,10 +169,6 @@ class MyProcesses():
             model_pickled = self.model_queues[id].get()
             model = pickle.loads(model_pickled)
             self.model_queues[id].put(model_pickled)
-
-        ## NEED TO COMPILE??
-        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-        model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
         return model
 
@@ -221,15 +225,39 @@ class MyProcesses():
 
         return local_logger
 
-    def worker_predictor(self,id,arguments):
+    def add_predicting(self,id,arguments):
         """
         START A PROCESS FOR PREDICTING
         PREDICTION SHOULD TAKE 1 SEC? SINCE WE STILL NEED TO PERFORM OUR ALGORITHM PER SHIP'S MOVEMENT
         """
-        ## Making it a thread makes it pass the keras/mutiprocess issue
-        if self.predictors[id] is None or self.predictors[id].isAlive() == False:
-            self.predictors[id] = Thread(target=self.test_delay_predictor, args=arguments)
+        ## Making it a thread makes it pass the keras/mutiprocess issue.  Actually this fails keras when threads
+        # if self.predictors[id] is None or self.predictors[id].isAlive() == False:
+        #     #self.predictors[id] = Thread(target=self.test_delay_predictor, args=arguments)
+        #     self.predictors[id] = Thread(target=self.worker_predict_model, args=arguments)
+        #     self.predictors[id].start()
+
+        ## FOR MODEL.PREDICT NEED TO USE PROCESS??
+        if self.predictors[id] is None or self.predictors[id].is_alive() == False:
+            self.predictors[id] = Process(target=self.worker_predict_model, args=arguments)
             self.predictors[id].start()
+            self.predictors[id].join()
+
+
+        ## WHEN NOT CREATING PROCESS, DOESNT TIME OUT!!!! CREATING A PROCESS EVEN WITH ONLY 2 PLAYERS TIMES OUT
+        # name, id, x_train = arguments
+        # logging.debug("Trying..")
+        # try:
+        #     # model = self.get_model_queues(id, logger)
+        #     # predictions = model.predict(x_train)
+        #     # logger.debug("Predictions done")
+        #
+        #     model = self.load_model(id, logging)
+        #     logging.debug("Loaded model")
+        #     predictions = model.predict(x_train)
+        #     logging.debug("Predictions done")
+        # except:
+        #     pass
+
 
         # if self.predictors[id] is None or self.predictors[id].is_alive() == False:
         #     self.predictors[id] = Process(target=self.test_delay, args=arguments)
@@ -239,17 +267,17 @@ class MyProcesses():
         #     self.predictors[id]["processor"] = Process(target=self.test_delay, args=arguments)
         #     self.predictors[id]["processor"].start()
 
-    def trainer_handler(self):
+    def spawn_trainers(self):
         """
         STARTS HANDLER PROCESSES PER ENEMY ID
         """
         for id in self.enemyIDs:
             arguments = (id,)
-            #self.trainers[id]["handler"] = Process(target=self.handler, args=arguments)
-            self.trainers[id]["handler"] = Process(target=self.handler2, args=arguments)
+            #self.trainers[id]["handler"] = Process(target=self.trainer_handler, args=arguments)
+            self.trainers[id]["handler"] = Process(target=self.trainer_handler2, args=arguments)
             self.trainers[id]["handler"].start()
 
-    def handler(self,id):
+    def trainer_handler(self,id):
         """
         HANDLES THE PROCESS FOR TRAINING, PER ID
         TRAINING A MODEL COULD TAKE LONGER THAN 2 SECS
@@ -258,7 +286,7 @@ class MyProcesses():
         MODEL.FIT STILL NOT WORKING HERE. EVEN AFTER COMPILING AFTER UNPICKING
         """
 
-        logger = self.get_logger(str(id) + "_trainer_handler")
+        logger = self.get_logger(str(id) + "trainer_handler")
         logger.debug("Handler for {}".format(str(id)))
 
         ## USING THREADS
@@ -271,8 +299,8 @@ class MyProcesses():
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
 
-                # self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer, args=arguments)
-                # #self.trainers[id]["thread"] = Thread(target=test_delay_trainer, args=arguments)
+                # self.trainers[id]["thread"] = Thread(target=self.worker_train_model, args=arguments)
+                # #self.trainers[id]["thread"] = Thread(target=worker_train_model, args=arguments)
                 # self.trainers[id]["thread"].start()
 
                 ## DONT START THREADS ANYMORE, DO TRAINING IN THIS PROCESS
@@ -299,14 +327,13 @@ class MyProcesses():
         #         self.trainers[id]["processor"] = Process(target=self.test_delay, args=arguments)
         #         self.trainers[id]["processor"].start()
 
-
             time.sleep(0.1)
 
         #logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
         self.trainers[id]["handler"].terminate()
 
-    def handler2(self, id):
+    def trainer_handler2(self, id):
         """
         LOADING/SAVING THE MODEL IN JSON
         WAS ERRORING BEFORE ON FIT SINCE I FORGOT TO COMPILE THE MODEL AFTER LOADING
@@ -329,7 +356,7 @@ class MyProcesses():
         model = self.init_save_models(id)
 
 
-        logger = self.get_logger(str(id) + "_trainer_handler")
+        logger = self.get_logger(str(id) + "trainer_handler")
         logger.debug("Handler for {}".format(str(id)))
 
         ## USING THREADS
@@ -342,31 +369,27 @@ class MyProcesses():
 
 
                 ## USING THREADS DOESNT WORK AT ALL
-                # self.trainers[id]["thread"] = Thread(target=self.test_delay_trainer2, args=arguments+(model,))
-                # #self.trainers[id]["thread"] = Thread(target=test_delay_trainer, args=arguments)
+                # self.trainers[id]["thread"] = Thread(target=self.worker_train_model2, args=arguments+(model,))
+                # #self.trainers[id]["thread"] = Thread(target=worker_train_model, args=arguments)
                 # self.trainers[id]["thread"].start()
 
 
                 ## DONT START THREADS ANYMORE, DO TRAINING IN THIS PROCESS
                 ## WORKS BUT GETTING UPDATED MAP FROM HLT ENGINE SLOWS DOWN AND TIMES OUT
                 name, id, x_train, y_train = arguments
-                #model = self.load_model(id)
                 logger.info("Got Model")
-                # model = copy.deepcopy(model)
-                logger.info("Done copying {}".format(type(model)))
                 model.fit(x_train, y_train, batch_size=300, epochs=1,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
                 logger.info("Trained")
                 self.save_model(id, model)
                 logger.info("Time after training {}".format(time.clock()))
 
-
-            time.sleep(0.01)
+            time.sleep(0.05)
 
         # logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
         self.trainers[id]["handler"].terminate()
 
-    def worker_trainer(self,id,arguments):
+    def add_training(self,id,arguments):
         """
         POPULATES THE QUEUE FROM THE MAIN PROCESS
         """
@@ -388,7 +411,21 @@ class MyProcesses():
         time.sleep(num)
         #logger.info("Time after sleep {}".format(time.clock()))
 
-    def test_delay_trainer(self,name,id,x_train,y_train):
+    def worker_predict_model(self, name,id,x_train):
+        logger = self.get_logger(name)
+        try:
+            # model = self.get_model_queues(id, logger)
+            # predictions = model.predict(x_train)
+            # logger.debug("Predictions done")
+
+            model = self.load_model(id,logger)
+            logger.debug("Loaded model")
+            predictions = model.predict(x_train)
+            logger.debug("Predictions done")
+        except:
+            pass
+
+    def worker_train_model(self,name,id,x_train,y_train):
         logger = self.get_logger(name)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
 
@@ -408,7 +445,7 @@ class MyProcesses():
 
         logger.info("Time after training {}".format(time.clock()))
 
-    def test_delay_trainer2(self, name, id, x_train, y_train,model):
+    def worker_train_model2(self, name, id, x_train, y_train,model):
         logger = self.get_logger(name)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
         logger.info("Got Model")

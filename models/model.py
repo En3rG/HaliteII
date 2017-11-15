@@ -25,6 +25,9 @@
 
 
 
+
+
+
 import numpy as np
 import logging
 import time
@@ -44,6 +47,11 @@ import tempfile
 import keras.models
 
 def make_keras_picklable():
+    """
+    THIS FUNCTION IS REQUIRED TO PICKLE KERAS MODEL
+
+    NO LONGER USED?
+    """
     def __getstate__(self):
         model_str = ""
         with tempfile.NamedTemporaryFile(suffix='.hdf5', delete=False) as fd:
@@ -329,7 +337,7 @@ class NeuralNet():
         print("Evaluate elapse:", time.clock()-start)
 
         start = time.clock()
-        self.model.predict(x_test)
+        predictions = self.model.predict(x_test)
 
         print("Predict elapse:", time.clock()-start)
 
@@ -438,3 +446,55 @@ class NeuralNet():
 
 
 
+
+
+
+# from keras.models import model_from_json
+# from keras.models import Sequential
+# from keras.layers import Dense, Dropout, Flatten
+# from keras.layers import Conv2D, MaxPooling2D
+# from keras.models import model_from_json
+# from keras.utils import np_utils
+# from keras import optimizers
+# from keras import regularizers
+# from keras.optimizers import SGD
+# import keras
+#
+#
+# samples = 200
+# y = 28
+# x = 28
+# z = 3
+# num_classes = 225
+# x_train = np.random.random((samples, y, x, z))
+# y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+#
+#
+#
+# start = time.clock()
+#
+#
+# json_file = open(str(1) + ".json", "r")
+# loaded_model_json = json_file.read()
+# json_file.close()
+# model = model_from_json(loaded_model_json)
+# ## Load weights into new model
+# model.load_weights(str(1) + ".h5")
+# sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+# model.compile(loss='categorical_crossentropy', optimizer=sgd)
+#
+# # make_keras_picklable()
+# # pick_a = pickle.dumps(model)
+# #
+# # unpick_a = pickle.loads(pick_a)
+# # unpick_a.predict(x_train)
+#
+#
+#
+#
+# predictions = model.predict(x_train)
+#
+# ## Predictions 0.2, reading and predictions 0.7
+#
+# end = time.clock()
+# print(end-start)

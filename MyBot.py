@@ -15,11 +15,6 @@ import keras
 ## IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
 
 
-NN = NeuralNet()
-
-
-
-
 
 def set_delay(num):
     """
@@ -37,10 +32,6 @@ def model_handler(MP,turn):
     FROM THE MODEL QUEUES TO ENSURE ITS THE LATEST ONE
     """
     for id in MP.enemyIDs:
-        #logging.info("Calling model: {}".format(MP.get_model_queues(id)))  ## ERRORING WHY????
-        args = ("pred_" + str(id) + "_" + str(turn), id, 0.5)
-        MP.worker_predictor(id,args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
-
         samples = 200
         y = 28
         x = 28
@@ -49,10 +40,12 @@ def model_handler(MP,turn):
         x_train = np.random.random((samples, y, x, z))
         y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
 
-        #NN.train_model(x_train,y_train)
-
         args = ("train_" + str(id) + "_" + str(turn), id, x_train,y_train)
-        MP.worker_trainer(id, args)
+        #MP.add_training(id, args)
+
+        args = ("pred_" + str(id) + "_" + str(turn), id, x_train)
+        MP.add_predicting(id, args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
+        #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
 
     return turn + 1
 
@@ -61,7 +54,7 @@ if __name__ == "__main__":
 
     ## BY DEFAULT, KERAS MODEL ARE NOT SERIALIZABLE
     ## TO PLACE IN QUEUE, NEED TO BE PICKLED
-    make_keras_picklable()
+    make_keras_picklable()  ## NO LONGER USED?
 
     ## GAME START
     ## INITIALIZES LOG

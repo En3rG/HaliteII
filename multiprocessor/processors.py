@@ -11,14 +11,19 @@ import copy
 import pickle
 from keras.models import model_from_json
 from keras.optimizers import SGD
+import MyCommon
 
 class MyProcesses():
-    def __init__(self,game):
+    def __init__(self,game,disable_log, wait_time):
         ## FOR TESTING ONLY
         #log_myID(game.map)
         #log_numPlayers(game.map)
 
         #self.main_conn, self.sub_conn = Pipe()  ## Not used
+        self.wait_time = wait_time
+        self.disable_log = disable_log
+        MyCommon.disable_log(self.disable_log, logging)
+
         self.game_map = game.map
         self.myID = self.get_myID()
         self.enemyIDs = self.get_enemyID()
@@ -27,9 +32,12 @@ class MyProcesses():
         self.set_predictors()
         self.set_trainers()
         self.exit = False
+        self.predictions_queue = Queue()
         self.model_queues = self.init_model_queues()
 
+
         self.spawn_trainers()
+        self.spawn_predictors()
 
     def get_myID(self):
         """
@@ -179,7 +187,8 @@ class MyProcesses():
         SETTING QUEUE TO NONE/QUEUE() DOESNT WORK
         """
         if not self.model_queues[id].empty():
-            test = self.model_queues[id].get()
+            discard = self.model_queues[id].get()
+            discard = None
 
         #self.model_queues[id].put(model)
 
@@ -192,8 +201,12 @@ class MyProcesses():
         INITIALIZE PREDICTOR PROCESSES AS PLAYER IDs
         """
         for id in self.enemyIDs:
-            self.predictors[id] = None
+            #self.predictors[id] = None
             #self.predictors[id] = self.init_process()  ## HAVING JUST THIS IS MUCH SLOWER, WHY?
+
+            self.predictors[id] = {}
+            self.predictors[id]["handler"] = None
+            self.predictors[id]["args_queue"] = Queue()
 
             # self.predictors[id] = {}
             # self.predictors[id]["processor"] = self.init_process()
@@ -209,23 +222,15 @@ class MyProcesses():
             self.trainers[id]["thread"] = None ## self.init_thread() ## <-- errors! why??
             self.trainers[id]["args_queue"] = Queue()
 
-    def get_logger(self,name):
-        """
-        CREATE A LOGGER PER PROCESSOR
-        """
-        ## INITIALIZE LOGGING
-        fh = logging.FileHandler(name + '.log')
-        fmt = logging.Formatter("%(asctime)-6s: %(name)s - %(levelname)s - %(message)s)")
-        fh.setFormatter(fmt)
-        local_logger = logging.getLogger(name)
-        local_logger.setLevel(logging.DEBUG)
-        # local_logger = multiprocessing.get_logger()
-        local_logger.addHandler(fh)
-        local_logger.info(name + ' (worker) Process started')
 
-        return local_logger
 
     def add_predicting(self,id,arguments):
+
+
+        ## CHANGING TO ADDING TO QUEUE
+        self.predictors[id]["args_queue"].put(arguments)
+
+
         """
         START A PROCESS FOR PREDICTING
         PREDICTION SHOULD TAKE 1 SEC? SINCE WE STILL NEED TO PERFORM OUR ALGORITHM PER SHIP'S MOVEMENT
@@ -237,10 +242,10 @@ class MyProcesses():
         #     self.predictors[id].start()
 
         ## FOR MODEL.PREDICT NEED TO USE PROCESS??
-        if self.predictors[id] is None or self.predictors[id].is_alive() == False:
-            self.predictors[id] = Process(target=self.worker_predict_model, args=arguments)
-            self.predictors[id].start()
-            self.predictors[id].join()
+        # if self.predictors[id]['handler'] is None or self.predictors[id]['handler'].is_alive() == False:
+        #     self.predictors[id]['handler'] = Process(target=self.worker_predict_model, args=arguments)
+        #     self.predictors[id]['handler'].start()
+        #     self.predictors[id]['handler'].join()
 
 
         ## WHEN NOT CREATING PROCESS, DOESNT TIME OUT!!!! CREATING A PROCESS EVEN WITH ONLY 2 PLAYERS TIMES OUT
@@ -267,6 +272,18 @@ class MyProcesses():
         #     self.predictors[id]["processor"] = Process(target=self.test_delay, args=arguments)
         #     self.predictors[id]["processor"].start()
 
+    def spawn_predictors(self):
+        """
+        STARTS HANDLER PROCESSES PER ENEMY ID
+
+        BEFORE SPAWNING PREDICTORS, WAS ALWAYS SPAWNING PROCESSORS PER TURN PER ENEMY IDs, WHICH WAS TIMING OUT
+        THIS SEEMS TO BE A BETTER ARCHITECTURE
+        """
+        for id in self.enemyIDs:
+            arguments = (id,)
+            self.predictors[id]["handler"] = Process(target=self.predictor_handler, args=arguments)
+            self.predictors[id]["handler"].start()
+
     def spawn_trainers(self):
         """
         STARTS HANDLER PROCESSES PER ENEMY ID
@@ -277,6 +294,59 @@ class MyProcesses():
             self.trainers[id]["handler"] = Process(target=self.trainer_handler2, args=arguments)
             self.trainers[id]["handler"].start()
 
+    def predictor_handler(self, id):
+        """
+        HANDLES PREDICTIONS
+
+        IF TAKING MORE THAN XX, DO NOT PUT INTO QUEUE
+        """
+        logger = MyCommon.get_logger(str(id) + "_predictor_handler")
+        MyCommon.disable_log(self.disable_log,logging)
+        logger.debug("Handler for {}".format(str(id)))
+
+        ## USING THREADS
+        while self.exit == False:
+            if not self.predictors[id]["args_queue"].empty():
+                logger.debug("Popping from Queue")
+                arguments = self.predictors[id]["args_queue"].get()
+                name, id, x_train = arguments
+
+
+                try:
+                    start = time.clock()
+
+                    # model = self.get_model_queues(id, logger)
+                    # predictions = model.predict(x_train)
+                    # logger.debug("Predictions done")
+
+                    model = self.load_model(id, logger)
+                    logger.debug("Loaded model")
+                    predictions = model.predict(x_train)
+                    logger.debug("Predictions done")
+                    ## WHEN I WAS PASSING Q IN ARGUMENTS, IT SEEMS TO MESS UP THE OTHER QUEUES
+                    ## WORKS FINE WHEN IT WAS ADDED TO MP AS PREDICTIONS_QUEUE
+
+                    end = time.clock()
+                    logger.debug("Predictions took {}".format(end-start))
+
+                    if (end-start) > (self.wait_time - 0.05):
+                        logger.debug("Preditions took too long. Not placing to queue")
+                    else:
+                        self.predictions_queue.put((id, predictions))
+                        logger.debug("Preditions placed in q")
+
+                except:
+                    pass
+
+            else:
+                logger.debug("Waiting...")
+
+            time.sleep(0.05)
+
+
+        self.predictors[id]["handler"].terminate()
+
+
     def trainer_handler(self,id):
         """
         HANDLES THE PROCESS FOR TRAINING, PER ID
@@ -286,7 +356,8 @@ class MyProcesses():
         MODEL.FIT STILL NOT WORKING HERE. EVEN AFTER COMPILING AFTER UNPICKING
         """
 
-        logger = self.get_logger(str(id) + "trainer_handler")
+        logger = MyCommon.get_logger(str(id) + "_trainer_handler")
+        MyCommon.disable_log(self.disable_log,logging)
         logger.debug("Handler for {}".format(str(id)))
 
         ## USING THREADS
@@ -327,7 +398,7 @@ class MyProcesses():
         #         self.trainers[id]["processor"] = Process(target=self.test_delay, args=arguments)
         #         self.trainers[id]["processor"].start()
 
-            time.sleep(0.1)
+            time.sleep(0.05)
 
         #logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
@@ -356,7 +427,8 @@ class MyProcesses():
         model = self.init_save_models(id)
 
 
-        logger = self.get_logger(str(id) + "trainer_handler")
+        logger = MyCommon.get_logger(str(id) + "_trainer_handler")
+        MyCommon.disable_log(self.disable_log, logging)
         logger.debug("Handler for {}".format(str(id)))
 
         ## USING THREADS
@@ -378,10 +450,15 @@ class MyProcesses():
                 ## WORKS BUT GETTING UPDATED MAP FROM HLT ENGINE SLOWS DOWN AND TIMES OUT
                 name, id, x_train, y_train = arguments
                 logger.info("Got Model")
+                start = time.clock()
                 model.fit(x_train, y_train, batch_size=300, epochs=1,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                end = time.clock()
                 logger.info("Trained")
+                logger.info("Training took {}".format(end - start))
                 self.save_model(id, model)
-                logger.info("Time after training {}".format(time.clock()))
+                end = time.clock()
+                logger.info("Training and Saving model took {}".format(end - start))
+
 
             time.sleep(0.05)
 
@@ -406,27 +483,33 @@ class MyProcesses():
 
     def test_delay_predictor(self, name, id, num):
         ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
-        #logger = self.get_logger(name)
+        #logger = MyCommon.get_logger(name)
         #logger.info("At {} and sleeping at {}".format(name, time.clock()))
         time.sleep(num)
         #logger.info("Time after sleep {}".format(time.clock()))
 
     def worker_predict_model(self, name,id,x_train):
-        logger = self.get_logger(name)
+        logger = MyCommon.get_logger(name)
+        MyCommon.disable_log(self.disable_log, logging)
         try:
             # model = self.get_model_queues(id, logger)
             # predictions = model.predict(x_train)
             # logger.debug("Predictions done")
-
+            start = time.clock()
             model = self.load_model(id,logger)
             logger.debug("Loaded model")
             predictions = model.predict(x_train)
-            logger.debug("Predictions done")
+            end = time.clock()
+            logger.debug("Predictions done {}".format(end-start))
         except:
             pass
 
+
+
+
     def worker_train_model(self,name,id,x_train,y_train):
-        logger = self.get_logger(name)
+        logger = MyCommon.get_logger(name)
+        MyCommon.disable_log(self.disable_log, logging)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
 
         model = self.get_model_queues(id,logger)
@@ -446,7 +529,8 @@ class MyProcesses():
         logger.info("Time after training {}".format(time.clock()))
 
     def worker_train_model2(self, name, id, x_train, y_train,model):
-        logger = self.get_logger(name)
+        logger = MyCommon.get_logger(name)
+        MyCommon.disable_log(self.disable_log, logging)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
         logger.info("Got Model")
         logger.info("Done copying {}".format(type(model)))

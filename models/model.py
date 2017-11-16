@@ -447,54 +447,117 @@ class NeuralNet():
 
 
 
+from multiprocessing import Process, freeze_support
+from keras.models import model_from_json
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras.utils import np_utils
+from keras import optimizers
+from keras import regularizers
+from keras.optimizers import SGD
+import keras
+
+class NeuralNet():
+    def __init__(self):
+        self.y = 28
+        self.x = 28
+        self.z = 3
+        self.num_classes = 225
+        self.batch = 300
+        self.epoch = 1
+        self.model = self.neural_network_model(self.y,self.x,self.z,self.num_classes)
+
+    def neural_network_model(self,y,x,z,num_classes):
+        model = None
+        with graph.as_default():
+            model = Sequential()
+            model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
+            model.add(Conv2D(32, (3, 3), activation='relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            model.add(Dropout(0.25))
+            model.add(Conv2D(64, (3, 3), activation='relu'))
+            model.add(Conv2D(64, (3, 3), activation='relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
+            model.add(Dropout(0.25))
+            model.add(Flatten())
+            model.add(Dense(50, activation='relu'))
+            model.add(Dropout(0.5))
+            model.add(Dense(num_classes, activation='softmax'))
+            sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+        return model
+
+def save_model():
+    ## CREATE MODEL
+    NN = NeuralNet()
+    model_json = NN.model.to_json()
+    with open("test.json", "w") as json_file:
+        json_file.write(model_json)
+
+    ## Serialize weights to HDF5
+    NN.model.save_weights("test.h5")
+
+def get_data():
+    ## SAMPLE DATA
+    samples = 200
+    y = 28
+    x = 28
+    z = 3
+    num_classes = 225
+    x_train = np.random.random((samples, y, x, z))
+    y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+
+    return x_train, y_train
+
+def load_model():
+    json_file = open("test.json", "r")
+    loaded_model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(loaded_model_json)
+    ## Load weights into new model
+    model.load_weights("test.h5")
+    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+    return model
+
+def spawn_predictors(p,x_train):
+    for id in [1,2,3,4,5,6,7]:
+        arguments = (x_train,)
+        p[id] = Process(target=predictor_handler, args=arguments)
+        p[id].start()
+        p[id].join()
+
+def predictor_handler(x_train):
+    start = time.clock()
+
+    model = load_model()
+    print("Loaded model")
+    predictions = model.predict(x_train)
+    print("Predictions done")
+
+    end = time.clock()
+    print("Predictions took {}".format(end - start))
 
 
-# from keras.models import model_from_json
-# from keras.models import Sequential
-# from keras.layers import Dense, Dropout, Flatten
-# from keras.layers import Conv2D, MaxPooling2D
-# from keras.models import model_from_json
-# from keras.utils import np_utils
-# from keras import optimizers
-# from keras import regularizers
-# from keras.optimizers import SGD
-# import keras
-#
-#
-# samples = 200
-# y = 28
-# x = 28
-# z = 3
-# num_classes = 225
-# x_train = np.random.random((samples, y, x, z))
-# y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
-#
-#
-#
-# start = time.clock()
-#
-#
-# json_file = open(str(1) + ".json", "r")
-# loaded_model_json = json_file.read()
-# json_file.close()
-# model = model_from_json(loaded_model_json)
-# ## Load weights into new model
-# model.load_weights(str(1) + ".h5")
-# sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-# model.compile(loss='categorical_crossentropy', optimizer=sgd)
-#
-# # make_keras_picklable()
-# # pick_a = pickle.dumps(model)
-# #
-# # unpick_a = pickle.loads(pick_a)
-# # unpick_a.predict(x_train)
-#
-#
-#
-#
-# predictions = model.predict(x_train)
-#
-# ## Predictions 0.2, reading and predictions 0.7
-#
-# end = time.clock()
-# print(end-start)
+if __name__ == "__main__":
+    freeze_support()
+
+    save_model()
+    x_train, y_train = get_data()
+
+    start = time.clock()
+    model = load_model()
+    predictions = model.predict(x_train)
+    end = time.clock()
+    print("Predictions time (main process): ", end-start)
+
+    p = {}
+    start = time.clock()
+    spawn_predictors(p,x_train)
+    end = time.clock()
+    print("Predictions time (subprocess): ",end-start)
+
+

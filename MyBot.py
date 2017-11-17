@@ -26,6 +26,7 @@ def set_delay(end,start,max_delay):
     HELP MULTIPROCESSES COMPLETE ITS TASKS
 
     USE TIMEDELTA BASE ON DATETIME INSTEAD OF TIME.CLOCK() FOR BETTER ACCURACY
+    HALITE ENGINE SEEMS TO TIME OUT
     """
     used = timedelta.total_seconds(end-start)
     sleep_time = max_delay - used
@@ -36,6 +37,7 @@ def set_delay(end,start,max_delay):
 def wait_predictions_queue(Q,start,wait_time):
     """
     WAIT FOR ALL PREDICTIONS TO BE DONE
+    BY wait_time SPECIFIED
     """
     end = datetime.datetime.now()
     while timedelta.total_seconds(end - start) < wait_time:
@@ -45,7 +47,8 @@ def wait_predictions_queue(Q,start,wait_time):
 
 def get_predictions_queue(Q):
     """
-    GET PREDICTIONS FROM QUEUE
+    GET PREDICTIONS FROM QUEUE, PER ID
+    NEED TO DETERMINE SHIP IDs
     """
     q = {}
     logging.debug("At get_queue time: {}".format(datetime.datetime.now()))
@@ -61,9 +64,11 @@ def get_predictions_queue(Q):
 
 def clean_predicting_args(MP):
     """
-    SINCE PREDICTING CAN TAKE MORE TIME THAN WE WANT SOMETIMES
+    SINCE PREDICTING COULD TAKE MORE TIME THAN WE WANT SOMETIMES
     NEED TO MAKE SURE WE CLEAN PREDICTING ARGS QUEUE,
     SINCE IT'LL BE USELESS IF ITS NOT FROM THAT TURN
+
+    THIS MAY NOT RUN AS MUCH NOW, SINCE MODEL COMPLEXITY HAS BEEN REDUCED
     """
     for id in MP.enemyIDs:
         logging.debug("Cleaning args queue for id: {} at {}".format(id,datetime.datetime.now()))
@@ -82,11 +87,14 @@ def model_handler(MP, turn, wait_time):
     WHERE ITS TRAINING OLDER MODEL. NOW NO LONGER PASSING NN, GRAB NN
     FROM THE MODEL QUEUES TO ENSURE ITS THE LATEST ONE
 
+    RETURNS PREDICTIONS AS DICTIONARY, WITH KEY OF ENEMY IDs
     """
 
     start = datetime.datetime.now()
 
     for id in MP.enemyIDs:
+
+        ## THESE PARAMETERS ARE ONLY FOR TESTING PURPOSES, DELETE LATER
         samples = 200
         y = 28
         x = 28
@@ -104,11 +112,12 @@ def model_handler(MP, turn, wait_time):
         #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
 
 
+    ## GATHER/CLEANUP QUEUES
     wait_predictions_queue(MP.predictions_queue,start,wait_time)
-    q = get_predictions_queue(MP.predictions_queue)
+    predictions = get_predictions_queue(MP.predictions_queue)
     clean_predicting_args(MP)
 
-    return q, turn + 1
+    return predictions, turn + 1
 
 
 
@@ -117,7 +126,7 @@ if __name__ == "__main__":
 
     ## UPDATABLE PARAMETERS
     disable_log = False
-    max_delay = 1.905 ## TO MAXIMIZE TIME PER TURN
+    max_delay = 1.900 ## TO MAXIMIZE TIME PER TURN
     wait_time = 1.200 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
 
     ## BY DEFAULT, KERAS MODEL ARE NOT SERIALIZABLE
@@ -136,9 +145,9 @@ if __name__ == "__main__":
     MP = MyProcesses(game,disable_log,wait_time)
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
-    time.sleep(5)
+    time.sleep(3)
 
-    q = {}
+    predictions = {}
     turn = 0
     myMap_prev = None
     myMatrix_prev = None
@@ -175,7 +184,7 @@ if __name__ == "__main__":
             logging.info("4")
 
             ## FOR TRAINING/PREDICTING MODEL
-            q, turn = model_handler(MP,turn, wait_time)
+            predictions, turn = model_handler(MP,turn, wait_time)
 
             #logging.info("Q received: {}".format(len(q)))
 

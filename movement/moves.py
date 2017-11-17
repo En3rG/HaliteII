@@ -4,7 +4,7 @@ import hlt
 
 def starter_bot_moves(game_map,command_queue):
     """
-    MOVES FROM STARTER BOT
+    MOVES FROM STARTER BOT AS IS
     """
     ## FOR EVERY SHIP I CONTROL
     for ship in game_map.get_me().all_ships():

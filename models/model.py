@@ -24,33 +24,26 @@
 
 
 
-
-
-
-
 import numpy as np
 import logging
 import time
 import copy
-
 import tensorflow as tf
 import pickle
 from threading import Thread
-
-graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
-
-
-
-
 import types
 import tempfile
 import keras.models
+
+
+graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
+
 
 def make_keras_picklable():
     """
     THIS FUNCTION IS REQUIRED TO PICKLE KERAS MODEL
 
-    NO LONGER USED?
+    NO LONGER USED.
     """
     def __getstate__(self):
         model_str = ""
@@ -71,8 +64,6 @@ def make_keras_picklable():
     cls = keras.models.Model
     cls.__getstate__ = __getstate__
     cls.__setstate__ = __setstate__
-
-
 
 
 
@@ -186,7 +177,6 @@ class NeuralNet():
 
         28x28 TIMES OUT WITH 4 PLAYERS
         """
-        #self.model = [0]
         self.y = 28 ## 42, 28
         self.x = 28 ## 42, 28
         self.z = 3 ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS (CAN BE TAKEN INTO ACCOUNT IN UNITS)

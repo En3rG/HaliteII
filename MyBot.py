@@ -168,27 +168,16 @@ if __name__ == "__main__":
 
             logging.info("update_map time: {}".format(datetime.datetime.now()-start))
 
-
-            logging.info("2")
-
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map)
-
-            logging.info("3")
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
             myMatrix = MyMatrix(game_map,myMap_prev)
 
-            logging.info("4")
-
             ## FOR TRAINING/PREDICTING MODEL
             predictions, turn = model_handler(MP,turn, wait_time)
-
-            #logging.info("Q received: {}".format(len(q)))
-
-            logging.info("5")
 
             ## FOR TESTING ONLY
             #log_planets(game_map)
@@ -197,36 +186,26 @@ if __name__ == "__main__":
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
 
-            logging.info("6")
-
             ## CURRENTLY FROM STARTER BOT MOVES
             moves.starter_bot_moves(game_map,command_queue)
 
-            logging.info("7")
-
-
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
-
 
             ## SAVE OLD DATA FOR NEXT TURN
             ## WHEN USING DEEPCOPY SEEMS TO TIME OUT AFTER 7 TURNS
             myMap_prev = myMap
             myMatrix_prev = myMatrix
 
-            logging.info("8")
-
             ## SET A DELAY PER TURN
             end = datetime.datetime.now()
             set_delay(end,start,max_delay)
 
-            logging.info("9")
             logging.info("about to send commands {}".format(datetime.datetime.now()))
 
             ## SEND OUR COMMANDS TO HALITE ENGINE THIS TURN
             game.send_command_queue(command_queue)
             ## TURN END
 
-            logging.info("10")
             logging.info("Commands send at {}".format(datetime.datetime.now()))
 
 

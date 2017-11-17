@@ -20,11 +20,13 @@ class MyProcesses():
         #log_numPlayers(game.map)
 
         #self.main_conn, self.sub_conn = Pipe()  ## Not used
-        self.wait_time = wait_time
+
+        ## DISABLE LOG IF TRUE
         self.disable_log = disable_log
         MyCommon.disable_log(self.disable_log, logging)
 
         self.game_map = game.map
+        self.wait_time = wait_time
         self.myID = self.get_myID()
         self.enemyIDs = self.get_enemyID()
         self.predictors = {}
@@ -35,20 +37,19 @@ class MyProcesses():
         self.predictions_queue = Queue()
         self.model_queues = self.init_model_queues()
 
-
         self.spawn_trainers()
         self.spawn_predictors()
 
     def get_myID(self):
         """
         GET MY ID
-        FROM THE ENGINE, PLAYER IDs ARE INTs
+        FROM THE ENGINE, PLAYER IDs ARE INTEGER
         """
         return self.game_map.my_id
 
     def get_enemyID(self):
         """
-        GET IDs OF THE ENEMY PLAYERS, AS STRINGS
+        GET IDs OF THE ENEMY PLAYERS, AS INTEGERS
         """
         IDs = []
 
@@ -62,7 +63,8 @@ class MyProcesses():
     def init_process(self):
         """
         INITIALIZE A PROCESS AND TERMINATE.
-        IS THIS NECESSARY? SHOULD WE JUST INITIALIZE TO None?
+        IS THIS NECESSARY?
+        CURRENTLY NOT USED, JUST INITIALIZING TO None
         """
         p = Process()
         p.start()
@@ -72,7 +74,7 @@ class MyProcesses():
     def init_thread(self):
         """
         INITIALIZE A THREAD
-        NOT USED.  THREADS ARE CURRENTLY INITIALIZED TO NONE
+        NOT USED.  THREADS ARE CURRENTLY INITIALIZED TO None
         """
         thread = Thread()
         thread.start()
@@ -82,6 +84,8 @@ class MyProcesses():
         """
         INITIALIZE QUEUES FOR COMMUNICATING WITH THE MAIN PROCESS.
         ONE PER ENEMY ID
+
+        NO LONGER USED.  SAVING MODEL AS A FILE
         """
         q = {}
         for id in self.enemyIDs:
@@ -94,7 +98,6 @@ class MyProcesses():
             ## PROBLEM IS KERAS OBJECT CANNOT BE SERIALIZED OUT OF THE BAT??
             ## http://zachmoshe.com/2017/04/03/pickling-keras-models.html
 
-
             #q[id].put(NN.model)
             NN_model_pickled = pickle.dumps(NN.model)
             q[id].put(NN_model_pickled)
@@ -103,27 +106,17 @@ class MyProcesses():
 
         return q
 
-    def init_save_models(self,id):
+    def init_save_model(self,id):
         """
         SAVE MODELS/WEIGHTS TO FILE
+        PER ENEMY ID SPECIFIED
         """
-        # for id in self.enemyIDs:
-        #     NN = NeuralNet()
-        #     logging.info("NN: {}".format(NN.model))
-        #     model_json = NN.model.to_json()
-        #     with open(str(id) + ".json", "w") as json_file:
-        #         json_file.write(model_json)
-        #
-        #     ## Serialize weights to HDF5
-        #     NN.model.save_weights(str(id) + ".h5")
-
-
         NN = NeuralNet()
         model_json = NN.model.to_json()
         with open(str(id) + ".json", "w") as json_file:
             json_file.write(model_json)
 
-        ## Serialize weights to HDF5
+        ## SERIALIZE WEIGHTS TO HDF5
         NN.model.save_weights(str(id) + ".h5")
 
         return NN.model
@@ -131,17 +124,18 @@ class MyProcesses():
     def save_model(self,id,model):
         """
         SAVE MODELS/WEIGHTS TO FILE
+        USED AFTER TRAINING A MODEL
         """
         model_json = model.to_json()
         with open(str(id) + ".json", "w") as json_file:
             json_file.write(model_json)
 
-        ## Serialize weights to HDF5
+        ## SERIALIZE WEIGHTS TO HDF5
         model.save_weights(str(id) + ".h5")
 
     def load_model(self, id,logger):
         """
-        LOAD MODELS/WEIGHTS TO FILE
+        LOAD MODELS/WEIGHTS FROME FILE
 
         THIS TAKES ABOUT 0.4 SECS.  ALMOST SAME AS UNPICKLING A PICKLED MODEL
         """
@@ -153,7 +147,8 @@ class MyProcesses():
         logger.debug("Json file closed")
         model = model_from_json(loaded_model_json)
         logger.debug("Model loaded")
-        ## Load weights into new model
+
+        ## LOAD WEIGHTS INTO MODEL
         model.load_weights(str(id) + ".h5")
         logger.debug("Loaded weights")
         sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
@@ -166,6 +161,8 @@ class MyProcesses():
         """
         RETURN THE MODEL IN THE QUEUE
         MAKES A COPY JUST IN CASE ITS THE LAST ITEM IN THE QUEUE
+
+        NO LONGER USED.
         """
         if self.model_queues[id].empty():
             model = None
@@ -185,6 +182,8 @@ class MyProcesses():
         RESETS THE QUEUE WITH THE MODEL
         FIRST REMOVE ALL ITEMS IN THE QUEUE
         SETTING QUEUE TO NONE/QUEUE() DOESNT WORK
+
+        NO LONGER USED.
         """
         if not self.model_queues[id].empty():
             discard = self.model_queues[id].get()
@@ -201,15 +200,9 @@ class MyProcesses():
         INITIALIZE PREDICTOR PROCESSES AS PLAYER IDs
         """
         for id in self.enemyIDs:
-            #self.predictors[id] = None
-            #self.predictors[id] = self.init_process()  ## HAVING JUST THIS IS MUCH SLOWER, WHY?
-
             self.predictors[id] = {}
             self.predictors[id]["handler"] = None
             self.predictors[id]["args_queue"] = Queue()
-
-            # self.predictors[id] = {}
-            # self.predictors[id]["processor"] = self.init_process()
 
     def set_trainers(self):
         """
@@ -225,52 +218,12 @@ class MyProcesses():
 
 
     def add_predicting(self,id,arguments):
-
+        """
+        ADD ARGUMENTS TO QUEUE FOR PREDICTING
+        """
 
         ## CHANGING TO ADDING TO QUEUE
         self.predictors[id]["args_queue"].put(arguments)
-
-
-        """
-        START A PROCESS FOR PREDICTING
-        PREDICTION SHOULD TAKE 1 SEC? SINCE WE STILL NEED TO PERFORM OUR ALGORITHM PER SHIP'S MOVEMENT
-        """
-        ## Making it a thread makes it pass the keras/mutiprocess issue.  Actually this fails keras when threads
-        # if self.predictors[id] is None or self.predictors[id].isAlive() == False:
-        #     #self.predictors[id] = Thread(target=self.test_delay_predictor, args=arguments)
-        #     self.predictors[id] = Thread(target=self.worker_predict_model, args=arguments)
-        #     self.predictors[id].start()
-
-        ## FOR MODEL.PREDICT NEED TO USE PROCESS??
-        # if self.predictors[id]['handler'] is None or self.predictors[id]['handler'].is_alive() == False:
-        #     self.predictors[id]['handler'] = Process(target=self.worker_predict_model, args=arguments)
-        #     self.predictors[id]['handler'].start()
-        #     self.predictors[id]['handler'].join()
-
-
-        ## WHEN NOT CREATING PROCESS, DOESNT TIME OUT!!!! CREATING A PROCESS EVEN WITH ONLY 2 PLAYERS TIMES OUT
-        # name, id, x_train = arguments
-        # logging.debug("Trying..")
-        # try:
-        #     # model = self.get_model_queues(id, logger)
-        #     # predictions = model.predict(x_train)
-        #     # logger.debug("Predictions done")
-        #
-        #     model = self.load_model(id, logging)
-        #     logging.debug("Loaded model")
-        #     predictions = model.predict(x_train)
-        #     logging.debug("Predictions done")
-        # except:
-        #     pass
-
-
-        # if self.predictors[id] is None or self.predictors[id].is_alive() == False:
-        #     self.predictors[id] = Process(target=self.test_delay, args=arguments)
-        #     self.predictors[id].start()
-
-        # if self.predictors[id]["processor"].is_alive() == False:
-        #     self.predictors[id]["processor"] = Process(target=self.test_delay, args=arguments)
-        #     self.predictors[id]["processor"].start()
 
     def spawn_predictors(self):
         """
@@ -311,14 +264,15 @@ class MyProcesses():
                 arguments = self.predictors[id]["args_queue"].get()
                 name, id, x_train = arguments
 
-
                 try:
                     start = time.clock()
 
+                    ## USING MODELS IN QUEUES
                     # model = self.get_model_queues(id, logger)
                     # predictions = model.predict(x_train)
                     # logger.debug("Predictions done")
 
+                    ## LOADING MODEL FROM FILE
                     model = self.load_model(id, logger)
                     logger.debug("Loaded model")
                     predictions = model.predict(x_train)
@@ -343,7 +297,7 @@ class MyProcesses():
 
             time.sleep(0.05)
 
-
+        ## TERMINATE PROCESS
         self.predictors[id]["handler"].terminate()
 
 
@@ -354,6 +308,8 @@ class MyProcesses():
         AVOID HAVING THE TRAINING TAKE MORE THAN 2 SECS THOUGH
 
         MODEL.FIT STILL NOT WORKING HERE. EVEN AFTER COMPILING AFTER UNPICKING
+
+        NO LONGER USED.
         """
 
         logger = MyCommon.get_logger(str(id) + "_trainer_handler")
@@ -424,14 +380,12 @@ class MyProcesses():
         import keras
 
         ## UPDATED SO MODEL WILL NEVER BE READ ON THIS THREAD
-        model = self.init_save_models(id)
-
+        model = self.init_save_model(id)
 
         logger = MyCommon.get_logger(str(id) + "_trainer_handler")
         MyCommon.disable_log(self.disable_log, logging)
         logger.debug("Handler for {}".format(str(id)))
 
-        ## USING THREADS
         while self.exit == False:
             logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
 
@@ -462,7 +416,7 @@ class MyProcesses():
 
             time.sleep(0.05)
 
-        # logger.debug("Kiling")
+        ## TERMINATE PROCESSES
         self.trainers[id]["processor"].terminate()
         self.trainers[id]["handler"].terminate()
 
@@ -471,24 +425,11 @@ class MyProcesses():
         POPULATES THE QUEUE FROM THE MAIN PROCESS
         """
         self.trainers[id]["args_queue"].put(arguments)
-        #self.trainers[id]["args_queue"].append(arguments)
-
-        # ## WHY IS THIS MUCH FASTER THAN WORKER_PREDICTOR??
-        # if self.trainers[id]["processor"].is_alive() == False:
-        #     self.trainers[id]["processor"] = Process(target=self.test_delay, args=arguments)
-        #     self.trainers[id]["processor"].start()
-        #     #self.trainers[id]["processor"].join()  ## If you join it'll timeout
-        # else:
-        #     self.trainers[id]["args_queue"].append(arguments)
-
-    def test_delay_predictor(self, name, id, num):
-        ## WHEN GENERATING LOGS, TIMES OUT EVEN AT 0.5 PER PLAYER?
-        #logger = MyCommon.get_logger(name)
-        #logger.info("At {} and sleeping at {}".format(name, time.clock()))
-        time.sleep(num)
-        #logger.info("Time after sleep {}".format(time.clock()))
 
     def worker_predict_model(self, name,id,x_train):
+        """
+        PREDICT MODEL ROM FILE
+        """
         logger = MyCommon.get_logger(name)
         MyCommon.disable_log(self.disable_log, logging)
         try:
@@ -505,30 +446,28 @@ class MyProcesses():
             pass
 
 
-
-
     def worker_train_model(self,name,id,x_train,y_train):
+        """
+        TRAIN MODEL TO QUEUE
+
+        NO LONGER USED.
+        """
         logger = MyCommon.get_logger(name)
         MyCommon.disable_log(self.disable_log, logging)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
-
         model = self.get_model_queues(id,logger)
-
         logger.info("Got Model")
-
         model = copy.deepcopy(model)
-
         logger.info("Done copying {}".format(type(model)))
-
         model.fit(x_train, y_train, batch_size=200, epochs=1, verbose=0)    ## ERROR IS HERE. WHY? Sequential object has no attribute model
         logger.info("Trained")
         self.set_model_queues(id, model)
-        #self.set_model_queues(id, model.train_model(x_train,y_train))
-        #self.set_model_queues(id, [model[0]+1])
-
         logger.info("Time after training {}".format(time.clock()))
 
     def worker_train_model2(self, name, id, x_train, y_train,model):
+        """
+        TRAIN MODEL TO FILE
+        """
         logger = MyCommon.get_logger(name)
         MyCommon.disable_log(self.disable_log, logging)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))

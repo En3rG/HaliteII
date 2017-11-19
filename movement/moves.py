@@ -9,7 +9,7 @@ def starter_bot_moves(game_map,command_queue):
     ## FOR EVERY SHIP I CONTROL
     for ship in game_map.get_me().all_ships():
 
-        log_myShip(ship)
+        #log_myShip(ship)
 
         ## IF SHIP IS DOCKED
         if ship.docking_status != ship.DockingStatus.UNDOCKED:

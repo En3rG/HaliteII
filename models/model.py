@@ -85,10 +85,26 @@ class MyMap():
     CONVERT GAME_MAP TO DICTIONARY
     ACCESS WITH PLAYER IDs AND SHIP IDs
     """
+    MAX_NODES = 3
+    NUM_NODES = 0
+
     def __init__(self,game_map, myMap_prev):
         self.game_map = game_map
         self.myMap_prev = myMap_prev
         self.data = self.get_data()
+
+        ## KEEP A LIMIT OF NODES IN MEMORY
+        self.check_limit()
+
+    def check_limit(self):
+        """
+        DELETE NODES THAT ARE OVER THE MAX LIMIT
+        """
+        MyMap.NUM_NODES += 1
+        if MyMap.NUM_NODES > MyMap.MAX_NODES:
+            ## DELETE OLD NODES
+            self.myMap_prev.myMap_prev.myMap_prev = None
+            MyMap.NUM_NODES -= 1
 
     def get_data(self):
         """
@@ -113,12 +129,28 @@ class MyMap():
         return data
 
 class MyMatrix():
+    MAX_NODES = 3
+    NUM_NODES =0
+
     def __init__(self, game_map, myMatrix_prev,input_matrix_y,input_matrix_x):
         self.game_map = game_map
         self.matrix_prev = myMatrix_prev
         self.input_matrix_y = input_matrix_y
         self.input_matrix_x = input_matrix_x
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
+
+        ## KEEP A LIMIT OF NODES IN MEMORY
+        self.check_limit()
+
+    def check_limit(self):
+        """
+        DELETE NODES THAT ARE OVER THE MAX LIMIT
+        """
+        MyMatrix.NUM_NODES += 1
+        if MyMatrix.NUM_NODES > MyMatrix.MAX_NODES:
+            ## DELETE OLD NODES
+            self.matrix_prev.matrix_prev.matrix_prev = None
+            MyMatrix.NUM_NODES -= 1
 
     def get_matrix(self):
         """
@@ -342,82 +374,55 @@ class NeuralNet():
             for ship_id, ship_data in myMap.myMap_prev.data[player_id].items():
                 ## ship_data HAS x, y, health, dock_status
 
-                logging.info("1")
-
                 ## PREVIOUS SHIP POSITION
                 prev_x = round(ship_data['x'])
                 prev_y = round(ship_data['y'])
 
-                logging.info("2")
-
                 ## MATRICES BASED ON PREVIOUS MATRIX
                 matrix, matrix_hp = myMatrix.matrix_prev.matrix[player_id]
-
-                logging.info("3")
 
                 ## GET MATRIX, WITH SHIP IN THE MIDDLE
                 ## +1 TO INCLUDE VALUE AT half_y
                 half_y = math.floor(myMatrix.input_matrix_y / 2)
                 half_x = math.floor(myMatrix.input_matrix_x / 2)
 
-                logging.info("4")
-
                 ## HERE CURRENT MATRIX IS REALLY PREVIOUS MATRIX
                 matrix_current = matrix[prev_y - half_y:prev_y + half_y + 1, \
                                         prev_x - half_x:prev_x + half_x + 1]
 
-                logging.info("5")
-
                 ## CHECK IF ENEMY WAS FOUND IN SIGHT
                 if Matrix_val.ENEMY_SHIP.value in matrix_current:
-
-                    logging.info("6")
 
                     ## GET MATRIX HP
                     ## +1 TO INCLUDE VALUE AT half_y
                     matrix_hp_current = matrix_hp[prev_y - half_y:prev_y + half_y + 1, \
                                                   prev_x - half_x:prev_x + half_x + 1]
 
-                    logging.info("7")
-
                     ## CHECK IF SHIP EXIST BEFORE
                     ## PREVIOUS PREVIOUS LOCATION
                     ship_prev = myMap.myMap_prev.myMap_prev.data[player_id].get(ship_id)
 
-                    logging.info("8")
-
                     matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
                     if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY
-
-                        logging.info("9")
 
                         ## GET PREVIOUS LOCATION OF THIS SHIP
                         prev_prev_x = ship_prev.get('x')
                         prev_prev_y = ship_prev.get('y')
 
-                        logging.info("10")
-
                         prev_prev_y = round(prev_prev_y)
                         prev_prev_x = round(prev_prev_x)
 
-                        logging.info("11")
-
                         row = half_y + (prev_prev_y - prev_y)
                         col = half_x + (prev_prev_x - prev_x)
-
-                        logging.info("12")
 
                         ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
                         matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
 
 
-                        logging.info("13")
-
                     ## GET 3D ARRAY FOR TRAINING
                     x_train_data_current = NeuralNet.get_3D([matrix_current, matrix_hp_current, matrix_prev_loc])
                     x_train_data.append(x_train_data_current)
 
-                    logging.info("14")
 
                     ## NEED TO GET y_train FOR THIS SHIP
                     y_train_current = np.zeros((15, 15), dtype=np.float)
@@ -432,7 +437,7 @@ class NeuralNet():
                         row = 7 + (now_y - prev_y)
                         col = 7 + (now_x - prev_x)
 
-                        logging.info("testing!!1")
+                        logging.info("testing!!1 with player id: {}".format(player_id))
                         logging.info("Current position x: {} y {}".format(now_x,now_y))
                         logging.info("Prev position x: {} y {}".format(prev_x, prev_y))
                         logging.info("position x: {} y {}".format(col, row))
@@ -442,13 +447,11 @@ class NeuralNet():
                     y_train_current = np.ndarray.flatten(y_train_current)
                     y_train_data.append(y_train_current)
 
-                    logging.info("15")
-
             ## GET 4D ARRAY FOR TRAINING
             x_train = NeuralNet.get_4D(x_train_data)
             y_train = NeuralNet.get_2D(y_train_data)
 
-            logging.info("16")
+
 
         ## TESTING ONLY
         # samples = 200
@@ -458,6 +461,7 @@ class NeuralNet():
         # num_classes = 225
         # x_train = np.random.random((samples, y, x, z))
         # y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+
 
         return x_train, y_train
 
@@ -533,10 +537,6 @@ class NeuralNet():
         # x_test = np.random.random((samples, y, x, z))
         # ship_ids = []  ## WILL CONTAIN SHIP IDS OF BEING PREDICTED
 
-        # a1 = np.random.random((3,3))
-        # b1 = np.random.random((3,3))
-        # c1 = ModelData.get_3D([a1,b1])
-
         return x_test, ship_ids
 
     @staticmethod
@@ -570,6 +570,25 @@ class NeuralNet():
             return None
         else:
             return np.stack(array_3d)
+
+    @staticmethod
+    def translate_predictions(predictions):
+        for player_id, dict in predictions.items():
+
+            ## LOOPING WILL BE VERY SLOW, USE MAP!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            ship_ids, data = dict
+
+            for id, pred in zip(ship_ids,data):
+
+                ## NO NEED TO RESHAPE. CAN JUST GET ARGMAX AND HAVE A DICTIONARY TO GET VALUES FASTER
+                # ncols = 15
+                # new = np.reshape(pred, (-1, ncols))  ## -1 TO AUTOMATICALLY CALCULATE #ROWS PER ncols GIVEN
+
+                logging.info("Test!1 argmax: {} max: {}".format(np.argmax(pred),max(pred)))
+
+                Predict.COORDS[1]
+
 
     def testing_time(self):
         """
@@ -642,12 +661,10 @@ class NeuralNet():
         print(new)
 
 
-
-class ModelData():
-    """
-    WILL CONTAIN FUNCTIONS REGARDING INPUT DATA TO THE NN MODEL
-    """
-    test = None
+class Predict():
+    COORDS = {0:(0,0),
+              1:(0,0),
+              3:(0,0),}
 
 
 
@@ -853,9 +870,6 @@ class ModelData():
 #     spawn_predictors(p,x_train)
 #     end = time.clock()
 #     print("Predictions time (subprocess): ",end-start)
-
-
-
 
 
 

@@ -17,7 +17,9 @@ from datetime import timedelta
 import os
 import signal
 
+
 ## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
+
 
 
 def set_delay(end,start):
@@ -55,12 +57,26 @@ def get_predictions_queue(Q):
     """
     q = {}
     logging.debug("At get_queue time: {}".format(datetime.datetime.now()))
-    if Q.empty():
-        logging.debug("Q is empty")
-    else:
-        while not Q.empty():
-            id, ship_ids, data = Q.get()
-            q[id] = (ship_ids,data)
+
+    # if Q.empty():
+    #     logging.debug("Q is empty")
+    # else:
+    #     while not Q.empty():
+    #         id, ship_ids, data = Q.get()
+    #         q[id] = (ship_ids,data)
+
+    ## SINCE Q.empty() MAY NOT BE ACCURATE AND CAUSES .get() TO LOCK UP
+    ## WE'LL USE TIMEOUT INSTEAD
+    while True:
+        try:
+            item = Q.get(timeout=GET_TIMEOUT)
+            if item:
+                id, ship_ids, data = item
+                q[id] = (ship_ids,data)
+            else:
+                break
+        except:
+            break
 
     logging.debug("Length of Q: {}".format(len(q)))
     return q
@@ -75,11 +91,25 @@ def clean_predicting_args(MP):
     """
     for id in MP.enemyIDs:
         logging.debug("Cleaning args queue for id: {} at {}".format(id,datetime.datetime.now()))
-        while not MP.predictors[id]["args_queue"].empty():
-            logging.debug("Not empty")
-            discard = MP.predictors[id]["args_queue"].get()  ## False FOR NO WAIT (SEEMS TO TAKE MORE MEMORY WHEN FALSE)
-            discard = None
-            logging.debug("Cleaned at {}".format(datetime.datetime.now()))
+
+        # while not MP.predictors[id]["args_queue"].empty():
+        #     logging.debug("Not empty")
+        #     garbage = MP.predictors[id]["args_queue"].get()  ## False FOR NO WAIT (SEEMS TO TAKE MORE MEMORY WHEN FALSE)
+        #     garbage = None
+        #     logging.debug("Cleaned at {}".format(datetime.datetime.now()))
+
+        ## SINCE Q.empty() MAY NOT BE ACCURATE AND CAUSES .get() TO LOCK UP
+        ## WE'LL USE TIMEOUT INSTEAD
+        while True:
+            try:
+                garbage = MP.predictors[id]["args_queue"].get(timeout=GET_TIMEOUT)
+                if garbage:
+                    garbage = None
+                    logging.debug("Cleaned at {}".format(datetime.datetime.now()))
+                else:
+                    break
+            except:
+                break
 
     logging.debug("Done cleaning: {}".format(datetime.datetime.now()))
 
@@ -126,9 +156,10 @@ if __name__ == "__main__":
     freeze_support()
 
     ## UPDATABLE PARAMETERS
-    disable_log = True
+    disable_log = False
     MAX_DELAY = 1.900 ## TO MAXIMIZE TIME PER TURN
     WAIT_TIME = 1.200 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.05 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
     input_matrix_z = 3
@@ -186,6 +217,9 @@ if __name__ == "__main__":
 
             ## FOR TRAINING/PREDICTING MODEL
             predictions, turn = model_handler(MP,turn, myMap, myMatrix)
+
+            ## TRANSLATE PREDICTIONS
+            NeuralNet.translate_predictions(predictions)
 
             logging.info("model_handler completed")
 

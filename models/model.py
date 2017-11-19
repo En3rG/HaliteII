@@ -527,9 +527,34 @@ class NeuralNet():
                 train_data_current = NeuralNet.get_3D([matrix_current,matrix_hp_current,matrix_prev_loc])
                 train_data.append(train_data_current)
 
+                ## ADD ROTATED VERSIONS OF THE ARRAY, TO INCREASE TRAINING DATA
+                ## ROTATE 90 COUNTER CLOCKWISE
+                matrix_current_1 = np.rot90(matrix_current)
+                matrix_hp_current_1 = np.rot90(matrix_hp_current)
+                matrix_prev_loc_1 = np.rot90(matrix_prev_loc)
+
+                ## ROTATE 180 COUNTER CLOCKWISE
+                matrix_current_2 = np.rot90(matrix_current, 2)
+                matrix_hp_current_2 = np.rot90(matrix_hp_current, 2)
+                matrix_prev_loc_2 = np.rot90(matrix_prev_loc, 2)
+
+                ## ROTATE 90 CLOCKWISE
+                matrix_current_3 = np.flipud(matrix_current)
+                matrix_hp_current_3 = np.flipud(matrix_hp_current)
+                matrix_prev_loc_3 = np.flipud(matrix_prev_loc)
+
+                ## GET 3D ARRAY FOR TRAINING FOR ROTATED MATRIXES
+                train_data_current = NeuralNet.get_3D([matrix_current_1, matrix_hp_current_1, matrix_prev_loc_1])
+                train_data.append(train_data_current)
+
+                train_data_current = NeuralNet.get_3D([matrix_current_2, matrix_hp_current_2, matrix_prev_loc_2])
+                train_data.append(train_data_current)
+
+                train_data_current = NeuralNet.get_3D([matrix_current_3, matrix_hp_current_3, matrix_prev_loc_3])
+                train_data.append(train_data_current)
+
         ## GET 4D ARRAY FOR TRAINING
         x_test = NeuralNet.get_4D(train_data)
-
 
         # ## TESTING ONLY
         # samples = 200
@@ -958,6 +983,8 @@ class Predicted():
 #     spawn_predictors(p,x_train)
 #     end = time.clock()
 #     print("Predictions time (subprocess): ",end-start)
+
+
 
 
 

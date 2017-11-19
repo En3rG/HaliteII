@@ -24,6 +24,7 @@ def log_planets(game_map):
         logging.debug("docked_ship_ids: {}".format(planet._docked_ship_ids))
         logging.debug("Health: {}".format(planet.health))
         logging.debug("Radius: {}".format(planet.radius))
+        logging.debug("Owner: {}".format(planet.owner))
         logging.debug("Owned: {}".format(planet.is_owned()))
 
     logging.debug(" ")

@@ -14,7 +14,7 @@ from keras.optimizers import SGD
 import MyCommon
 
 class MyProcesses():
-    def __init__(self,game,disable_log, wait_time):
+    def __init__(self,game,disable_log, wait_time, y, x, z):
         ## FOR TESTING ONLY
         #log_myID(game.map)
         #log_numPlayers(game.map)
@@ -25,6 +25,9 @@ class MyProcesses():
         self.disable_log = disable_log
         MyCommon.disable_log(self.disable_log, logging)
 
+        self.y = y
+        self.x = x
+        self.z = z
         self.game_map = game.map
         self.wait_time = wait_time
         self.myID = self.get_myID()
@@ -92,7 +95,7 @@ class MyProcesses():
             q[id] = Queue()
 
             ## INITIALIZE MODELS
-            NN = NeuralNet()
+            NN = NeuralNet(self.y,self.x,self.z)
             logging.info("NN: {}".format(NN.model))
 
             ## PROBLEM IS KERAS OBJECT CANNOT BE SERIALIZED OUT OF THE BAT??
@@ -111,7 +114,7 @@ class MyProcesses():
         SAVE MODELS/WEIGHTS TO FILE
         PER ENEMY ID SPECIFIED
         """
-        NN = NeuralNet()
+        NN = NeuralNet(self.y,self.x,self.z)
         model_json = NN.model.to_json()
         with open(str(id) + ".json", "w") as json_file:
             json_file.write(model_json)
@@ -151,7 +154,8 @@ class MyProcesses():
         ## LOAD WEIGHTS INTO MODEL
         model.load_weights(str(id) + ".h5")
         logger.debug("Loaded weights")
-        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        sgd = NeuralNet.get_sgd()
         model.compile(loss='categorical_crossentropy', optimizer=sgd)
         logger.debug("Compiled model")
 
@@ -262,7 +266,7 @@ class MyProcesses():
             if not self.predictors[id]["args_queue"].empty():
                 logger.debug("Popping from Queue")
                 arguments = self.predictors[id]["args_queue"].get()
-                name, id, x_train = arguments
+                name, id, x_train, ship_ids = arguments
 
                 try:
                     start = time.clock()
@@ -286,7 +290,7 @@ class MyProcesses():
                     if (end-start) > (self.wait_time - 0.05):
                         logger.debug("Preditions took too long. Not placing to queue")
                     else:
-                        self.predictions_queue.put((id, predictions))
+                        self.predictions_queue.put((id, ship_ids, predictions))
                         logger.debug("Preditions placed in q")
 
                 except:

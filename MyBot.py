@@ -20,7 +20,7 @@ import signal
 ## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
 
 
-def set_delay(end,start,max_delay):
+def set_delay(end,start):
     """
     DELAY TO MAXIMIZE 2 SECONDS PER TURN
     HELP MULTIPROCESSES COMPLETE ITS TASKS
@@ -29,26 +29,29 @@ def set_delay(end,start,max_delay):
     HALITE ENGINE SEEMS TO TIME OUT
     """
     used = timedelta.total_seconds(end-start)
-    sleep_time = max_delay - used
+    sleep_time = MAX_DELAY - used
     logging.debug("Setting Delay for: {}".format(sleep_time))
     if sleep_time > 0:
         time.sleep(sleep_time)
 
-def wait_predictions_queue(Q,start,wait_time):
+def wait_predictions_queue(Q,start):
     """
     WAIT FOR ALL PREDICTIONS TO BE DONE
-    BY wait_time SPECIFIED
+    BY WAIT_TIME SPECIFIED
     """
     end = datetime.datetime.now()
-    while timedelta.total_seconds(end - start) < wait_time:
+    while timedelta.total_seconds(end - start) < WAIT_TIME:
         if Q.qsize() >= 3:
             break
         end = datetime.datetime.now()
 
+    logging.info("Done waiting for predictions queue")
+
 def get_predictions_queue(Q):
     """
     GET PREDICTIONS FROM QUEUE, PER ID
-    NEED TO DETERMINE SHIP IDs
+    WILL RETURN A DICTIONARY PER ID
+    CONTAINING SHIP_IDS, AND PREDICTIONS
     """
     q = {}
     logging.debug("At get_queue time: {}".format(datetime.datetime.now()))
@@ -56,8 +59,8 @@ def get_predictions_queue(Q):
         logging.debug("Q is empty")
     else:
         while not Q.empty():
-            id, data = Q.get()
-            q[id] = data
+            id, ship_ids, data = Q.get()
+            q[id] = (ship_ids,data)
 
     logging.debug("Length of Q: {}".format(len(q)))
     return q
@@ -80,7 +83,7 @@ def clean_predicting_args(MP):
 
     logging.debug("Done cleaning: {}".format(datetime.datetime.now()))
 
-def model_handler(MP, turn, wait_time):
+def model_handler(MP, turn, myMap, myMatrix):
     """
     HANDLES TRAINING AND PREDICTING ENEMY MODELS, PER ENEMY ID
     BEFORE WAS PASSING NN TO THE ARGUMENTS AND WAS CAUSING ISSUE
@@ -93,27 +96,25 @@ def model_handler(MP, turn, wait_time):
     start = datetime.datetime.now()
 
     for id in MP.enemyIDs:
+        logging.info("Model handler for player: {}".format(id))
 
-        ## THESE PARAMETERS ARE ONLY FOR TESTING PURPOSES, DELETE LATER
-        samples = 200
-        y = 28
-        x = 28
-        z = 3
-        num_classes = 225
-        x_train = np.random.random((samples, y, x, z))
-        y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+        ## GET DATA FOR TRAINING
+        x_train, y_train = NeuralNet.get_training_data(id, myMap, myMatrix)
+        if y_train is not None:
+            args = ("train_" + str(id) + "_" + str(turn), id, x_train,y_train)
+            MP.add_training(id, args)
 
-        args = ("train_" + str(id) + "_" + str(turn), id, x_train,y_train)
-        MP.add_training(id, args)
-
-        args = ("pred_" + str(id) + "_" + str(turn), id, x_train)
-        MP.add_predicting(id, args)  ## WHEN LOADING KERAS, CAUSES AN ERROR (UNLESS ITS THREADS)
-        logging.info("Added to queue for predicting id: {} time: {}".format(str(id),datetime.datetime.now()))
-        #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
+        ## GET DATA FOR PREDICTING
+        x_test, ship_ids = NeuralNet.get_predicting_data(id, myMap, myMatrix)
+        if x_test is not None:
+            args = ("pred_" + str(id) + "_" + str(turn), id, x_test, ship_ids)
+            MP.add_predicting(id, args)
+            logging.info("Added to queue for predicting id: {} time: {}".format(str(id),datetime.datetime.now()))
+            #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
 
 
     ## GATHER/CLEANUP QUEUES
-    wait_predictions_queue(MP.predictions_queue,start,wait_time)
+    wait_predictions_queue(MP.predictions_queue,start)
     predictions = get_predictions_queue(MP.predictions_queue)
     clean_predicting_args(MP)
 
@@ -125,9 +126,12 @@ if __name__ == "__main__":
     freeze_support()
 
     ## UPDATABLE PARAMETERS
-    disable_log = False
-    max_delay = 1.900 ## TO MAXIMIZE TIME PER TURN
-    wait_time = 1.200 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    disable_log = True
+    MAX_DELAY = 1.900 ## TO MAXIMIZE TIME PER TURN
+    WAIT_TIME = 1.200 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    input_matrix_y = 27
+    input_matrix_x = 27
+    input_matrix_z = 3
 
     ## BY DEFAULT, KERAS MODEL ARE NOT SERIALIZABLE
     ## TO PLACE IN QUEUE, NEED TO BE PICKLED
@@ -142,7 +146,7 @@ if __name__ == "__main__":
     EXP = Exploration(game)
 
     ## INITIALIZE PROCESSES
-    MP = MyProcesses(game,disable_log,wait_time)
+    MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z)
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
     time.sleep(3)
@@ -169,15 +173,21 @@ if __name__ == "__main__":
             logging.info("update_map time: {}".format(datetime.datetime.now()-start))
 
             ## CONVERT game_map TO MY VERSION
-            myMap = MyMap(game_map)
+            myMap = MyMap(game_map,myMap_prev)
+
+            logging.info("myMap completed")
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(game_map,myMap_prev)
+            myMatrix = MyMatrix(game_map,myMatrix_prev,input_matrix_y,input_matrix_x)
+
+            logging.info("myMatrix completed")
 
             ## FOR TRAINING/PREDICTING MODEL
-            predictions, turn = model_handler(MP,turn, wait_time)
+            predictions, turn = model_handler(MP,turn, myMap, myMatrix)
+
+            logging.info("model_handler completed")
 
             ## FOR TESTING ONLY
             #log_planets(game_map)
@@ -198,7 +208,7 @@ if __name__ == "__main__":
 
             ## SET A DELAY PER TURN
             end = datetime.datetime.now()
-            set_delay(end,start,max_delay)
+            set_delay(end,start)
 
             logging.info("about to send commands {}".format(datetime.datetime.now()))
 

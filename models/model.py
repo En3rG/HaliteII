@@ -34,7 +34,11 @@ from threading import Thread
 import types
 import tempfile
 import keras.models
-
+import keras
+from enum import Enum
+import math
+import datetime
+from keras.optimizers import SGD
 
 graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
 
@@ -67,14 +71,23 @@ def make_keras_picklable():
 
 
 
+class Matrix_val(Enum):
+    ALLY_SHIP = 1
+    ALLY_PLANET = 0.75
+    UNOWNED_PLANET = 0.25
+    DEFAULT = 0
+    ENEMY_PLANET = -0.5
+    ENEMY_SHIP_DOCKED = -0.75
+    ENEMY_SHIP = -1
 
 class MyMap():
     """
     CONVERT GAME_MAP TO DICTIONARY
-    FOR EACH ACCESS OF PLAYER IDs OR SHIP IDs
+    ACCESS WITH PLAYER IDs AND SHIP IDs
     """
-    def __init__(self,game_map):
+    def __init__(self,game_map, myMap_prev):
         self.game_map = game_map
+        self.myMap_prev = myMap_prev
         self.data = self.get_data()
 
     def get_data(self):
@@ -88,10 +101,10 @@ class MyMap():
         """
         data = {}
         for player in self.game_map.all_players():
-            player_id = str(player.id)
+            player_id = player.id
             data[player_id] = {}
             for ship in player.all_ships():
-                ship_id = str(ship.id)
+                ship_id = ship.id
                 data[player_id][ship_id] = {'x': ship.x, \
                                             'y': ship.y, \
                                             'health': ship.health, \
@@ -100,10 +113,12 @@ class MyMap():
         return data
 
 class MyMatrix():
-    def __init__(self, game_map, myMap_prev):
+    def __init__(self, game_map, myMatrix_prev,input_matrix_y,input_matrix_x):
         self.game_map = game_map
-        self.myMap_prev = myMap_prev
-        self.matrix = self.get_matrix()
+        self.matrix_prev = myMatrix_prev
+        self.input_matrix_y = input_matrix_y
+        self.input_matrix_x = input_matrix_x
+        self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
     def get_matrix(self):
         """
@@ -113,73 +128,100 @@ class MyMatrix():
         final_matrix = {}
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
         matrix_hp = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        matrix, matrix_hp = self.fill_planets(matrix,matrix_hp)
 
         for player in self.game_map.all_players():
             if player.id == self.game_map.my_id:
                 ## SKIPPING IF ITS ME
                 continue
 
-            matrix_temp = copy.deepcopy(matrix)
-            matrix_hp_temp = copy.deepcopy(matrix_hp)
+            matrix_current = copy.deepcopy(matrix)
+            matrix_hp_current = copy.deepcopy(matrix_hp)
+            matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player.id)
 
-            value = 1
-            matrix_temp, matrix_hp_temp = self.fill_ships(matrix_temp,matrix_hp_temp,player,value)
+
+            ## FILL CURRENT PLAYER'S SHIPS
+            matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,player)
 
             for player_enemy in self.game_map.all_players():
                 if player_enemy.id == player.id:
                     pass
                 else:
-                    value = -1
-                    matrix_temp, matrix_hp_temp = self.fill_ships(matrix_temp, matrix_hp_temp, player, value)
+                    ## FILL CURRENT PLAYER'S ENEMY SHIPS
+                    matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, player_enemy)
 
-            final_matrix[player.id] = (matrix_temp,matrix_hp_temp)
+            final_matrix[player.id] = (matrix_current,matrix_hp_current)
 
         return final_matrix
 
-    def fill_planets(self,matrix,matrix_hp):
+    def fill_planets(self,matrix,matrix_hp, player_id):
         """
-        FILL MATRIX WITH 0.5 (NOT OWNED)
-        -0.5 OWNED
+        FILL MATRIX WITH:
+         0.75 (OWNED BY CURRENT PLAYER)
+         0.25 (NOT OWNED)
+        -0.5 ENEMY OWNED
         ENTIRE BOX OF PLANET, CAN CHANGE TO CIRCLE LATER
 
         FILL IN MATRIX_HP OF PLANETS HP
         """
         for planet in self.game_map.all_planets():
-            value = 0.5 if planet.is_owned else -0.5
+            if not planet.is_owned():
+                value = Matrix_val.UNOWNED_PLANET.value
+            elif planet.owner == player_id:
+                value = Matrix_val.ALLY_PLANET.value
+            else:
+                value = Matrix_val.ENEMY_PLANET.value
 
             ## INSTEAD OF FILLING JUST THE CENTER, FILL IN A BOX
             #matrix[round(planet.y)][round(planet.x)] = value
-            matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius), \
-                   round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)] = value
+            matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius)+1, \
+                   round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)+1] = value
 
             ## FILL IN MATRIX_HP WITH HP OF PLANET
-            matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius), \
-                   round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)] = planet.health
+            matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
+                      round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health
 
         return matrix, matrix_hp
 
-    def fill_ships(self,matrix,matrix_hp,player,value):
+    def fill_ships_ally(self,matrix,matrix_hp,player):
         """
         FILL MATRIX WHERE SHIP IS AT AND ITS HP
-        1 FOR PLAYERS SHIP AND -1 FOR ENEMY SHIPS
+        1 FOR ALL ALLY
         """
+        value = Matrix_val.ALLY_SHIP.value
+
         for ship in player.all_ships():
             matrix[round(ship.y)][round(ship.x)] = value
             matrix_hp[round(ship.y)][round(ship.x)] = ship.health
 
         return matrix, matrix_hp
 
+    def fill_ships_enemy(self, matrix, matrix_hp, player):
+        """
+        FILL MATRIX WHERE SHIP IS AT AND ITS HP
+
+        value WILL DEPEND ON ENEMY, IF DOCKED OR NOT
+        """
+        for ship in player.all_ships():
+            if ship.docking_status.value == 0:  ## UNDOCKED
+                value = Matrix_val.ENEMY_SHIP.value
+            else:
+                value = Matrix_val.ENEMY_SHIP_DOCKED.value
+
+            matrix[round(ship.y)][round(ship.x)] = value
+            matrix_hp[round(ship.y)][round(ship.x)] = ship.health
+
+        return matrix, matrix_hp
+
 class NeuralNet():
-    def __init__(self):
+    def __init__(self,y,x,z):
         """
         42x42 MATRIX AT 300 SAMPLES CAUSES A TIME OUT IN HLT ENGINE
 
         28x28 TIMES OUT WITH 4 PLAYERS
         """
-        self.y = 28 ## 42, 28
-        self.x = 28 ## 42, 28
-        self.z = 3 ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS (CAN BE TAKEN INTO ACCOUNT IN UNITS)
+        self.y = y ## 42, 28
+        self.x = x ## 42, 28
+        self.z = z ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS (CAN BE TAKEN INTO ACCOUNT IN UNITS)
         self.num_classes = 225 ## 15x15
         self.batch = 300
         self.epoch = 1
@@ -260,7 +302,8 @@ class NeuralNet():
             model.add(Flatten())
             model.add(Dense(50, activation='relu'))
             model.add(Dense(num_classes, activation='softmax'))
-            sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            sgd = NeuralNet.get_sgd()
             model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
             ## SIMPLE VERSION!
@@ -278,21 +321,255 @@ class NeuralNet():
 
         return model
 
-    def get_3D(self,array_2d):
+    @staticmethod
+    def get_sgd():
+        return SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+    @staticmethod
+    def get_training_data(player_id, myMap, myMatrix):
+        """
+        GATHER TRAINING DATA FOR INPUT TO MODEL
+        x_train AND y_train
+        """
+        ## DEFAULT VALUES IF NO DATA FOR TRAINING
+        x_train_data = []
+        y_train_data = []
+        x_train = None
+        y_train = None
+
+        if myMap.myMap_prev is not None:
+            ## GO THROUGH PREVIOUS SHIPS OF CURRENT PLAYER
+            for ship_id, ship_data in myMap.myMap_prev.data[player_id].items():
+                ## ship_data HAS x, y, health, dock_status
+
+                logging.info("1")
+
+                ## PREVIOUS SHIP POSITION
+                prev_x = round(ship_data['x'])
+                prev_y = round(ship_data['y'])
+
+                logging.info("2")
+
+                ## MATRICES BASED ON PREVIOUS MATRIX
+                matrix, matrix_hp = myMatrix.matrix_prev.matrix[player_id]
+
+                logging.info("3")
+
+                ## GET MATRIX, WITH SHIP IN THE MIDDLE
+                ## +1 TO INCLUDE VALUE AT half_y
+                half_y = math.floor(myMatrix.input_matrix_y / 2)
+                half_x = math.floor(myMatrix.input_matrix_x / 2)
+
+                logging.info("4")
+
+                ## HERE CURRENT MATRIX IS REALLY PREVIOUS MATRIX
+                matrix_current = matrix[prev_y - half_y:prev_y + half_y + 1, \
+                                        prev_x - half_x:prev_x + half_x + 1]
+
+                logging.info("5")
+
+                ## CHECK IF ENEMY WAS FOUND IN SIGHT
+                if Matrix_val.ENEMY_SHIP.value in matrix_current:
+
+                    logging.info("6")
+
+                    ## GET MATRIX HP
+                    ## +1 TO INCLUDE VALUE AT half_y
+                    matrix_hp_current = matrix_hp[prev_y - half_y:prev_y + half_y + 1, \
+                                                  prev_x - half_x:prev_x + half_x + 1]
+
+                    logging.info("7")
+
+                    ## CHECK IF SHIP EXIST BEFORE
+                    ## PREVIOUS PREVIOUS LOCATION
+                    ship_prev = myMap.myMap_prev.myMap_prev.data[player_id].get(ship_id)
+
+                    logging.info("8")
+
+                    matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                    if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY
+
+                        logging.info("9")
+
+                        ## GET PREVIOUS LOCATION OF THIS SHIP
+                        prev_prev_x = ship_prev.get('x')
+                        prev_prev_y = ship_prev.get('y')
+
+                        logging.info("10")
+
+                        prev_prev_y = round(prev_prev_y)
+                        prev_prev_x = round(prev_prev_x)
+
+                        logging.info("11")
+
+                        row = half_y + (prev_prev_y - prev_y)
+                        col = half_x + (prev_prev_x - prev_x)
+
+                        logging.info("12")
+
+                        ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
+                        matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
+
+
+                        logging.info("13")
+
+                    ## GET 3D ARRAY FOR TRAINING
+                    x_train_data_current = NeuralNet.get_3D([matrix_current, matrix_hp_current, matrix_prev_loc])
+                    x_train_data.append(x_train_data_current)
+
+                    logging.info("14")
+
+                    ## NEED TO GET y_train FOR THIS SHIP
+                    y_train_current = np.zeros((15, 15), dtype=np.float)
+
+                    now_ship = myMap.data[player_id].get(ship_id)
+
+                    if now_ship: ## IF NONE, SHIP DIED
+                        ## CURRENT SHIP POSITION
+                        now_x = round(now_ship['x'])
+                        now_y = round(now_ship['y'])
+
+                        row = 7 + (now_y - prev_y)
+                        col = 7 + (now_x - prev_x)
+
+                        logging.info("testing!!1")
+                        logging.info("Current position x: {} y {}".format(now_x,now_y))
+                        logging.info("Prev position x: {} y {}".format(prev_x, prev_y))
+                        logging.info("position x: {} y {}".format(col, row))
+
+                        y_train_current[row][col] = Matrix_val.ALLY_SHIP.value
+
+                    y_train_current = np.ndarray.flatten(y_train_current)
+                    y_train_data.append(y_train_current)
+
+                    logging.info("15")
+
+            ## GET 4D ARRAY FOR TRAINING
+            x_train = NeuralNet.get_4D(x_train_data)
+            y_train = NeuralNet.get_2D(y_train_data)
+
+            logging.info("16")
+
+        ## TESTING ONLY
+        # samples = 200
+        # y = 27
+        # x = 27
+        # z = 3
+        # num_classes = 225
+        # x_train = np.random.random((samples, y, x, z))
+        # y_train = keras.utils.to_categorical(np.random.randint(10, size=(samples, 1)), num_classes=num_classes)
+
+        return x_train, y_train
+
+    @staticmethod
+    def get_predicting_data(player_id, myMap, myMatrix):
+        """
+        GET SHIPS THAT HAVE ENEMY ON SIGHT
+        PREP DATA FOR INPUT TO MODEL
+        """
+        ship_ids = []
+        train_data = []
+
+        ## GO THROUGH SHIPS OF CURRENT PLAYER
+        for ship_id, ship_data in myMap.data[player_id].items():
+            ## ship_data HAS x, y, health, dock_status
+
+            ## CURRENT SHIP POSITION
+            now_x = round(ship_data['x'])
+            now_y = round(ship_data['y'])
+
+            matrix, matrix_hp = myMatrix.matrix[player_id]
+
+            ## GET MATRIX, WITH SHIP IN THE MIDDLE
+            ## +1 TO INCLUDE VALUE AT half_y
+            half_y = math.floor(myMatrix.input_matrix_y / 2)
+            half_x = math.floor(myMatrix.input_matrix_x / 2)
+            matrix_current = matrix[now_y - half_y:now_y + half_y + 1,\
+                                    now_x - half_x:now_x + half_x + 1]
+
+            ## CHECK IF ENEMY IS FOUND IN SIGHT
+            if Matrix_val.ENEMY_SHIP.value in matrix_current:
+
+                ## ADD THIS SHIP ID
+                ship_ids.append(ship_id)
+
+                ## GET MATRIX HP
+                ## +1 TO INCLUDE VALUE AT half_y
+                matrix_hp_current = matrix_hp[now_y - half_y:now_y + half_y + 1, \
+                                              now_x - half_x:now_x + half_x + 1]
+
+                ## CHECK IF SHIP EXIST BEFORE
+                ship_prev = myMap.myMap_prev.data[player_id].get(ship_id)
+
+                matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY
+                    ## GET PREVIOUS LOCATION OF THIS SHIP
+                    prev_x = ship_prev.get('x')
+                    prev_y = ship_prev.get('y')
+
+                    prev_y = round(prev_y)
+                    prev_x = round(prev_x)
+
+                    row = half_y + (prev_y - now_y)
+                    col = half_x + (prev_x - now_x)
+
+                    ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
+                    matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
+
+                ## GET 3D ARRAY FOR TRAINING
+                train_data_current = NeuralNet.get_3D([matrix_current,matrix_hp_current,matrix_prev_loc])
+                train_data.append(train_data_current)
+
+        ## GET 4D ARRAY FOR TRAINING
+        x_test = NeuralNet.get_4D(train_data)
+
+
+        # ## TESTING ONLY
+        # samples = 200
+        # y = 27
+        # x = 27
+        # z = 3
+        # num_classes = 225
+        # x_test = np.random.random((samples, y, x, z))
+        # ship_ids = []  ## WILL CONTAIN SHIP IDS OF BEING PREDICTED
+
+        # a1 = np.random.random((3,3))
+        # b1 = np.random.random((3,3))
+        # c1 = ModelData.get_3D([a1,b1])
+
+        return x_test, ship_ids
+
+    @staticmethod
+    def get_2D(array_1d):
+        """
+        TAKES A LIST OF 1D ARRAY WITH LEN X
+        RETURNS YxX ARRAY
+        """
+        if array_1d == []:
+            return None
+        else:
+            return np.vstack(array_1d)
+
+    @staticmethod
+    def get_3D(array_2d):
         """
         TAKES A LIST OF 2D ARRAY WITH YxX
         RETURNS YxXxZ ARRAY
         """
+        for x in array_2d:
+            logging.info("Shapes for 3d: {}".format(x.shape))
         return np.dstack(array_2d)
 
-    def get_4D(self,array_3d):
+    @staticmethod
+    def get_4D(array_3d):
         """
         TAKES A LIST OF 3D ARRAY WITH YxXxZ
         RETURNS DxYxXxZ ARRAY
         """
-        return np.stack(array_3d)
-
-
+        if array_3d == []:
+            return None
+        else:
+            return np.stack(array_3d)
 
     def testing_time(self):
         """
@@ -365,6 +642,16 @@ class NeuralNet():
         print(new)
 
 
+
+class ModelData():
+    """
+    WILL CONTAIN FUNCTIONS REGARDING INPUT DATA TO THE NN MODEL
+    """
+    test = None
+
+
+
+
 # make_keras_picklable()
 #
 # samples = 200
@@ -400,6 +687,7 @@ class NeuralNet():
 # args = (x_train,y_train,300,1,1)
 # thread2 = Thread(target=test_fit,args=args)
 # thread2.start()
+
 
 
 
@@ -565,5 +853,10 @@ class NeuralNet():
 #     spawn_predictors(p,x_train)
 #     end = time.clock()
 #     print("Predictions time (subprocess): ",end-start)
+
+
+
+
+
 
 

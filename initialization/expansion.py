@@ -25,7 +25,7 @@ class Exploration():
         planets = {}
 
         for planet in self.game_map.all_planets():
-            planets[planet.id] = {'coords':(planet.x,planet.y), \
+            planets[planet.id] = {'coords':(planet.y,planet.x), \
                                   'docks':planet.num_docking_spots}
 
         return planets
@@ -75,13 +75,13 @@ class Exploration():
         for player in self.game_map.all_players():
             if player.id == self.game_map.my_id:
                 for ship in player.all_ships():
-                    coords.append((ship.x,ship.y))
+                    coords.append((ship.y,ship.x))
 
         return self.calculate_centroid(coords)
 
     def calculate_centroid(self,arr):
         """
-        CALCULATE CENTROID.  COORDS ARE IN (x,y) FORMAT
+        CALCULATE CENTROID.  COORDS ARE IN (y,x) FORMAT
         CALCULATE MIDDLE POINT OF A TRIANGLE (3 SHIPS)
         BASED ON:
         x = x1+x2+x3 / 3
@@ -96,13 +96,13 @@ class Exploration():
         sum_x = np.sum(data[:, 0])
         sum_y = np.sum(data[:, 1])
 
-        return (sum_x / length, sum_y / length)
+        return (sum_y / length, sum_x / length)
 
     def within_circle(self,point,center,radius):
         """
         RETURNS TRUE OR FALSE
         WHETHER point IS INSIDE THE CIRCLE, AT center WITH radius provided
-        point AND center HAVE (x,y)
+        point AND center HAVE (y,x)
         """
         return ( (point[0]-center[0])**2 + (point[1]-center[1])**2 ) < (radius**2)
 
@@ -132,6 +132,7 @@ class Exploration():
         """
         scores = {}
         for id, dist in self.distances_from_me.items():
+            ## GET 2 SMALLEST DISTANCE
             list_dist = heapq.nsmallest(2, ((d, i) for i, d in enumerate(self.distance_matrix[id])))
             ## INFO FOR PLANET WITH dist AWAY FROM MY STARTING LOCATION
             docks = self.planets[id]['docks']

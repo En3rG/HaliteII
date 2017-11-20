@@ -13,14 +13,10 @@ import numpy as np
 import sys
 import keras
 import datetime
-from datetime import timedelta
 import os
 import signal
 
-
-## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'
-
-
+## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'. N/A ANYMORE.
 
 def set_delay(end,start):
     """
@@ -28,9 +24,10 @@ def set_delay(end,start):
     HELP MULTIPROCESSES COMPLETE ITS TASKS
 
     USE TIMEDELTA BASE ON DATETIME INSTEAD OF TIME.CLOCK() FOR BETTER ACCURACY
-    HALITE ENGINE SEEMS TO TIME OUT
+    HALITE ENGINE SEEMS TO TIME OUT.
+    SEEMS HALITE ENGINE SLOWS DOWN IF PREVIOUS TURN TOOK MORE THAN 2 SECS TO GET REPLY
     """
-    used = timedelta.total_seconds(end-start)
+    used = datetime.timedelta.total_seconds(end-start)
     sleep_time = MAX_DELAY - used
     logging.debug("Setting Delay for: {}".format(sleep_time))
     if sleep_time > 0:
@@ -42,7 +39,7 @@ def wait_predictions_queue(Q,start):
     BY WAIT_TIME SPECIFIED
     """
     end = datetime.datetime.now()
-    while timedelta.total_seconds(end - start) < WAIT_TIME:
+    while datetime.timedelta.total_seconds(end - start) < WAIT_TIME:
         if Q.qsize() >= 3:
             break
         end = datetime.datetime.now()
@@ -142,14 +139,12 @@ def model_handler(MP, turn, myMap, myMatrix):
             logging.info("Added to queue for predicting id: {} time: {}".format(str(id),datetime.datetime.now()))
             #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
 
-
     ## GATHER/CLEANUP QUEUES
     wait_predictions_queue(MP.predictions_queue,start)
     predictions = get_predictions_queue(MP.predictions_queue)
     clean_predicting_args(MP)
 
     return predictions, turn + 1
-
 
 
 if __name__ == "__main__":
@@ -208,10 +203,8 @@ if __name__ == "__main__":
 
             logging.info("myMap completed")
 
-
             ## FOR TESTING ONLY
             log_all_ships(myMap)
-
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR PREDICTION
@@ -256,7 +249,6 @@ if __name__ == "__main__":
             ## TURN END
 
             logging.info("Commands send at {}".format(datetime.datetime.now()))
-
 
     finally:
         ## TERMINATE MULTIPROCESSES

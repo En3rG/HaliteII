@@ -72,8 +72,13 @@ def make_keras_picklable():
 
 
 class Matrix_val(Enum):
+    """
+    VALUES PLACED ON THE MATRIX
+    REPRESENTING ITS STATUS
+    """
     ALLY_SHIP = 1
-    ALLY_PLANET = 0.75
+    ALLY_SHIP_DOCKED = 0.75
+    ALLY_PLANET = 0.50
     UNOWNED_PLANET = 0.25
     DEFAULT = 0
     ENEMY_PLANET = -0.5
@@ -187,10 +192,7 @@ class MyMatrix():
 
     def fill_planets(self,matrix,matrix_hp, player_id):
         """
-        FILL MATRIX WITH:
-         0.75 (OWNED BY CURRENT PLAYER)
-         0.25 (NOT OWNED)
-        -0.5 ENEMY OWNED
+        FILL MATRIX WITH
         ENTIRE BOX OF PLANET, CAN CHANGE TO CIRCLE LATER
 
         FILL IN MATRIX_HP OF PLANETS HP
@@ -217,11 +219,13 @@ class MyMatrix():
     def fill_ships_ally(self,matrix,matrix_hp,player):
         """
         FILL MATRIX WHERE SHIP IS AT AND ITS HP
-        1 FOR ALL ALLY
         """
-        value = Matrix_val.ALLY_SHIP.value
-
         for ship in player.all_ships():
+            if ship.docking_status.value == 0:  ## UNDOCKED
+                value = Matrix_val.ALLY_SHIP.value
+            else:
+                value = Matrix_val.ALLY_SHIP_DOCKED.value
+
             matrix[round(ship.y)][round(ship.x)] = value
             matrix_hp[round(ship.y)][round(ship.x)] = ship.health
 

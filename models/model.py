@@ -426,11 +426,6 @@ class NeuralNet():
                         matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
 
 
-                    ## GET 3D ARRAY FOR TRAINING
-                    x_train_data_current = NeuralNet.get_3D([matrix_current, matrix_hp_current, matrix_prev_loc])
-                    x_train_data.append(x_train_data_current)
-
-
                     ## NEED TO GET y_train FOR THIS SHIP
                     y_train_current = np.zeros((15, 15), dtype=np.float)
 
@@ -451,8 +446,59 @@ class NeuralNet():
 
                         y_train_current[row][col] = Matrix_val.ALLY_SHIP.value
 
-                    y_train_current = np.ndarray.flatten(y_train_current)
-                    y_train_data.append(y_train_current)
+                    ## GET 3D ARRAY FOR TRAINING
+                    x_train_data_current = NeuralNet.get_3D([matrix_current, matrix_hp_current, matrix_prev_loc])
+                    x_train_data.append(x_train_data_current)
+
+
+                    ## ADD ROTATED VERSIONS OF THE ARRAY, TO INCREASE TRAINING DATA
+                    ## ROTATE 90 COUNTER CLOCKWISE
+                    matrix_current_1 = np.rot90(matrix_current)
+                    matrix_hp_current_1 = np.rot90(matrix_hp_current)
+                    matrix_prev_loc_1 = np.rot90(matrix_prev_loc)
+
+                    ## ROTATE 180 COUNTER CLOCKWISE
+                    matrix_current_2 = np.rot90(matrix_current, 2)
+                    matrix_hp_current_2 = np.rot90(matrix_hp_current, 2)
+                    matrix_prev_loc_2 = np.rot90(matrix_prev_loc, 2)
+
+                    ## ROTATE 90 CLOCKWISE
+                    matrix_current_3 = np.flipud(matrix_current)
+                    matrix_hp_current_3 = np.flipud(matrix_hp_current)
+                    matrix_prev_loc_3 = np.flipud(matrix_prev_loc)
+
+
+                    ## GET 3D ARRAY FOR TRAINING FOR ROTATED MATRIXES
+                    x_train_data_current = NeuralNet.get_3D([matrix_current_1, matrix_hp_current_1, matrix_prev_loc_1])
+                    x_train_data.append(x_train_data_current)
+
+                    x_train_data_current = NeuralNet.get_3D([matrix_current_2, matrix_hp_current_2, matrix_prev_loc_2])
+                    x_train_data.append(x_train_data_current)
+
+                    x_train_data_current = NeuralNet.get_3D([matrix_current_3, matrix_hp_current_3, matrix_prev_loc_3])
+                    x_train_data.append(x_train_data_current)
+
+
+                    ## FLATTEN FOR Y_TRAIN
+                    y_train_current_ = np.ndarray.flatten(y_train_current)
+                    y_train_data.append(y_train_current_)
+
+                    ## ADD ROTATED VERSIONS OF THE ARRAY, TO INCREASE TRAINING DATA
+                    ## ROTATE 90 COUNTER CLOCKWISE
+                    y_train_current_1 = np.rot90(y_train_current)
+                    y_train_current_1_ = np.ndarray.flatten(y_train_current_1)
+                    y_train_data.append(y_train_current_1_)
+
+                    ## ROTATE 180 COUNTER CLOCKWISE
+                    y_train_current_2 = np.rot90(y_train_current, 2)
+                    y_train_current_2_ = np.ndarray.flatten(y_train_current_2)
+                    y_train_data.append(y_train_current_2_)
+
+                    ## ROTATE 90 CLOCKWISE
+                    y_train_current_3 = np.flipud(y_train_current)
+                    y_train_current_3_ = np.ndarray.flatten(y_train_current_3)
+                    y_train_data.append(y_train_current_3_)
+
 
             ## GET 4D ARRAY FOR TRAINING
             x_train = NeuralNet.get_4D(x_train_data)
@@ -479,7 +525,7 @@ class NeuralNet():
         PREP DATA FOR INPUT TO MODEL
         """
         ship_ids = []
-        train_data = []
+        test_data = []
 
         ## GO THROUGH SHIPS OF CURRENT PLAYER
         for ship_id, ship_data in myMap.data[player_id].items():
@@ -527,38 +573,13 @@ class NeuralNet():
                     ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
                     matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
 
-                ## GET 3D ARRAY FOR TRAINING
-                train_data_current = NeuralNet.get_3D([matrix_current,matrix_hp_current,matrix_prev_loc])
-                train_data.append(train_data_current)
+                ## GET 3D ARRAY FOR PREDICTING
+                test_data_current = NeuralNet.get_3D([matrix_current,matrix_hp_current,matrix_prev_loc])
+                test_data.append(test_data_current)
 
-                ## ADD ROTATED VERSIONS OF THE ARRAY, TO INCREASE TRAINING DATA
-                ## ROTATE 90 COUNTER CLOCKWISE
-                matrix_current_1 = np.rot90(matrix_current)
-                matrix_hp_current_1 = np.rot90(matrix_hp_current)
-                matrix_prev_loc_1 = np.rot90(matrix_prev_loc)
 
-                ## ROTATE 180 COUNTER CLOCKWISE
-                matrix_current_2 = np.rot90(matrix_current, 2)
-                matrix_hp_current_2 = np.rot90(matrix_hp_current, 2)
-                matrix_prev_loc_2 = np.rot90(matrix_prev_loc, 2)
-
-                ## ROTATE 90 CLOCKWISE
-                matrix_current_3 = np.flipud(matrix_current)
-                matrix_hp_current_3 = np.flipud(matrix_hp_current)
-                matrix_prev_loc_3 = np.flipud(matrix_prev_loc)
-
-                ## GET 3D ARRAY FOR TRAINING FOR ROTATED MATRIXES
-                train_data_current = NeuralNet.get_3D([matrix_current_1, matrix_hp_current_1, matrix_prev_loc_1])
-                train_data.append(train_data_current)
-
-                train_data_current = NeuralNet.get_3D([matrix_current_2, matrix_hp_current_2, matrix_prev_loc_2])
-                train_data.append(train_data_current)
-
-                train_data_current = NeuralNet.get_3D([matrix_current_3, matrix_hp_current_3, matrix_prev_loc_3])
-                train_data.append(train_data_current)
-
-        ## GET 4D ARRAY FOR TRAINING
-        x_test = NeuralNet.get_4D(train_data)
+        ## GET 4D ARRAY FOR PREDICTING
+        x_test = NeuralNet.get_4D(test_data)
 
         # ## TESTING ONLY
         # samples = 200

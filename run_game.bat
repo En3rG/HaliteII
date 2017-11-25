@@ -1,1 +1,1 @@
-.\halite -d "384 256" "python MyBot.py" "python StarterBot.py" "python StarterBot.py" "python StarterBot.py"
+.\halite -d "240 160" "python MyBot.py" "python StarterBot.py" "python StarterBot.py" "python StarterBot.py"

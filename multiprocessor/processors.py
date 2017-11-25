@@ -38,7 +38,7 @@ class MyProcesses():
         self.set_trainers()
         self.exit = False
         self.predictions_queue = Queue()
-        self.model_queues = self.init_model_queues()
+        #self.model_queues = self.init_model_queues()
 
         self.spawn_trainers()
         self.spawn_predictors()

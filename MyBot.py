@@ -5,6 +5,7 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
 from models.model import NeuralNet, MyMap, MyMatrix, make_keras_picklable
+from projection.projection import MyProjection
 from movement import moves
 import MyCommon
 import time
@@ -152,16 +153,16 @@ if __name__ == "__main__":
 
     ## UPDATABLE PARAMETERS
     disable_log = False
-    MAX_DELAY = 1.900 ## TO MAXIMIZE TIME PER TURN
-    WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
-    GET_TIMEOUT = 0.035 ## TIMEOUT SET FOR .GET()
+    MAX_DELAY = 1.850 ## TO MAXIMIZE TIME PER TURN
+    WAIT_TIME = 0.850 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.025 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
-    input_matrix_z = 3
+    input_matrix_z = 4
 
     ## BY DEFAULT, KERAS MODEL ARE NOT SERIALIZABLE
     ## TO PLACE IN QUEUE, NEED TO BE PICKLED
-    make_keras_picklable()  ## NO LONGER USED?
+    #make_keras_picklable()  ## NO LONGER USED?
 
     ## GAME START
     ## INITIALIZES LOG
@@ -202,6 +203,18 @@ if __name__ == "__main__":
             myMap = MyMap(game_map,myMap_prev)
 
             logging.info("myMap completed")
+
+            ## GET PRJECTIONS OF ENEMY SHIPS
+            myProjection = MyProjection(game_map,myMap)
+
+
+            logging.info("myProjetion completed")
+
+
+            ## FOR TESTING ONLY
+            ## SEE IF ENEMY IS ONCOMING
+            myProjection.check_for_enemy()
+
 
             ## FOR TESTING ONLY
             log_all_ships(myMap)
@@ -249,6 +262,11 @@ if __name__ == "__main__":
             ## TURN END
 
             logging.info("Commands send at {}".format(datetime.datetime.now()))
+
+
+            ## CLEAN UP OBJECTS NO LONGER REQUIRED NEXT TURN
+            ## NECESSARY??
+
 
     finally:
         ## TERMINATE MULTIPROCESSES

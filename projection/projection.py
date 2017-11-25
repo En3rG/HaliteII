@@ -1,0 +1,93 @@
+
+import numpy as np
+import logging
+from models.model import Matrix_val
+
+class MyProjection():
+    def __init__(self,game_map, myMap):
+        self.game_map = game_map
+        self.myMap = myMap
+        if myMap.myMap_prev == None:
+            self.turns = {}
+        else:
+            self.turns = self.get_projection()
+
+    def get_projection(self):
+        """
+        GET WHERE ENEMY SHIPS ARE PROJECTED TO BE AT (UP TO NEXT 5 TURNS)
+        BASED ON SHIPS CURRENT VELOCITY
+        """
+
+        ## INITIALIZE EMPTY MATRIX
+        turns = {}
+        turns[1] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+        turns[2] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+        turns[3] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+        turns[4] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+        turns[5] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+
+        for player_id, ships in self.myMap.data.items():
+            if player_id != self.game_map.my_id:
+                for ship_id, ship_data in ships.items():
+                    try:
+                        current_x = ship_data['x']
+                        current_y = ship_data['y']
+                        prev_x = self.myMap.myMap_prev.data[player_id][ship_id]['x']
+                        prev_y = self.myMap.myMap_prev.data[player_id][ship_id]['y']
+                    except:
+                        ## SHIP DIDNT EXIST PREVIOUSLY
+                        ## GO TO NEXT LOOP
+                        continue
+
+                    ## FILL IN MATRIX WITH ENEMY PROJECTION
+                    slope = self.get_slope(prev_y,prev_x,current_y,current_x)
+                    self.set_turn_projection(1, turns[1], slope, current_y, current_x)
+                    self.set_turn_projection(2, turns[2], slope, current_y, current_x)
+                    self.set_turn_projection(3, turns[3], slope, current_y, current_x)
+                    self.set_turn_projection(4, turns[4], slope, current_y, current_x)
+                    self.set_turn_projection(5, turns[5], slope, current_y, current_x)
+
+
+        return turns
+
+    def get_slope(self,prev_y,prev_x,current_y,current_x):
+        return (current_y - prev_y, current_x - prev_x)
+
+    def set_turn_projection(self,multiplier,matrix,slope, current_y, current_x):
+        """
+        PLACE ENEMY_SHIP VALUE IN MATRIX PROVIDED
+        DEPENDS ON MULTIPLIER AND SLOP PROVIDED AS WELL
+        """
+        new_y = round(current_y + (slope[0] * multiplier))
+        new_x = round(current_x + (slope[1] * multiplier))
+
+        matrix[new_y][new_x] = Matrix_val.ENEMY_SHIP.value
+
+    def check_for_enemy(self):
+        """
+        CHECKS IF ENEMY IS COMING WITHIN THE NEXT 5 TURNS
+        WITHIN MY SHIPS PERIMETER
+        """
+        radius = 21
+
+        for player_id, ships in self.myMap.data.items():
+            if player_id == self.game_map.my_id:
+                for ship_id, ship_data in ships.items():
+                    for turn in range(1, 6):
+                        if self.turns != {}:
+                            current_matrix = self.turns[turn]
+
+                            ## CHECK A CERTAIN SQUARE/PERIMETER IF ENEMY WILL BE THERE IN THAT TURN
+                            perimeter = current_matrix[round(ship_data['y']) - radius:round(ship_data['y']) + radius, \
+                                                       round(ship_data['x']) - radius:round(ship_data['x']) + radius]
+
+                            if Matrix_val.ENEMY_SHIP.value in perimeter:
+                                ## ENEMY DETECTED
+                                logging.info("Enemy detected ship id: {}, turn: {}".format(ship_id, turn))
+
+
+
+
+
+
+

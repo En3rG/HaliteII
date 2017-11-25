@@ -47,6 +47,8 @@ def make_keras_picklable():
     """
     THIS FUNCTION IS REQUIRED TO PICKLE KERAS MODEL
 
+    TEMP FILE IS PLACED AT: 'Users\Gio\AppData\Local\Temp'
+
     NO LONGER USED.
     """
     def __getstate__(self):
@@ -327,20 +329,21 @@ class NeuralNet():
             # model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
 
-            ## SIMPLIER THAN ABOVE
-            model = Sequential()
-            # ## INPUT: 100x100 IMAGES WITH 3 CHANNELS -> (100, 100, 3) TENSORS.
-            # ## THIS APPLIES 32 CONVOLUTION FILTERS OF SIZE 3x3 EACH
-            model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
-            model.add(MaxPooling2D(pool_size=(2, 2)))
-            model.add(Conv2D(64, (3, 3), activation='relu'))
-            model.add(MaxPooling2D(pool_size=(2, 2)))
-            model.add(Flatten())
-            model.add(Dense(50, activation='relu'))
-            model.add(Dense(num_classes, activation='softmax'))
-            #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-            sgd = NeuralNet.get_sgd()
-            model.compile(loss='categorical_crossentropy', optimizer=sgd)
+            ## SIMPLIER THAN ABOVE (WORKS IN TIME)
+            # model = Sequential()
+            # # ## INPUT: 100x100 IMAGES WITH 3 CHANNELS -> (100, 100, 3) TENSORS.
+            # # ## THIS APPLIES 32 CONVOLUTION FILTERS OF SIZE 3x3 EACH
+            # model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
+            # model.add(MaxPooling2D(pool_size=(2, 2)))
+            # model.add(Conv2D(64, (3, 3), activation='relu'))
+            # model.add(MaxPooling2D(pool_size=(2, 2)))
+            # model.add(Flatten())
+            # model.add(Dense(50, activation='relu'))
+            # model.add(Dense(num_classes, activation='softmax'))
+            # #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+            # sgd = NeuralNet.get_sgd()
+            # model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
 
             ## SIMPLE VERSION!
             ## CREATE MODEL
@@ -355,6 +358,31 @@ class NeuralNet():
             # model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
 
+            ## SIMPLEST VERSION  (decent, first one to get (0,0) prediction
+            # model = Sequential()
+            # model.add(Dense(100, input_shape=(y, x, z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+            # model.add(Flatten())
+            # model.add(Dense(50, activation='relu'))
+            # model.add(Dense(num_classes, activation='softmax'))
+            #
+            # sgd = NeuralNet.get_sgd()
+            # model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+
+            ## SIMPLEST VERSION (decent, better one to get (0,0) prediction
+            model = Sequential()
+            model.add(Dense(100, input_shape=(y, x, z), activation='tanh', kernel_regularizer=regularizers.l2(0.01)))
+            model.add(Flatten())
+            model.add(Dense(50, activation='tanh'))
+            model.add(Dense(num_classes, activation='softmax'))
+
+            sgd = NeuralNet.get_sgd()
+            model.compile(loss='categorical_crossentropy', optimizer=sgd)
+
+
+
+
+
         return model
 
     @staticmethod
@@ -362,7 +390,7 @@ class NeuralNet():
         ## ORIGINALLY AT lr=0.01
         ## CHANGED TO lr=0.7
         ## CHANGED TO lr=0.9
-        return SGD(lr=0.9, decay=1e-6, momentum=0.9, nesterov=True)
+        return SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
     @staticmethod
     def get_training_data(player_id, myMap, myMatrix):
@@ -376,7 +404,7 @@ class NeuralNet():
         x_train = None
         y_train = None
 
-        if myMap.myMap_prev is not None:
+        if myMap.myMap_prev is not None and myMap.myMap_prev.myMap_prev is not None:
             ## GO THROUGH PREVIOUS SHIPS OF CURRENT PLAYER
             for ship_id, ship_data in myMap.myMap_prev.data[player_id].items():
                 ## ship_data HAS x, y, health, dock_status
@@ -399,28 +427,36 @@ class NeuralNet():
 
                 ## CHECK IF ENEMY WAS FOUND IN SIGHT
                 if Matrix_val.ENEMY_SHIP.value in matrix_current:
+                ##-->
+
 
                     ## GET MATRIX HP
                     ## +1 TO INCLUDE VALUE AT half_y
                     matrix_hp_current = matrix_hp[prev_y - half_y:prev_y + half_y + 1, \
                                                   prev_x - half_x:prev_x + half_x + 1]
 
+
                     ## CHECK IF SHIP EXIST BEFORE
                     ## PREVIOUS PREVIOUS LOCATION
                     ship_prev = myMap.myMap_prev.myMap_prev.data[player_id].get(ship_id)
 
+
                     matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
                     if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY
+
 
                         ## GET PREVIOUS LOCATION OF THIS SHIP
                         prev_prev_x = ship_prev.get('x')
                         prev_prev_y = ship_prev.get('y')
 
+
                         prev_prev_y = round(prev_prev_y)
                         prev_prev_x = round(prev_prev_x)
 
+
                         row = half_y + (prev_prev_y - prev_y)
                         col = half_x + (prev_prev_x - prev_x)
+
 
                         ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
                         matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
@@ -429,33 +465,48 @@ class NeuralNet():
                     ## NEED TO GET y_train FOR THIS SHIP
                     y_train_current = np.zeros((15, 15), dtype=np.float)
 
+
                     now_ship = myMap.data[player_id].get(ship_id)
+
 
                     if now_ship: ## IF NONE, SHIP DIED
                         ## CURRENT SHIP POSITION
                         now_x = round(now_ship['x'])
                         now_y = round(now_ship['y'])
 
+
                         row = 7 + (now_y - prev_y)
                         col = 7 + (now_x - prev_x)
 
+
                         logging.info("Training data with player id: {} ship id: {}".format(player_id,ship_id))
-                        logging.info("Current position x: {} y: {}".format(now_x,now_y))
+                        try: logging.info("Prev Prev position x: {} y: {}".format(prev_prev_x, prev_prev_y))
+                        except: pass
                         logging.info("Prev position x: {} y: {}".format(prev_x, prev_y))
+                        logging.info("Current position x: {} y: {}".format(now_x, now_y))
                         logging.info("Place prev matrix at pos x: {} y: {}".format(col, row))
+
 
                         y_train_current[row][col] = Matrix_val.ALLY_SHIP.value
 
+
+
+                    ## ADD JUST THE SHIP IN A MATRIX (ONLY NECESSARY FOR 4 INPUT MATRIX)
+                    matrix_ship_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                    matrix_ship_loc[7][7] = matrix_current[7][7]
+
                     ## GET 3D ARRAY FOR TRAINING
-                    x_train_data_current = NeuralNet.get_3D([matrix_current, matrix_hp_current, matrix_prev_loc])
+                    x_train_data_current = NeuralNet.get_3D([matrix_ship_loc, matrix_prev_loc, matrix_current, matrix_hp_current])  ## 4 INPUT
+                    #x_train_data_current = NeuralNet.get_3D([matrix_hp_current,matrix_prev_loc, matrix_current])  ## ONLY 3 INPUT
                     x_train_data.append(x_train_data_current)
 
 
-                    ## ADD ROTATED VERSIONS OF THE ARRAY, TO INCREASE TRAINING DATA
+                    # ## ADD ROTATED VERSIONS OF THE ARRAY, TO INCREASE TRAINING DATA
                     ## ROTATE 90 COUNTER CLOCKWISE
                     matrix_current_1 = np.rot90(matrix_current)
                     matrix_hp_current_1 = np.rot90(matrix_hp_current)
                     matrix_prev_loc_1 = np.rot90(matrix_prev_loc)
+
 
                     ## ROTATE 180 COUNTER CLOCKWISE
                     matrix_current_2 = np.rot90(matrix_current, 2)
@@ -469,13 +520,16 @@ class NeuralNet():
 
 
                     ## GET 3D ARRAY FOR TRAINING FOR ROTATED MATRIXES
-                    x_train_data_current = NeuralNet.get_3D([matrix_current_1, matrix_hp_current_1, matrix_prev_loc_1])
+                    x_train_data_current = NeuralNet.get_3D([matrix_ship_loc, matrix_prev_loc_1, matrix_current_1, matrix_hp_current_1])
+                    #x_train_data_current = NeuralNet.get_3D([matrix_hp_current_1,matrix_prev_loc_1, matrix_current_1])
                     x_train_data.append(x_train_data_current)
 
-                    x_train_data_current = NeuralNet.get_3D([matrix_current_2, matrix_hp_current_2, matrix_prev_loc_2])
+                    x_train_data_current = NeuralNet.get_3D([matrix_ship_loc, matrix_prev_loc_2, matrix_current_2, matrix_hp_current_2])
+                    #x_train_data_current = NeuralNet.get_3D([matrix_hp_current_2,matrix_prev_loc_2, matrix_current_2])
                     x_train_data.append(x_train_data_current)
 
-                    x_train_data_current = NeuralNet.get_3D([matrix_current_3, matrix_hp_current_3, matrix_prev_loc_3])
+                    x_train_data_current = NeuralNet.get_3D([matrix_ship_loc, matrix_prev_loc_3, matrix_current_3, matrix_hp_current_3])
+                    #x_train_data_current = NeuralNet.get_3D([matrix_hp_current_3,matrix_prev_loc_3, matrix_current_3])
                     x_train_data.append(x_train_data_current)
 
 
@@ -499,6 +553,8 @@ class NeuralNet():
                     y_train_current_3_ = np.ndarray.flatten(y_train_current_3)
                     y_train_data.append(y_train_current_3_)
 
+
+                ##<-- ## UNTAB IF TRAINING WITH EVERY TURN, NOT JUST WHEN ENEMY IN SIGHT
 
             ## GET 4D ARRAY FOR TRAINING
             x_train = NeuralNet.get_4D(x_train_data)
@@ -573,8 +629,13 @@ class NeuralNet():
                     ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
                     matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
 
+                ## ADD JUST THE SHIP IN A MATRIX (ONLY NECESSARY FOR 4 INPUT MATRIX)
+                matrix_ship_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                matrix_ship_loc[7][7] = matrix_current[7][7]
+
                 ## GET 3D ARRAY FOR PREDICTING
-                test_data_current = NeuralNet.get_3D([matrix_current,matrix_hp_current,matrix_prev_loc])
+                test_data_current = NeuralNet.get_3D([matrix_ship_loc,matrix_prev_loc,matrix_current,matrix_hp_current])  ## 4 INPUT
+                #test_data_current = NeuralNet.get_3D([matrix_hp_current,matrix_prev_loc, matrix_current]) ## ONLY 3 INPUT
                 test_data.append(test_data_current)
 
 

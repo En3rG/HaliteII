@@ -86,6 +86,7 @@ class Matrix_val(Enum):
     ENEMY_PLANET = -0.5
     ENEMY_SHIP_DOCKED = -0.75
     ENEMY_SHIP = -1
+    MAX_SHIP_HP = 255
 
 class MyMap():
     """
@@ -121,6 +122,8 @@ class MyMap():
         1 = DOCKING
         2 = DOCKED
         3 = UNDOCKING
+
+        enemy_in_turn WILL BE POPULATED BY PROJECTIONS
         """
         data = {}
         for player in self.game_map.all_players():
@@ -131,7 +134,9 @@ class MyMap():
                 data[player_id][ship_id] = {'x': ship.x, \
                                             'y': ship.y, \
                                             'health': ship.health, \
-                                            'dock_status': ship.docking_status.value}
+                                            'dock_status': ship.docking_status.value, \
+                                            'enemy_in_turn':[], \
+                                            'enemy_coord':[]}
 
         return data
 
@@ -198,6 +203,7 @@ class MyMatrix():
         ENTIRE BOX OF PLANET, CAN CHANGE TO CIRCLE LATER
 
         FILL IN MATRIX_HP OF PLANETS HP
+        HP IS A PERCENTAGE OF MAX_SHIP_HP
         """
         for planet in self.game_map.all_planets():
             if not planet.is_owned():
@@ -214,13 +220,14 @@ class MyMatrix():
 
             ## FILL IN MATRIX_HP WITH HP OF PLANET
             matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
-                      round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health
+                      round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health/Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 
     def fill_ships_ally(self,matrix,matrix_hp,player):
         """
         FILL MATRIX WHERE SHIP IS AT AND ITS HP
+        HP IS A PERCENTAGE OF MAX_SHIP_HP
         """
         for ship in player.all_ships():
             if ship.docking_status.value == 0:  ## UNDOCKED
@@ -229,13 +236,14 @@ class MyMatrix():
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
             matrix[round(ship.y)][round(ship.x)] = value
-            matrix_hp[round(ship.y)][round(ship.x)] = ship.health
+            matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 
     def fill_ships_enemy(self, matrix, matrix_hp, player):
         """
         FILL MATRIX WHERE SHIP IS AT AND ITS HP
+        HP IS A PERCENTAGE OF MAX_SHIP_HP
 
         value WILL DEPEND ON ENEMY, IF DOCKED OR NOT
         """
@@ -246,7 +254,7 @@ class MyMatrix():
                 value = Matrix_val.ENEMY_SHIP_DOCKED.value
 
             matrix[round(ship.y)][round(ship.x)] = value
-            matrix_hp[round(ship.y)][round(ship.x)] = ship.health
+            matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 
@@ -261,8 +269,6 @@ class NeuralNet():
         self.x = x ## 42, 28
         self.z = z ## 4   ## UNITS, HP, PREVIOUS LOCATION, DOCKING STATUS (CAN BE TAKEN INTO ACCOUNT IN UNITS)
         self.num_classes = 225 ## 15x15
-        self.batch = 300
-        self.epoch = 1
         self.model = self.neural_network_model(self.y,self.x,self.z,self.num_classes)
 
     # def train_model(self, x_train, y_train):
@@ -363,8 +369,7 @@ class NeuralNet():
             # model.add(Dense(100, input_shape=(y, x, z), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
             # model.add(Flatten())
             # model.add(Dense(50, activation='relu'))
-            # model.add(Dense(num_classes, activation='softmax'))
-            #
+            # model.add(Dense(num_classes, activation='get_sgd
             # sgd = NeuralNet.get_sgd()
             # model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
@@ -376,21 +381,40 @@ class NeuralNet():
             model.add(Dense(50, activation='tanh'))
             model.add(Dense(num_classes, activation='softmax'))
 
-            sgd = NeuralNet.get_sgd()
-            model.compile(loss='categorical_crossentropy', optimizer=sgd)
-
-
-
-
+            opt = NeuralNet.get_optimizer()
+            model.compile(loss='categorical_crossentropy', optimizer=opt)
 
         return model
 
     @staticmethod
-    def get_sgd():
-        ## ORIGINALLY AT lr=0.01
+    def get_optimizer():
+        ## SGD
+        ## decay IS LEARNING RATE DECAY OVER EACH UPDATE
+        ## ORIGINALLY AT lr=0.01, decay=1e-6
         ## CHANGED TO lr=0.7
         ## CHANGED TO lr=0.9
-        return SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        ## CHANGED TO lr=0.0033
+        ## CHANGED TO lr=0.005
+        #return SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+        ## RMSprop
+        #return keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
+
+        ## Adagrad
+        #return keras.optimizers.Adagrad(lr=0.01, epsilon=1e-08, decay=0.0)
+
+        ## Adadelta
+        #return keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0)
+
+        ## Adam
+        #return keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+
+        ## Adamax
+        return keras.optimizers.Adamax(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+
+        ## Nadam
+        #return keras.optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
+
 
     @staticmethod
     def get_training_data(player_id, myMap, myMatrix):
@@ -479,12 +503,12 @@ class NeuralNet():
                         col = 7 + (now_x - prev_x)
 
 
-                        logging.info("Training data with player id: {} ship id: {}".format(player_id,ship_id))
-                        try: logging.info("Prev Prev position x: {} y: {}".format(prev_prev_x, prev_prev_y))
+                        logging.debug("Training data with player id: {} ship id: {}".format(player_id,ship_id))
+                        try: logging.debug("Prev Prev position x: {} y: {}".format(prev_prev_x, prev_prev_y))
                         except: pass
-                        logging.info("Prev position x: {} y: {}".format(prev_x, prev_y))
-                        logging.info("Current position x: {} y: {}".format(now_x, now_y))
-                        logging.info("Place prev matrix at pos x: {} y: {}".format(col, row))
+                        logging.debug("Prev position x: {} y: {}".format(prev_x, prev_y))
+                        logging.debug("Current position x: {} y: {}".format(now_x, now_y))
+                        logging.debug("Place prev matrix at pos x: {} y: {}".format(col, row))
 
 
                         y_train_current[row][col] = Matrix_val.ALLY_SHIP.value
@@ -689,7 +713,7 @@ class NeuralNet():
 
             ## LOOPING WILL BE VERY SLOW, USE MAP!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            logging.info("With player id: {}".format(player_id))
+            logging.debug("With player id: {}".format(player_id))
             ship_ids, data = dict
 
             for id, pred in zip(ship_ids,data):
@@ -702,7 +726,7 @@ class NeuralNet():
 
                 new_location = Predicted.get_new_location(argmax)
 
-                logging.info("Predicted ship id: {} new location: {} percentage: {}".format(id,new_location, max(pred)))
+                logging.debug("Predicted ship id: {} new location: {} percentage: {}".format(id,new_location, max(pred)))
 
 
     def testing_time(self):
@@ -855,10 +879,8 @@ class Predicted():
 
         IF RETURNING -10, -10. SHIP PREDICTED TO DIE OR INVALID LOCATION
         """
-
-
         center = (7,7)
-        logging.info("key {}".format(key))
+        logging.debug("key {}".format(key))
         coords = Predicted.COORDS[key]
 
         if coords == (0,0):

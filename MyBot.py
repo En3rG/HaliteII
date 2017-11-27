@@ -19,7 +19,7 @@ import signal
 
 ## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'. N/A ANYMORE.
 
-def set_delay(end,start):
+def set_delay(start):
     """
     DELAY TO MAXIMIZE 2 SECONDS PER TURN
     HELP MULTIPROCESSES COMPLETE ITS TASKS
@@ -28,9 +28,12 @@ def set_delay(end,start):
     HALITE ENGINE SEEMS TO TIME OUT.
     SEEMS HALITE ENGINE SLOWS DOWN IF PREVIOUS TURN TOOK MORE THAN 2 SECS TO GET REPLY
     """
+    end = datetime.datetime.now()
     used = datetime.timedelta.total_seconds(end-start)
     sleep_time = MAX_DELAY - used
-    logging.debug("Setting Delay for: {}".format(sleep_time))
+    logging.info("Setting Delay for: {}".format(sleep_time))
+    sleep_time = round(sleep_time,3) ## ROUND WITH 3 DECIMAL
+    logging.info("Rounded delay: {}".format(sleep_time))
     if sleep_time > 0:
         time.sleep(sleep_time)
 
@@ -45,7 +48,7 @@ def wait_predictions_queue(Q,start):
             break
         end = datetime.datetime.now()
 
-    logging.info("Done waiting for predictions queue")
+    logging.debug("Done waiting for predictions queue")
 
 def get_predictions_queue(Q):
     """
@@ -124,7 +127,7 @@ def model_handler(MP, turn, myMap, myMatrix):
     start = datetime.datetime.now()
 
     for id in MP.enemyIDs:
-        logging.info("Model handler for player: {}".format(id))
+        logging.debug("Model handler for player: {}".format(id))
 
         ## GET DATA FOR TRAINING
         x_train, y_train = NeuralNet.get_training_data(id, myMap, myMatrix)
@@ -137,7 +140,7 @@ def model_handler(MP, turn, myMap, myMatrix):
         if x_test is not None:
             args = ("pred_" + str(id) + "_" + str(turn), id, x_test, ship_ids)
             MP.add_predicting(id, args)
-            logging.info("Added to queue for predicting id: {} time: {}".format(str(id),datetime.datetime.now()))
+            logging.debug("Added to queue for predicting id: {} time: {}".format(str(id),datetime.datetime.now()))
             #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
 
     ## GATHER/CLEANUP QUEUES
@@ -153,12 +156,14 @@ if __name__ == "__main__":
 
     ## UPDATABLE PARAMETERS
     disable_log = False
-    MAX_DELAY = 1.850 ## TO MAXIMIZE TIME PER TURN
-    WAIT_TIME = 0.850 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
-    GET_TIMEOUT = 0.025 ## TIMEOUT SET FOR .GET()
+    MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
+    WAIT_TIME = 1.200 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.015 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
     input_matrix_z = 4
+    num_epoch = 3
+    batch_size = 300
 
     ## BY DEFAULT, KERAS MODEL ARE NOT SERIALIZABLE
     ## TO PLACE IN QUEUE, NEED TO BE PICKLED
@@ -173,7 +178,7 @@ if __name__ == "__main__":
     EXP = Exploration(game)
 
     ## INITIALIZE PROCESSES
-    MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z)
+    MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
     time.sleep(3)
@@ -189,7 +194,7 @@ if __name__ == "__main__":
     try:
         while True:
 
-            start = datetime.datetime.now()
+            main_start = datetime.datetime.now()
 
             logging.info("Turn # {} Calling update_map() at: {}".format(turn,datetime.datetime.now()))
 
@@ -197,34 +202,39 @@ if __name__ == "__main__":
             ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
             game_map = game.update_map()
 
-            logging.info("update_map time: {}".format(datetime.datetime.now()-start))
+            logging.info("update_map time: {}".format(datetime.datetime.now()-main_start))
 
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
 
-            logging.info("myMap completed")
+            logging.info("myMap completed {}".format(datetime.datetime.now()))
 
             ## GET PRJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(game_map,myMap)
 
 
-            logging.info("myProjetion completed")
+            logging.info("myProjetion completed {}".format(datetime.datetime.now()))
 
 
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
             myProjection.check_for_enemy()
 
+            ## TESTING ONLY
+            for player_id, ships in myMap.data.items():
+                for ship_id, ship_data in ships.items():
+                    logging.info("Testing player id: {} ship id: {} data: {}".format(player_id,ship_id,ship_data))
+
 
             ## FOR TESTING ONLY
             log_all_ships(myMap)
 
             ## GATHER MAP MATRIX
-            ## THIS WILL BE USED FOR PREDICTION
+            ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
             myMatrix = MyMatrix(game_map,myMatrix_prev,input_matrix_y,input_matrix_x)
 
-            logging.info("myMatrix completed")
+            logging.info("myMatrix completed {}".format(datetime.datetime.now()))
 
             ## FOR TRAINING/PREDICTING MODEL
             predictions, turn = model_handler(MP,turn, myMap, myMatrix)
@@ -232,7 +242,7 @@ if __name__ == "__main__":
             ## TRANSLATE PREDICTIONS
             NeuralNet.translate_predictions(predictions)
 
-            logging.info("model_handler completed")
+            logging.info("model_handler completed {}".format(datetime.datetime.now()))
 
             ## FOR TESTING ONLY
             #log_planets(game_map)
@@ -252,8 +262,7 @@ if __name__ == "__main__":
             myMatrix_prev = myMatrix
 
             ## SET A DELAY PER TURN
-            end = datetime.datetime.now()
-            set_delay(end,start)
+            set_delay(main_start)
 
             logging.info("about to send commands {}".format(datetime.datetime.now()))
 

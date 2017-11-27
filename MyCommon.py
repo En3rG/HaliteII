@@ -23,7 +23,7 @@ def get_logger(name):
     local_logger = logging.getLogger(name)
     local_logger.setLevel(logging.DEBUG)
     local_logger.addHandler(fh)
-    local_logger.info(name + ' (worker) Process started')
+    local_logger.debug(name + ' (worker) Process started')
 
     return local_logger
 

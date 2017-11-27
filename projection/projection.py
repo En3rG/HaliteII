@@ -68,26 +68,56 @@ class MyProjection():
         CHECKS IF ENEMY IS COMING WITHIN THE NEXT 5 TURNS
         WITHIN MY SHIPS PERIMETER
         """
-        radius = 21
+        radius = 10
 
         for player_id, ships in self.myMap.data.items():
             if player_id == self.game_map.my_id:
                 for ship_id, ship_data in ships.items():
+                    ## CHECK NEXT 5 TURNS
                     for turn in range(1, 6):
                         if self.turns != {}:
                             current_matrix = self.turns[turn]
 
                             ## CHECK A CERTAIN SQUARE/PERIMETER IF ENEMY WILL BE THERE IN THAT TURN
-                            perimeter = current_matrix[round(ship_data['y']) - radius:round(ship_data['y']) + radius, \
-                                                       round(ship_data['x']) - radius:round(ship_data['x']) + radius]
+                            starting_y = round(ship_data['y']) - radius
+                            starting_x = round(ship_data['x']) - radius
+                            perimeter = current_matrix[starting_y:round(ship_data['y']) + radius, \
+                                                       starting_x:round(ship_data['x']) + radius]
 
                             if Matrix_val.ENEMY_SHIP.value in perimeter:
                                 ## ENEMY DETECTED
-                                logging.info("Enemy detected ship id: {}, turn: {}".format(ship_id, turn))
+                                self.myMap.data[player_id][ship_id]['enemy_in_turn'].append(turn)
+                                logging.debug("Enemy detected ship id: {}, turn: {}".format(ship_id, turn))
+
+                                ## GET LOCATION/COORDS OF PROJECTED ENEMY
+                                list_coords = np.argwhere(perimeter == Matrix_val.ENEMY_SHIP.value)
+                                ## ADD y AND x OFFSET, SINCE PERIMETER IS JUST A SUBSET OF THE MATRIX
+                                list_coords[:,0] += starting_y
+                                list_coords[:,1] += starting_x
+
+                                self.myMap.data[player_id][ship_id]['enemy_coord'].append(list_coords)
+                                logging.debug("Enemy detected in coords: {}".format(list_coords))
+
+#
 
 
 
-
-
+# import numpy as np
+#
+# a = np.array([[0., 1., 2., 3., 4.],
+#                  [7., 8., 9., 10., 4.],
+#                  [14., 15., 16., 17., 4.],
+#                  [1., 20., 21., 22., 23.],
+#                  [27., 28., 1., 20., 29.]])
+#
+# b = a[0:4,2:5]
+#
+# print(b)
+#
+#
+# print(np.argwhere(a == 4.))
+# print(np.argwhere(b == 4.))
+#
+# print(type(np.argwhere(b == 4.)))
 
 

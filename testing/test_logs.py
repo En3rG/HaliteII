@@ -30,14 +30,14 @@ def log_planets(game_map):
     logging.debug(" ")
 
 def log_all_ships(myMap):
-    logging.info("Logging all ships:")
+    logging.debug("Logging all ships:")
     for player_id, dict in myMap.data.items():
-        logging.info("Player id: {}".format(player_id))
+        logging.debug("Player id: {}".format(player_id))
         for ship_id, ship in dict.items():
-            logging.info("ship_id: {} at y:{} x:{}".format(ship_id,ship['y'],ship['x']))
+            logging.debug("ship_id: {} at y:{} x:{}".format(ship_id,ship['y'],ship['x']))
 
 def log_myShip(ship):
-    logging.info("My ship id: {}, x: {}, y: {}".format(ship.id, ship.x, ship.y))
+    logging.debug("My ship id: {}, x: {}, y: {}".format(ship.id, ship.x, ship.y))
     logging.debug(" ")
 
 def log_dimensions(game_map):

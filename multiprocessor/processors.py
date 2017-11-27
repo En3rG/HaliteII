@@ -14,7 +14,7 @@ from keras.optimizers import SGD
 import MyCommon
 
 class MyProcesses():
-    def __init__(self,game,disable_log, wait_time, y, x, z):
+    def __init__(self,game,disable_log, wait_time, y, x, z, num_epoch, batch_size):
         ## FOR TESTING ONLY
         #log_myID(game.map)
         #log_numPlayers(game.map)
@@ -22,6 +22,8 @@ class MyProcesses():
         #self.main_conn, self.sub_conn = Pipe()  ## Not used
 
         ## DISABLE LOG IF TRUE
+        self.num_epoch = num_epoch
+        self.batch_size = batch_size
         self.disable_log = disable_log
         MyCommon.disable_log(self.disable_log, logging)
 
@@ -96,7 +98,7 @@ class MyProcesses():
 
             ## INITIALIZE MODELS
             NN = NeuralNet(self.y,self.x,self.z)
-            logging.info("NN: {}".format(NN.model))
+            logging.debug("NN: {}".format(NN.model))
 
             ## PROBLEM IS KERAS OBJECT CANNOT BE SERIALIZED OUT OF THE BAT??
             ## http://zachmoshe.com/2017/04/03/pickling-keras-models.html
@@ -105,7 +107,7 @@ class MyProcesses():
             NN_model_pickled = pickle.dumps(NN.model)
             q[id].put(NN_model_pickled)
 
-            logging.info("Q at init_model_queues empty?: {}".format(q[id].empty()))
+            logging.debug("Q at init_model_queues empty?: {}".format(q[id].empty()))
 
         return q
 
@@ -155,8 +157,8 @@ class MyProcesses():
         model.load_weights(str(id) + ".h5")
         logger.debug("Loaded weights")
         #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-        sgd = NeuralNet.get_sgd()
-        model.compile(loss='categorical_crossentropy', optimizer=sgd)
+        opt = NeuralNet.get_optimizer()
+        model.compile(loss='categorical_crossentropy', optimizer=opt)
         logger.debug("Compiled model")
 
         return model
@@ -278,14 +280,14 @@ class MyProcesses():
 
                     ## LOADING MODEL FROM FILE
                     model = self.load_model(id, logger)
-                    logger.debug("Loaded model")
+                    logger.info("Loaded model")
                     predictions = model.predict(x_train)
-                    logger.debug("Predictions done")
+                    logger.info("Predictions done")
                     ## WHEN I WAS PASSING Q IN ARGUMENTS, IT SEEMS TO MESS UP THE OTHER QUEUES
                     ## WORKS FINE WHEN IT WAS ADDED TO MP AS PREDICTIONS_QUEUE
 
                     end = time.clock()
-                    logger.debug("Predictions took {}".format(end-start))
+                    logger.info("Predictions took {}".format(end-start))
 
                     if (end-start) > (self.wait_time - 0.05):
                         logger.debug("Preditions took too long. Not placing to queue")
@@ -340,7 +342,7 @@ class MyProcesses():
                 logger.info("Got Model")
                 #model = copy.deepcopy(model)
                 logger.info("Done copying {}".format(type(model)))
-                model.fit(x_train, y_train, batch_size=200, epochs=1,verbose=1)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=1)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
                 logger.info("Trained")
                 self.set_model_queues(id, model)
                 logger.info("Time after training {}".format(time.clock()))
@@ -409,7 +411,7 @@ class MyProcesses():
                 name, id, x_train, y_train = arguments
                 logger.info("Got Model")
                 start = time.clock()
-                model.fit(x_train, y_train, batch_size=300, epochs=1,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
                 end = time.clock()
                 logger.info("Trained")
                 logger.info("Training took {}".format(end - start))
@@ -463,7 +465,7 @@ class MyProcesses():
         logger.info("Got Model")
         model = copy.deepcopy(model)
         logger.info("Done copying {}".format(type(model)))
-        model.fit(x_train, y_train, batch_size=200, epochs=1, verbose=0)    ## ERROR IS HERE. WHY? Sequential object has no attribute model
+        model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch, verbose=0)    ## ERROR IS HERE. WHY? Sequential object has no attribute model
         logger.info("Trained")
         self.set_model_queues(id, model)
         logger.info("Time after training {}".format(time.clock()))
@@ -471,13 +473,15 @@ class MyProcesses():
     def worker_train_model2(self, name, id, x_train, y_train,model):
         """
         TRAIN MODEL TO FILE
+
+        NO LONGER USED.
         """
         logger = MyCommon.get_logger(name)
         MyCommon.disable_log(self.disable_log, logging)
         logger.info("At {} and sleeping at {}".format(name, time.clock()))
         logger.info("Got Model")
         logger.info("Done copying {}".format(type(model)))
-        model.fit(x_train, y_train, batch_size=200, epochs=1,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+        model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
         logger.info("Trained")
         self.save_model(id, model)
         logger.info("Time after training {}".format(time.clock()))

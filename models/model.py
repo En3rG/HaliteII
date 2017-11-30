@@ -101,6 +101,11 @@ class MyMap():
         self.myMap_prev = myMap_prev
         self.data = self.get_data()
 
+        self.planets_owned = set()     ## PLANETS I OWN
+        self.planets_unowned = set()   ## PLANETS UNOWNED
+        self.planets_enemy = set()     ## PLANETS OWNED BY ENEMY
+        self.set_planet_status()
+
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
 
@@ -139,6 +144,18 @@ class MyMap():
                                             'enemy_coord':[]}
 
         return data
+
+    def set_planet_status(self):
+        """
+        SET STATUS OF PLANETS
+        """
+        for planet in self.game_map.all_planets():
+            if not planet.is_owned():
+                self.planets_unowned.add(planet.id)
+            elif planet.owner is not None and planet.owner.id == self.game_map.my_id:
+                self.planets_owned.add(planet.id)
+            else:
+                self.planets_enemy.add(planet.id)
 
 class MyMatrix():
     MAX_NODES = 3
@@ -197,6 +214,9 @@ class MyMatrix():
 
         return final_matrix
 
+
+
+
     def fill_planets(self,matrix,matrix_hp, player_id):
         """
         FILL MATRIX WITH
@@ -208,7 +228,7 @@ class MyMatrix():
         for planet in self.game_map.all_planets():
             if not planet.is_owned():
                 value = Matrix_val.UNOWNED_PLANET.value
-            elif planet.owner == player_id:
+            elif planet.owner is not None and planet.owner.id == player_id:
                 value = Matrix_val.ALLY_PLANET.value
             else:
                 value = Matrix_val.ENEMY_PLANET.value

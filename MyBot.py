@@ -234,6 +234,7 @@ if __name__ == "__main__":
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
             myMatrix = MyMatrix(game_map,myMatrix_prev,input_matrix_y,input_matrix_x)
 
+
             logging.info("myMatrix completed {}".format(datetime.datetime.now()))
 
             ## FOR TRAINING/PREDICTING MODEL

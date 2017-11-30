@@ -97,14 +97,25 @@ class MyMap():
     NUM_NODES = 0
 
     def __init__(self,game_map, myMap_prev):
+        self.planets_owned = set()  ## PLANETS I OWN
+        self.planets_unowned = set()  ## PLANETS UNOWNED
+        self.planets_enemy = set()  ## PLANETS OWNED BY ENEMY
+
+        self.ships_owned = set()  ## SHIPS I OWN
+        self.ships_new = set()  ## SHIPS THAT DIDNT EXIST PREVIOUSLY
+        self.ships_died = set()  ## SHIPS THAT DIED
+        self.ships_docked_ally = set()  ## SHIPS THAT ARE DOCKED (MINE)
+        self.ships_docked_enemy = set()  ## SHIPS THAT ARE DOCKED (ENEMY)
+        self.ships_attacking = set()  ## THESE ARE CURRENTLY NOT USED
+        self.ships_defending = set()  ## THESE ARE CURRENTLY NOT USED
+        self.ships_expanding = set()  ## THESE ARE CURRENTLY NOT USED
+
         self.game_map = game_map
         self.myMap_prev = myMap_prev
-        self.data = self.get_data()
 
-        self.planets_owned = set()     ## PLANETS I OWN
-        self.planets_unowned = set()   ## PLANETS UNOWNED
-        self.planets_enemy = set()     ## PLANETS OWNED BY ENEMY
+        self.data = self.get_data()
         self.set_planet_status()
+        self.set_ships_status()
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -132,7 +143,10 @@ class MyMap():
         """
         data = {}
         for player in self.game_map.all_players():
+
             player_id = player.id
+            mine = True if player_id == self.game_map.my_id else False
+
             data[player_id] = {}
             for ship in player.all_ships():
                 ship_id = ship.id
@@ -142,6 +156,20 @@ class MyMap():
                                             'dock_status': ship.docking_status.value, \
                                             'enemy_in_turn':[], \
                                             'enemy_coord':[]}
+
+                docked = False if ship.docking_status.value == 0 else True
+
+                ## GATHER SHIPS I OWN
+                if mine:
+                    self.ships_owned.add(ship_id)
+                    ## GATHER DOCKED SHIPS
+                    if docked:
+                        self.ships_docked_ally.add(ship_id)
+                else:
+                    ## GATHER ENEMY DOCKED SHIPS
+                    if docked:
+                        self.ships_docked_enemy.add(ship_id)
+
 
         return data
 
@@ -156,6 +184,21 @@ class MyMap():
                 self.planets_owned.add(planet.id)
             else:
                 self.planets_enemy.add(planet.id)
+
+    def set_ships_status(self):
+        """
+        SET STATUS OF SHIPS
+        """
+        for ship_id in self.ships_owned:
+            ## CHECK IF SHIP IS NEW
+            if self.myMap_prev is not None and ship_id not in self.myMap_prev.ships_owned:
+                self.ships_new.add(ship_id)
+
+        ## CHECK FOR SHIPS THAT DIED FROM LAST TURN
+        if self.myMap_prev is not None:
+            ## CHECK FOR SHIPS ONLY IN PREVIOUS, BUT NOT IN CURRENT (SET DIFFERENCE)
+            self.ships_died = self.myMap_prev.ships_owned - self.ships_owned
+
 
 class MyMatrix():
     MAX_NODES = 3

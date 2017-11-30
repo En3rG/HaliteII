@@ -1,7 +1,8 @@
 import hlt
 import logging
 from initialization.expansion import Exploration
-from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions, log_all_ships
+from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions, log_all_ships, log_myMap_ships, \
+                              log_myMap_planets
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
 from models.model import NeuralNet, MyMap, MyMatrix, make_keras_picklable
@@ -209,21 +210,20 @@ if __name__ == "__main__":
 
             logging.info("myMap completed {}".format(datetime.datetime.now()))
 
+            ## TESTING ONLY
+            log_myMap_ships(myMap)
+            log_myMap_planets(myMap)
+
+
             ## GET PRJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(game_map,myMap)
 
-
             logging.info("myProjetion completed {}".format(datetime.datetime.now()))
-
 
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
             myProjection.check_for_enemy()
 
-            ## TESTING ONLY
-            for player_id, ships in myMap.data.items():
-                for ship_id, ship_data in ships.items():
-                    logging.info("Testing player id: {} ship id: {} data: {}".format(player_id,ship_id,ship_data))
 
 
             ## FOR TESTING ONLY

@@ -34,7 +34,19 @@ def log_all_ships(myMap):
     for player_id, dict in myMap.data.items():
         logging.debug("Player id: {}".format(player_id))
         for ship_id, ship in dict.items():
-            logging.debug("ship_id: {} at y:{} x:{}".format(ship_id,ship['y'],ship['x']))
+            logging.debug("ship_id: {} with data:{}".format(ship_id,ship))
+
+def log_myMap_ships(myMap):
+    logging.debug("My ships: {}".format(myMap.ships_owned))
+    logging.debug("New ships: {}".format(myMap.ships_new))
+    logging.debug("Died ships: {}".format(myMap.ships_died))
+    logging.debug("My Docked ships: {}".format(myMap.ships_docked_ally))
+    logging.debug("Enemy Docked ships: {}".format(myMap.ships_docked_enemy))
+
+def log_myMap_planets(myMap):
+    logging.debug("My planets: {}".format(myMap.planets_owned))
+    logging.debug("Enemy planets: {}".format(myMap.planets_enemy))
+    logging.debug("Unowned planets: {}".format(myMap.planets_unowned))
 
 def log_myShip(ship):
     logging.debug("My ship id: {}, x: {}, y: {}".format(ship.id, ship.x, ship.y))

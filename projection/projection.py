@@ -26,14 +26,14 @@ class MyProjection():
         turns[4] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
         turns[5] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
 
-        for player_id, ships in self.myMap.data.items():
+        for player_id, ships in self.myMap.data_ships.items():
             if player_id != self.game_map.my_id:
                 for ship_id, ship_data in ships.items():
                     try:
                         current_x = ship_data['x']
                         current_y = ship_data['y']
-                        prev_x = self.myMap.myMap_prev.data[player_id][ship_id]['x']
-                        prev_y = self.myMap.myMap_prev.data[player_id][ship_id]['y']
+                        prev_x = self.myMap.myMap_prev.data_ships[player_id][ship_id]['x']
+                        prev_y = self.myMap.myMap_prev.data_ships[player_id][ship_id]['y']
                     except:
                         ## SHIP DIDNT EXIST PREVIOUSLY
                         ## GO TO NEXT LOOP
@@ -70,7 +70,7 @@ class MyProjection():
         """
         radius = 10
 
-        for player_id, ships in self.myMap.data.items():
+        for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.game_map.my_id:
                 for ship_id, ship_data in ships.items():
                     ## CHECK NEXT 5 TURNS
@@ -86,7 +86,7 @@ class MyProjection():
 
                             if Matrix_val.ENEMY_SHIP.value in perimeter:
                                 ## ENEMY DETECTED
-                                self.myMap.data[player_id][ship_id]['enemy_in_turn'].append(turn)
+                                self.myMap.data_ships[player_id][ship_id]['enemy_in_turn'].append(turn)
                                 logging.debug("Enemy detected ship id: {}, turn: {}".format(ship_id, turn))
 
                                 ## GET LOCATION/COORDS OF PROJECTED ENEMY
@@ -95,7 +95,7 @@ class MyProjection():
                                 list_coords[:,0] += starting_y
                                 list_coords[:,1] += starting_x
 
-                                self.myMap.data[player_id][ship_id]['enemy_coord'].append(list_coords)
+                                self.myMap.data_ships[player_id][ship_id]['enemy_coord'].append(list_coords)
                                 logging.debug("Enemy detected in coords: {}".format(list_coords))
 
 #

@@ -39,6 +39,7 @@ from enum import Enum
 import math
 import datetime
 from keras.optimizers import SGD
+from initialization.expansion import Exploration
 
 graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
 
@@ -88,6 +89,18 @@ class Matrix_val(Enum):
     ENEMY_SHIP = -1
     MAX_SHIP_HP = 255
 
+class ShipTasks(Enum):
+    """
+    VALUES FOR SHIPS TASKS
+    """
+    NONE = -1   ## DEFAULT
+    MINING = 0
+    EXPANDING = 1
+    DEFENDING = 2
+    ATTACKING = 3
+    RUNNING = 4
+
+
 class MyMap():
     """
     CONVERT GAME_MAP TO DICTIONARY
@@ -104,18 +117,21 @@ class MyMap():
         self.ships_owned = set()  ## SHIPS I OWN
         self.ships_new = set()  ## SHIPS THAT DIDNT EXIST PREVIOUSLY
         self.ships_died = set()  ## SHIPS THAT DIED
-        self.ships_docked_ally = set()  ## SHIPS THAT ARE DOCKED (MINE)
-        self.ships_docked_enemy = set()  ## SHIPS THAT ARE DOCKED (ENEMY)
+        self.ships_mining_ally = set()  ## SHIPS THAT ARE DOCKED (MINE)
+        self.ships_mining_enemy = set()  ## SHIPS THAT ARE DOCKED (ENEMY)
         self.ships_attacking = set()  ## THESE ARE CURRENTLY NOT USED
         self.ships_defending = set()  ## THESE ARE CURRENTLY NOT USED
         self.ships_expanding = set()  ## THESE ARE CURRENTLY NOT USED
+        self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
 
         self.game_map = game_map
         self.myMap_prev = myMap_prev
 
-        self.data = self.get_data()
+        self.data_ships = self.get_ship_data()
+        self.data_planets = {}
         self.set_planet_status()
         self.set_ships_status()
+        self.set_from_planet()  ## ASSOCIATE NEW SHIPS TO A PLANET
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -130,7 +146,7 @@ class MyMap():
             self.myMap_prev.myMap_prev.myMap_prev = None
             MyMap.NUM_NODES -= 1
 
-    def get_data(self):
+    def get_ship_data(self):
         """
         RETURN DATA IN DICTIONARY FORM
         DOCKING STATUS:
@@ -145,7 +161,7 @@ class MyMap():
         for player in self.game_map.all_players():
 
             player_id = player.id
-            mine = True if player_id == self.game_map.my_id else False
+            mine = player_id == self.game_map.my_id
 
             data[player_id] = {}
             for ship in player.all_ships():
@@ -155,49 +171,90 @@ class MyMap():
                                             'health': ship.health, \
                                             'dock_status': ship.docking_status.value, \
                                             'enemy_in_turn':[], \
-                                            'enemy_coord':[]}
+                                            'enemy_coord':[],\
+                                            'from_planet':None, \
+                                            'task':ShipTasks.NONE}
+                                             ## from_planet IS ONLY SET ON NEW SHIPS
 
-                docked = False if ship.docking_status.value == 0 else True
+                docked = not(ship.docking_status.value == 0)
 
                 ## GATHER SHIPS I OWN
                 if mine:
                     self.ships_owned.add(ship_id)
                     ## GATHER DOCKED SHIPS
                     if docked:
-                        self.ships_docked_ally.add(ship_id)
+                        self.ships_mining_ally.add(ship_id)
                 else:
                     ## GATHER ENEMY DOCKED SHIPS
                     if docked:
-                        self.ships_docked_enemy.add(ship_id)
+                        self.ships_mining_enemy.add(ship_id)
 
 
         return data
 
     def set_planet_status(self):
         """
+        GATHER PLANETS WITH KEY AS PLANET ID
+
         SET STATUS OF PLANETS
         """
         for planet in self.game_map.all_planets():
+            ## FILL IN PLANETS DATA
+            self.set_planet_data(planet)
+
             if not planet.is_owned():
                 self.planets_unowned.add(planet.id)
             elif planet.owner is not None and planet.owner.id == self.game_map.my_id:
                 self.planets_owned.add(planet.id)
+                self.data_planets[planet.id]['my_miners'].update(planet._docked_ship_ids)
             else:
                 self.planets_enemy.add(planet.id)
+
+    def set_planet_data(self, planet):
+        """
+        FILL PLANET DATA
+        """
+        ## my_miners ARE MY SHIPS MINING OR GOING TO MINE THIS PLANET
+        ## NEED TO ADD SHIPS TASKED TO EXPANDING
+        self.data_planets[planet.id] = {'y': planet.y, \
+                                   'x': planet.x, \
+                                   'radius': planet.radius, \
+                                   'num_docks': planet.num_docking_spots, \
+                                   'my_miners': set(), \
+                                   'owner': None if planet.owner is None else planet.owner.id}
+
 
     def set_ships_status(self):
         """
         SET STATUS OF SHIPS
         """
-        for ship_id in self.ships_owned:
-            ## CHECK IF SHIP IS NEW
-            if self.myMap_prev is not None and ship_id not in self.myMap_prev.ships_owned:
-                self.ships_new.add(ship_id)
+        # for ship_id in self.ships_owned:
+        #     ## CHECK IF SHIP IS NEW
+        #     if self.myMap_prev is not None and ship_id not in self.myMap_prev.ships_owned:
+        #         self.ships_new.add(ship_id)
 
-        ## CHECK FOR SHIPS THAT DIED FROM LAST TURN
         if self.myMap_prev is not None:
+            ## CHECK FOR SHIPS THAT ARE NEW
+            self.ships_new = self.ships_owned - self.myMap_prev.ships_owned
+
+            ## CHECK FOR MY SHIPS THAT DIED FROM LAST TURN
             ## CHECK FOR SHIPS ONLY IN PREVIOUS, BUT NOT IN CURRENT (SET DIFFERENCE)
             self.ships_died = self.myMap_prev.ships_owned - self.ships_owned
+
+    def set_from_planet(self):
+        """
+        ASSOCIATE NEW SHIPS WITH A PLANET ORIGIN
+        """
+        for ship_id in self.ships_new:
+            for planet_id in self.planets_owned:
+                planet_coord = (self.data_planets[planet_id]['y'],self.data_planets[planet_id]['x'])
+                ship_coord = (self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
+
+                ## PLUS 2 SINCE SPAWN CAN BE AROUND THERE, MADE IT 3 TO BE SURE
+                if Exploration.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+3):
+                    self.data_ships[self.game_map.my_id][ship_id]['from_planet'] = planet_id
+                    logging.debug("From planet set {}".format(planet_id))
+                    break
 
 
 class MyMatrix():
@@ -493,7 +550,7 @@ class NeuralNet():
 
         if myMap.myMap_prev is not None and myMap.myMap_prev.myMap_prev is not None:
             ## GO THROUGH PREVIOUS SHIPS OF CURRENT PLAYER
-            for ship_id, ship_data in myMap.myMap_prev.data[player_id].items():
+            for ship_id, ship_data in myMap.myMap_prev.data_ships[player_id].items():
                 ## ship_data HAS x, y, health, dock_status
 
                 ## PREVIOUS SHIP POSITION
@@ -525,7 +582,7 @@ class NeuralNet():
 
                     ## CHECK IF SHIP EXIST BEFORE
                     ## PREVIOUS PREVIOUS LOCATION
-                    ship_prev = myMap.myMap_prev.myMap_prev.data[player_id].get(ship_id)
+                    ship_prev = myMap.myMap_prev.myMap_prev.data_ships[player_id].get(ship_id)
 
 
                     matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
@@ -553,7 +610,7 @@ class NeuralNet():
                     y_train_current = np.zeros((15, 15), dtype=np.float)
 
 
-                    now_ship = myMap.data[player_id].get(ship_id)
+                    now_ship = myMap.data_ships[player_id].get(ship_id)
 
 
                     if now_ship: ## IF NONE, SHIP DIED
@@ -671,7 +728,7 @@ class NeuralNet():
         test_data = []
 
         ## GO THROUGH SHIPS OF CURRENT PLAYER
-        for ship_id, ship_data in myMap.data[player_id].items():
+        for ship_id, ship_data in myMap.data_ships[player_id].items():
             ## ship_data HAS x, y, health, dock_status
 
             ## CURRENT SHIP POSITION
@@ -699,7 +756,7 @@ class NeuralNet():
                                               now_x - half_x:now_x + half_x + 1]
 
                 ## CHECK IF SHIP EXIST BEFORE
-                ship_prev = myMap.myMap_prev.data[player_id].get(ship_id)
+                ship_prev = myMap.myMap_prev.data_ships[player_id].get(ship_id)
 
                 matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
                 if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY

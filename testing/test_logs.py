@@ -31,19 +31,26 @@ def log_planets(game_map):
 
 def log_all_ships(myMap):
     logging.debug("Logging all ships:")
-    for player_id, dict in myMap.data.items():
+    for player_id, dict in myMap.data_ships.items():
         logging.debug("Player id: {}".format(player_id))
         for ship_id, ship in dict.items():
             logging.debug("ship_id: {} with data:{}".format(ship_id,ship))
 
+def log_all_planets(myMap):
+    logging.debug("Logging all planets:")
+    for planet_id, dict in myMap.data_planets.items():
+        logging.debug("Planet id: {} with data: {}".format(planet_id, dict))
+
 def log_myMap_ships(myMap):
+    logging.debug("------myMap Ships------")
     logging.debug("My ships: {}".format(myMap.ships_owned))
     logging.debug("New ships: {}".format(myMap.ships_new))
     logging.debug("Died ships: {}".format(myMap.ships_died))
-    logging.debug("My Docked ships: {}".format(myMap.ships_docked_ally))
-    logging.debug("Enemy Docked ships: {}".format(myMap.ships_docked_enemy))
+    logging.debug("My Docked ships: {}".format(myMap.ships_mining_ally))
+    logging.debug("Enemy Docked ships: {}".format(myMap.ships_mining_enemy))
 
 def log_myMap_planets(myMap):
+    logging.debug("------myMap Planets------")
     logging.debug("My planets: {}".format(myMap.planets_owned))
     logging.debug("Enemy planets: {}".format(myMap.planets_enemy))
     logging.debug("Unowned planets: {}".format(myMap.planets_unowned))

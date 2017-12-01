@@ -98,11 +98,12 @@ class Exploration():
 
         return (sum_y / length, sum_x / length)
 
+    @classmethod
     def within_circle(self,point,center,radius):
         """
         RETURNS TRUE OR FALSE
         WHETHER point IS INSIDE THE CIRCLE, AT center WITH radius provided
-        point AND center HAVE (y,x)
+        point AND center HAVE (y,x) FORMAT
         """
         return ( (point[0]-center[0])**2 + (point[1]-center[1])**2 ) < (radius**2)
 

@@ -2,7 +2,7 @@ import hlt
 import logging
 from initialization.expansion import Exploration
 from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions, log_all_ships, log_myMap_ships, \
-                              log_myMap_planets
+                              log_myMap_planets, log_all_planets
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
 from models.model import NeuralNet, MyMap, MyMatrix, make_keras_picklable
@@ -158,8 +158,8 @@ if __name__ == "__main__":
     ## UPDATABLE PARAMETERS
     disable_log = False
     MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
-    WAIT_TIME = 1.200 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
-    GET_TIMEOUT = 0.015 ## TIMEOUT SET FOR .GET()
+    WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.010 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
     input_matrix_z = 4
@@ -228,6 +228,7 @@ if __name__ == "__main__":
 
             ## FOR TESTING ONLY
             log_all_ships(myMap)
+            log_all_planets(myMap)
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION

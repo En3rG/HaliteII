@@ -5,7 +5,8 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
                               log_myMap_planets, log_all_planets
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
-from models.model import NeuralNet, MyMap, MyMatrix, make_keras_picklable
+from models.model import NeuralNet, make_keras_picklable
+from models.data import MyMap, MyMatrix
 from projection.projection import MyProjection
 from movement import moves
 import MyCommon
@@ -210,15 +211,13 @@ if __name__ == "__main__":
 
             logging.info("myMap completed {}".format(datetime.datetime.now()))
 
-            ## TESTING ONLY
-            log_myMap_ships(myMap)
-            log_myMap_planets(myMap)
+
 
 
             ## GET PRJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(game_map,myMap)
 
-            logging.info("myProjetion completed {}".format(datetime.datetime.now()))
+            logging.info("myProjection completed {}".format(datetime.datetime.now()))
 
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
@@ -226,9 +225,7 @@ if __name__ == "__main__":
 
 
 
-            ## FOR TESTING ONLY
-            log_all_ships(myMap)
-            log_all_planets(myMap)
+
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
@@ -246,15 +243,15 @@ if __name__ == "__main__":
 
             logging.info("model_handler completed {}".format(datetime.datetime.now()))
 
-            ## FOR TESTING ONLY
-            #log_planets(game_map)
-            #log_players(game_map)
+
 
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
 
             ## CURRENTLY FROM STARTER BOT MOVES
-            moves.starter_bot_moves(game_map,command_queue)
+            #moves.starter_bot_moves(game_map,command_queue)
+            myMoves = moves.MyMoves(myMap, EXP, game_map)
+            command_queue = myMoves.command_queue
 
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 
@@ -268,12 +265,26 @@ if __name__ == "__main__":
 
             logging.info("about to send commands {}".format(datetime.datetime.now()))
 
+            logging.info("Command_queue: {}".format(command_queue))
+
             ## SEND OUR COMMANDS TO HALITE ENGINE THIS TURN
             game.send_command_queue(command_queue)
             ## TURN END
 
             logging.info("Commands send at {}".format(datetime.datetime.now()))
 
+
+            ## TESTING ONLY
+            log_myMap_ships(myMap)
+            log_myMap_planets(myMap)
+
+            ## FOR TESTING ONLY
+            log_all_ships(myMap)
+            log_all_planets(myMap)
+
+            ## FOR TESTING ONLY
+            # log_planets(game_map)
+            # log_players(game_map)
 
             ## CLEAN UP OBJECTS NO LONGER REQUIRED NEXT TURN
             ## NECESSARY??

@@ -40,6 +40,7 @@ import math
 import datetime
 from keras.optimizers import SGD
 from initialization.expansion import Exploration
+from models.data import Matrix_val
 
 graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
 
@@ -72,311 +73,6 @@ def make_keras_picklable():
     cls.__getstate__ = __getstate__
     cls.__setstate__ = __setstate__
 
-
-
-class Matrix_val(Enum):
-    """
-    VALUES PLACED ON THE MATRIX
-    REPRESENTING ITS STATUS
-    """
-    ALLY_SHIP = 1
-    ALLY_SHIP_DOCKED = 0.75
-    ALLY_PLANET = 0.50
-    UNOWNED_PLANET = 0.25
-    DEFAULT = 0
-    ENEMY_PLANET = -0.5
-    ENEMY_SHIP_DOCKED = -0.75
-    ENEMY_SHIP = -1
-    MAX_SHIP_HP = 255
-
-class ShipTasks(Enum):
-    """
-    VALUES FOR SHIPS TASKS
-    """
-    NONE = -1   ## DEFAULT
-    MINING = 0
-    EXPANDING = 1
-    DEFENDING = 2
-    ATTACKING = 3
-    RUNNING = 4
-
-
-class MyMap():
-    """
-    CONVERT GAME_MAP TO DICTIONARY
-    ACCESS WITH PLAYER IDs AND SHIP IDs
-    """
-    MAX_NODES = 3
-    NUM_NODES = 0
-
-    def __init__(self,game_map, myMap_prev):
-        self.planets_owned = set()  ## PLANETS I OWN
-        self.planets_unowned = set()  ## PLANETS UNOWNED
-        self.planets_enemy = set()  ## PLANETS OWNED BY ENEMY
-
-        self.ships_owned = set()  ## SHIPS I OWN
-        self.ships_new = set()  ## SHIPS THAT DIDNT EXIST PREVIOUSLY
-        self.ships_died = set()  ## SHIPS THAT DIED
-        self.ships_mining_ally = set()  ## SHIPS THAT ARE DOCKED (MINE)
-        self.ships_mining_enemy = set()  ## SHIPS THAT ARE DOCKED (ENEMY)
-        self.ships_attacking = set()  ## THESE ARE CURRENTLY NOT USED
-        self.ships_defending = set()  ## THESE ARE CURRENTLY NOT USED
-        self.ships_expanding = set()  ## THESE ARE CURRENTLY NOT USED
-        self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
-
-        self.game_map = game_map
-        self.myMap_prev = myMap_prev
-
-        self.data_ships = self.get_ship_data()
-        self.data_planets = {}
-        self.set_planet_status()
-        self.set_ships_status()
-        self.set_from_planet()  ## ASSOCIATE NEW SHIPS TO A PLANET
-
-        ## KEEP A LIMIT OF NODES IN MEMORY
-        self.check_limit()
-
-    def check_limit(self):
-        """
-        DELETE NODES THAT ARE OVER THE MAX LIMIT
-        """
-        MyMap.NUM_NODES += 1
-        if MyMap.NUM_NODES > MyMap.MAX_NODES:
-            ## DELETE OLD NODES
-            self.myMap_prev.myMap_prev.myMap_prev = None
-            MyMap.NUM_NODES -= 1
-
-    def get_ship_data(self):
-        """
-        RETURN DATA IN DICTIONARY FORM
-        DOCKING STATUS:
-        0 = UNDOCKED
-        1 = DOCKING
-        2 = DOCKED
-        3 = UNDOCKING
-
-        enemy_in_turn WILL BE POPULATED BY PROJECTIONS
-        """
-        data = {}
-        for player in self.game_map.all_players():
-
-            player_id = player.id
-            mine = player_id == self.game_map.my_id
-
-            data[player_id] = {}
-            for ship in player.all_ships():
-                ship_id = ship.id
-                data[player_id][ship_id] = {'x': ship.x, \
-                                            'y': ship.y, \
-                                            'health': ship.health, \
-                                            'dock_status': ship.docking_status.value, \
-                                            'enemy_in_turn':[], \
-                                            'enemy_coord':[],\
-                                            'from_planet':None, \
-                                            'task':ShipTasks.NONE}
-                                             ## from_planet IS ONLY SET ON NEW SHIPS
-
-                docked = not(ship.docking_status.value == 0)
-
-                ## GATHER SHIPS I OWN
-                if mine:
-                    self.ships_owned.add(ship_id)
-                    ## GATHER DOCKED SHIPS
-                    if docked:
-                        self.ships_mining_ally.add(ship_id)
-                else:
-                    ## GATHER ENEMY DOCKED SHIPS
-                    if docked:
-                        self.ships_mining_enemy.add(ship_id)
-
-
-        return data
-
-    def set_planet_status(self):
-        """
-        GATHER PLANETS WITH KEY AS PLANET ID
-
-        SET STATUS OF PLANETS
-        """
-        for planet in self.game_map.all_planets():
-            ## FILL IN PLANETS DATA
-            self.set_planet_data(planet)
-
-            if not planet.is_owned():
-                self.planets_unowned.add(planet.id)
-            elif planet.owner is not None and planet.owner.id == self.game_map.my_id:
-                self.planets_owned.add(planet.id)
-                self.data_planets[planet.id]['my_miners'].update(planet._docked_ship_ids)
-            else:
-                self.planets_enemy.add(planet.id)
-
-    def set_planet_data(self, planet):
-        """
-        FILL PLANET DATA
-        """
-        ## my_miners ARE MY SHIPS MINING OR GOING TO MINE THIS PLANET
-        ## NEED TO ADD SHIPS TASKED TO EXPANDING
-        self.data_planets[planet.id] = {'y': planet.y, \
-                                   'x': planet.x, \
-                                   'radius': planet.radius, \
-                                   'num_docks': planet.num_docking_spots, \
-                                   'my_miners': set(), \
-                                   'owner': None if planet.owner is None else planet.owner.id}
-
-
-    def set_ships_status(self):
-        """
-        SET STATUS OF SHIPS
-        """
-        # for ship_id in self.ships_owned:
-        #     ## CHECK IF SHIP IS NEW
-        #     if self.myMap_prev is not None and ship_id not in self.myMap_prev.ships_owned:
-        #         self.ships_new.add(ship_id)
-
-        if self.myMap_prev is not None:
-            ## CHECK FOR SHIPS THAT ARE NEW
-            self.ships_new = self.ships_owned - self.myMap_prev.ships_owned
-
-            ## CHECK FOR MY SHIPS THAT DIED FROM LAST TURN
-            ## CHECK FOR SHIPS ONLY IN PREVIOUS, BUT NOT IN CURRENT (SET DIFFERENCE)
-            self.ships_died = self.myMap_prev.ships_owned - self.ships_owned
-
-    def set_from_planet(self):
-        """
-        ASSOCIATE NEW SHIPS WITH A PLANET ORIGIN
-        """
-        for ship_id in self.ships_new:
-            for planet_id in self.planets_owned:
-                planet_coord = (self.data_planets[planet_id]['y'],self.data_planets[planet_id]['x'])
-                ship_coord = (self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
-
-                ## PLUS 2 SINCE SPAWN CAN BE AROUND THERE, MADE IT 3 TO BE SURE
-                if Exploration.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+3):
-                    self.data_ships[self.game_map.my_id][ship_id]['from_planet'] = planet_id
-                    logging.debug("From planet set {}".format(planet_id))
-                    break
-
-
-class MyMatrix():
-    MAX_NODES = 3
-    NUM_NODES =0
-
-    def __init__(self, game_map, myMatrix_prev,input_matrix_y,input_matrix_x):
-        self.game_map = game_map
-        self.matrix_prev = myMatrix_prev
-        self.input_matrix_y = input_matrix_y
-        self.input_matrix_x = input_matrix_x
-        self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
-
-        ## KEEP A LIMIT OF NODES IN MEMORY
-        self.check_limit()
-
-    def check_limit(self):
-        """
-        DELETE NODES THAT ARE OVER THE MAX LIMIT
-        """
-        MyMatrix.NUM_NODES += 1
-        if MyMatrix.NUM_NODES > MyMatrix.MAX_NODES:
-            ## DELETE OLD NODES
-            self.matrix_prev.matrix_prev.matrix_prev = None
-            MyMatrix.NUM_NODES -= 1
-
-    def get_matrix(self):
-        """
-        GET BASE MATRIX (WITH PLANETS INFO)
-        GET MAP MATRIX PER PLAYER ID
-        """
-        final_matrix = {}
-        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        matrix_hp = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-
-        for player in self.game_map.all_players():
-            if player.id == self.game_map.my_id:
-                ## SKIPPING IF ITS ME
-                continue
-
-            matrix_current = copy.deepcopy(matrix)
-            matrix_hp_current = copy.deepcopy(matrix_hp)
-            matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player.id)
-
-
-            ## FILL CURRENT PLAYER'S SHIPS
-            matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,player)
-
-            for player_enemy in self.game_map.all_players():
-                if player_enemy.id == player.id:
-                    pass
-                else:
-                    ## FILL CURRENT PLAYER'S ENEMY SHIPS
-                    matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, player_enemy)
-
-            final_matrix[player.id] = (matrix_current,matrix_hp_current)
-
-        return final_matrix
-
-
-
-
-    def fill_planets(self,matrix,matrix_hp, player_id):
-        """
-        FILL MATRIX WITH
-        ENTIRE BOX OF PLANET, CAN CHANGE TO CIRCLE LATER
-
-        FILL IN MATRIX_HP OF PLANETS HP
-        HP IS A PERCENTAGE OF MAX_SHIP_HP
-        """
-        for planet in self.game_map.all_planets():
-            if not planet.is_owned():
-                value = Matrix_val.UNOWNED_PLANET.value
-            elif planet.owner is not None and planet.owner.id == player_id:
-                value = Matrix_val.ALLY_PLANET.value
-            else:
-                value = Matrix_val.ENEMY_PLANET.value
-
-            ## INSTEAD OF FILLING JUST THE CENTER, FILL IN A BOX
-            #matrix[round(planet.y)][round(planet.x)] = value
-            matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius)+1, \
-                   round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)+1] = value
-
-            ## FILL IN MATRIX_HP WITH HP OF PLANET
-            matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
-                      round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health/Matrix_val.MAX_SHIP_HP.value
-
-        return matrix, matrix_hp
-
-    def fill_ships_ally(self,matrix,matrix_hp,player):
-        """
-        FILL MATRIX WHERE SHIP IS AT AND ITS HP
-        HP IS A PERCENTAGE OF MAX_SHIP_HP
-        """
-        for ship in player.all_ships():
-            if ship.docking_status.value == 0:  ## UNDOCKED
-                value = Matrix_val.ALLY_SHIP.value
-            else:
-                value = Matrix_val.ALLY_SHIP_DOCKED.value
-
-            matrix[round(ship.y)][round(ship.x)] = value
-            matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
-
-        return matrix, matrix_hp
-
-    def fill_ships_enemy(self, matrix, matrix_hp, player):
-        """
-        FILL MATRIX WHERE SHIP IS AT AND ITS HP
-        HP IS A PERCENTAGE OF MAX_SHIP_HP
-
-        value WILL DEPEND ON ENEMY, IF DOCKED OR NOT
-        """
-        for ship in player.all_ships():
-            if ship.docking_status.value == 0:  ## UNDOCKED
-                value = Matrix_val.ENEMY_SHIP.value
-            else:
-                value = Matrix_val.ENEMY_SHIP_DOCKED.value
-
-            matrix[round(ship.y)][round(ship.x)] = value
-            matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
-
-        return matrix, matrix_hp
 
 class NeuralNet():
     def __init__(self,y,x,z):
@@ -919,7 +615,6 @@ class NeuralNet():
 
         print(new)
 
-
 class Predicted():
 
     """
@@ -973,21 +668,21 @@ class Predicted():
     """
 
     ## CAN GENERATE AN ALGORITHM LATER TO GENERATE THIS, FOR NOW KEEPING IT THIS WAY
-    COORDS = {0:(0, 0), 1:(0, 0), 2:(0, 0), 3:(0, 0), 4:(0, 0), 5:(0, 0), 6:(0, 0), 7:(0, 7), 8:(0, 0), 9:(0, 0), 10:(0, 0), 11:(0, 0), 12:(0, 0), 13:(0, 0), 14:(0, 0),
-              15:(0, 0),16:(0, 0),17:(0, 0),18:(0, 0),19:(1, 4),20:(1, 5),21:(1, 6),22:(1, 7),23:(1, 8),24:(1, 9),25:(1, 10),26:(0, 0),27:(0, 0),28:(0, 0),29:(0, 0),
-              30:(0, 0),31:(0, 0),32:(0, 0),33:(2, 3),34:(2, 4),35:(2, 5),36:(2, 6),37:(2, 7),38:(2, 8),39:(2, 9),40:(2, 10),41:(2, 11),42:(0, 0),43:(0, 0),44:(0, 0),
-              45:(0, 0),46:(0, 0),47:(3, 2),48:(3, 3),49:(3, 4),50:(3, 5),51:(3, 6),52:(3, 7),53:(3, 8),54:(3, 9),55:(3, 10),56:(3, 11),57:(3, 12),58:(0, 0),59:(0, 0),
-              60:(0, 0),61:(4, 1),62:(4, 2),63:(4, 3),64:(4, 4),65:(4, 5),66:(4, 6),67:(4, 7),68:(4, 8),69:(4, 9),70:(4, 10),71:(4, 11),72:(4, 12),73:(4, 13),74:(0, 0),
-              75:(0, 0),76:(5, 1),77:(5, 2),78:(5, 3),79:(5, 4),80:(5, 5),81:(5, 6),82:(5, 7),83:(5, 7),84:(5, 8),85:(5, 9),86:(5, 10),87:(5, 11),88:(5, 12),89:(0, 0),
-              90:(0, 0),91:(6, 1),92:(6, 2),93:(6, 3),94:(6, 4),95:(6, 5),96:(6, 6),97:(6, 7),98:(6, 7),99:(6, 8),100:(6, 9),101:(6, 10),102:(6, 11),103:(6, 12),104:(0, 0),
-              105:(7, 0),106:(7, 0),107:(7, 2),108:(7, 3),109:(7, 4),110:(7, 5),111:(7, 6),112:(7, 7),113:(7, 8),114:(7, 9),115:(7, 10),116:(7, 11),117:(7, 12),118:(7, 13),119:(7, 14),
-              120:(0, 0),121:(8, 0),122:(8, 2),123:(8, 3),124:(8, 4),125:(8, 5),126:(8, 6),127:(8, 7),128:(8, 8),129:(8, 9),130:(8, 10),131:(8, 11),132:(8, 12),133:(8, 13),134:(0, 0),
-              135:(0, 0),136:(9, 0),137:(9, 2),138:(9, 3),139:(9, 4),140:(9, 5),141:(9, 6),142:(9, 7),143:(9, 8),144:(9, 9),145:(9, 10),146:(9, 11),147:(9, 12),148:(9, 13),149:(0, 0),
-              150:(0, 0),151:(10, 0),152:(10, 2),153:(10, 3),154:(10, 4),155:(10, 5),156:(10, 6),157:(10, 7),158:(10, 8),159:(10, 9),160:(10, 10),161:(10, 11),162:(10, 12),163:(10, 13),164:(0, 0),
-              165:(0, 0),166:(0, 0),167:(11, 2),168:(11, 3),169:(11, 4),170:(11, 5),171:(11, 6),172:(11, 7),173:(11, 8),174:(11, 9),175:(11, 10),176:(11, 11),177:(11, 12),178:(0, 0),179:(0, 0),
-              180:(0, 0),181:(0, 0),182:(0, 0),183:(12, 3),184:(12, 4),185:(12, 5),186:(12, 6),187:(12, 7),188:(12, 8),189:(12, 9),190:(12, 10),191:(12, 11),192:(0, 0),193:(0, 0),194:(0, 0),
-              195:(0, 0),196:(0, 0),197:(0, 0),198:(0, 0),199:(13, 4),200:(13, 5),201:(13, 6),202:(13, 7),203:(13, 8),204:(13, 9),205:(13, 10),206:(0, 0),207:(0, 0),208:(0, 0),209:(0, 0),
-              210:(0, 0),211:(0, 0),212:(0, 0),213:(0, 0),214:(0, 0),215:(0, 0),216:(0, 0),217:(14, 7),218:(0, 0),219:(0, 0),220:(0, 0),221:(0, 0),222:(0, 0),223:(0, 0),224:(0, 0)}
+    COORDS = {0: (0, 0), 1: (0, 0), 2: (0, 0), 3: (0, 0), 4: (0, 0), 5: (0, 0), 6: (0, 0), 7: (0, 7), 8: (0, 0), 9: (0, 0), 10: (0, 0), 11: (0, 0), 12: (0, 0), 13: (0, 0), 14: (0, 0),
+              15: (0, 0), 16: (0, 0), 17: (0, 0), 18: (0, 0), 19: (1, 4), 20: (1, 5), 21: (1, 6), 22: (1, 7), 23: (1, 8), 24: (1, 9), 25: (1, 10), 26: (0, 0), 27: (0, 0), 28: (0, 0), 29: (0, 0),
+              30: (0, 0), 31: (0, 0), 32: (0, 0), 33: (2, 3), 34: (2, 4), 35: (2, 5), 36: (2, 6), 37: (2, 7), 38: (2, 8), 39: (2, 9), 40: (2, 10), 41: (2, 11), 42: (0, 0), 43: (0, 0), 44: (0, 0),
+              45: (0, 0), 46: (0, 0), 47: (3, 2), 48: (3, 3), 49: (3, 4), 50: (3, 5), 51: (3, 6), 52: (3, 7), 53: (3, 8), 54: (3, 9), 55: (3, 10), 56: (3, 11), 57: (3, 12), 58: (0, 0), 59: (0, 0),
+              60: (0, 0), 61: (4, 1), 62: (4, 2), 63: (4, 3), 64: (4, 4), 65: (4, 5), 66: (4, 6), 67: (4, 7), 68: (4, 8), 69: (4, 9), 70: (4, 10), 71: (4, 11), 72: (4, 12), 73: (4, 13), 74: (0, 0),
+              75: (0, 0), 76: (5, 1), 77: (5, 2), 78: (5, 3), 79: (5, 4), 80: (5, 5), 81: (5, 6), 82: (5, 7), 83: (5, 7), 84: (5, 8), 85: (5, 9), 86: (5, 10), 87: (5, 11), 88: (5, 12), 89: (0, 0),
+              90: (0, 0), 91: (6, 1), 92: (6, 2), 93: (6, 3), 94: (6, 4), 95: (6, 5), 96: (6, 6), 97: (6, 7), 98: (6, 7), 99: (6, 8), 100: (6, 9), 101: (6, 10), 102: (6, 11), 103: (6, 12), 104: (0, 0),
+              105: (7, 0), 106: (7, 0), 107: (7, 2), 108: (7, 3), 109: (7, 4), 110: (7, 5), 111: (7, 6), 112: (7, 7), 113: (7, 8), 114: (7, 9), 115: (7, 10), 116: (7, 11), 117: (7, 12), 118: (7, 13), 119: (7, 14),
+              120: (0, 0), 121: (8, 0), 122: (8, 2), 123: (8, 3), 124: (8, 4), 125: (8, 5), 126: (8, 6), 127: (8, 7), 128: (8, 8), 129: (8, 9), 130: (8, 10), 131: (8, 11), 132: (8, 12), 133: (8, 13), 134: (0, 0),
+              135: (0, 0), 136: (9, 0), 137: (9, 2), 138: (9, 3), 139: (9, 4), 140: (9, 5), 141: (9, 6), 142: (9, 7), 143: (9, 8), 144: (9, 9), 145: (9, 10), 146: (9, 11), 147: (9, 12), 148: (9, 13), 149: (0, 0),
+              150: (0, 0), 151: (10, 0), 152: (10, 2), 153: (10, 3), 154: (10, 4), 155: (10, 5), 156: (10, 6), 157: (10, 7), 158: (10, 8), 159: (10, 9), 160: (10, 10), 161: (10, 11), 162: (10, 12), 163: (10, 13), 164: (0, 0),
+              165: (0, 0), 166: (0, 0), 167: (11, 2), 168: (11, 3), 169: (11, 4), 170: (11, 5), 171: (11, 6), 172: (11, 7), 173: (11, 8), 174: (11, 9), 175: (11, 10), 176: (11, 11), 177: (11, 12), 178: (0, 0), 179: (0, 0),
+              180: (0, 0), 181: (0, 0), 182: (0, 0), 183: (12, 3), 184: (12, 4), 185: (12, 5), 186: (12, 6), 187: (12, 7), 188: (12, 8), 189: (12, 9), 190: (12, 10), 191: (12, 11), 192: (0, 0), 193: (0, 0), 194: (0, 0),
+              195: (0, 0), 196: (0, 0), 197: (0, 0), 198: (0, 0), 199: (13, 4), 200: (13, 5), 201: (13, 6), 202: (13, 7), 203: (13, 8), 204: (13, 9), 205: (13, 10), 206: (0, 0), 207: (0, 0), 208: (0, 0), 209: (0, 0),
+              210: (0, 0), 211: (0, 0), 212: (0, 0), 213: (0, 0), 214: (0, 0), 215: (0, 0), 216: (0, 0), 217: (14, 7), 218: (0, 0), 219: (0, 0), 220: (0, 0), 221: (0, 0), 222: (0, 0), 223: (0, 0), 224: (0, 0)}
 
     @staticmethod
     def get_new_location(key):
@@ -999,15 +694,14 @@ class Predicted():
 
         IF RETURNING -10, -10. SHIP PREDICTED TO DIE OR INVALID LOCATION
         """
-        center = (7,7)
+        center = (7, 7)
         logging.debug("key {}".format(key))
         coords = Predicted.COORDS[key]
 
-        if coords == (0,0):
-            return (-10,-10)  ## DEAD OR INVALID PREDICTION
+        if coords == (0, 0):
+            return (-10, -10)  ## DEAD OR INVALID PREDICTION
         else:
-            return coords[0]-center[0], coords[1]-center[1]
-
+            return coords[0] - center[0], coords[1] - center[1]
 
 
 # make_keras_picklable()

@@ -39,7 +39,7 @@ from enum import Enum
 import math
 import datetime
 from keras.optimizers import SGD
-from initialization.expansion import Exploration
+from initialization.explore import Exploration
 from models.data import Matrix_val
 
 graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING

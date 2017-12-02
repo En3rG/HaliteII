@@ -1,6 +1,6 @@
 import hlt
 import logging
-from initialization.expansion import Exploration
+from initialization.explore import Exploration
 from testing.test_logs import log_players, log_planets, log_myShip, log_dimensions, log_all_ships, log_myMap_ships, \
                               log_myMap_planets, log_all_planets
 from multiprocessor.processors import MyProcesses

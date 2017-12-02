@@ -41,6 +41,56 @@ class MyMoves():
         angle = math.degrees(math.atan2(target_coords[0] - coords[0], target_coords[1] - coords[1])) % 360
         return round(angle)
 
+    @classmethod
+    def get_destination(self, start_coord, angle, thrust):
+        """
+        GIVEN ANGLE AND THRUST, GET DESTINATION COORDS
+
+        start_coord HAVE (y,x) FORMAT
+        """
+        if angle == 0:
+            return (start_coord[0],start_coord[1] + thrust)
+
+        elif angle < 90:
+            angle_radian = math.radians(angle)
+            rise = thrust * math.sin(angle_radian)
+            run = thrust * math.cos(angle_radian)
+            return (start_coord[0] + rise, start_coord[1] + run)
+
+        elif angle == 90:
+            return (start_coord[0] - thrust, start_coord[1])
+
+        elif angle < 180:
+            angle = 180 - angle
+            angle_radian = math.radians(angle)
+
+            rise = thrust * math.sin(angle_radian)
+            run = thrust * math.cos(angle_radian)
+            return (start_coord[0] + rise, start_coord[1] - run)
+
+        elif angle == 180:
+            return (start_coord[0], start_coord[1] - thrust)
+
+        elif angle < 270:
+            angle = angle - 180
+            angle_radian = math.radians(angle)
+
+            rise = thrust * math.sin(angle_radian)
+            run = thrust * math.cos(angle_radian)
+            return (start_coord[0] - rise, start_coord[1] - run)
+
+        elif angle == 270:
+            return (start_coord[0] + thrust, start_coord[1])
+
+        else:
+            angle = 360 - angle
+            angle_radian = math.radians(angle)
+
+            rise = thrust * math.sin(angle_radian)
+            run = thrust * math.cos(angle_radian)
+            return (start_coord[0] - rise, start_coord[1] + run)
+
+
     def get_my_moves(self):
         if self.myMap.myMap_prev is None:
             ## FIRST TURN
@@ -48,7 +98,7 @@ class MyMoves():
                 ## GET BEST PLANET AND SET COMMAND QUEUE
                 target_planet_id = self.EXP.best_planet
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
-                planet_x = self.myMap.data_planets[target_planet_id]['y']
+                planet_x = self.myMap.data_planets[target_planet_id]['x']
 
                 ship_y = self.myMap.data_ships[self.game_map.my_id][ship_id]['y']
                 ship_x = self.myMap.data_ships[self.game_map.my_id][ship_id]['x']
@@ -66,10 +116,39 @@ class MyMoves():
                 ## SET PLANET MY MINER
                 self.set_planet_myminer(target_planet_id,ship_id)
 
+                ## GET DESTINATION COORDS (y,x)
+                self.set_ship_destination(ship_id,(ship_y,ship_x),angle,thrust)
+
 
         else:
             ## NOT FIRST TURN
-            test = None
+            for ship in self.game_map.get_me().all_ships():
+                ship_id = ship.id
+
+                target_planet_id = self.myMap.myMap_prev.data_ships[self.game_map.my_id][ship_id]['target'][1]
+                planet_y = self.myMap.data_planets[target_planet_id]['y']
+                planet_x = self.myMap.data_planets[target_planet_id]['x']
+
+
+                angle = self.get_angle((ship.y, ship.x), (planet_y, planet_x))
+                thrust = 7
+                self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
+
+                ## SET SHIP TARGET TO
+                self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
+
+                ## SET SHIP TASK TO
+                self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+
+                ## SET PLANET MY MINER
+                self.set_planet_myminer(target_planet_id, ship_id)
+
+                ## GET DESTINATION COORDS (y,x)
+                self.set_ship_destination(ship_id, (ship.y, ship.x), angle, thrust)
+
+    def set_ship_destination(self,ship_id, coords, angle, thrust):
+        self.myMap.data_ships[self.game_map.my_id][ship_id]['destination'] = \
+               self.get_destination((coords[0], coords[1]), angle, thrust)
 
     def set_ship_target(self,ship_id,target_type, target_id):
         """
@@ -89,6 +168,7 @@ class MyMoves():
         REGARDING SHIP GOING TO MINE THIS PLANET
         """
         self.myMap.data_planets[planet_id]['my_miners'].add(ship_id)
+
 
 def starter_bot_moves(game_map,command_queue):
     """
@@ -134,58 +214,7 @@ def starter_bot_moves(game_map,command_queue):
             break
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import math
-#
-# v1 = (1,0) ## y,x
-# v2 = (-1,0)
-#
-# v1_t = math.atan2(v1[0],v1[1])
-# v2_t = math.atan2(v2[0],v2[1])
-#
-# r = (v2_t - v1_t) * (180.0 / math.pi)
-#
-# print(r)
-#
-# if r < 0:
-#     r += 360.0
-#
-# print(r)
-#
-# print(math.degrees(math.atan2(v1[0] - v2[0], v1[1] - v2[1])) % 360)
+## y 40, x 60, angle 149, thrust 7
+## should give y 43.60 x 53.99
+# a = MyMoves.get_destination((40,60),149,7)
+# print(a)

@@ -1,8 +1,10 @@
 from enum import Enum
-from initialization.expansion import Exploration
+from initialization.explore import Exploration
 import numpy as np
 import copy
 import logging
+
+
 
 class Matrix_val(Enum):
     """
@@ -105,6 +107,7 @@ class MyMap():
                                             'enemy_coord':[],\
                                             'from_planet':None, \
                                             'target':None, \
+                                            'destination':None, \
                                             'task':ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS
 

@@ -160,11 +160,11 @@ if __name__ == "__main__":
     disable_log = False
     MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
     WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
-    GET_TIMEOUT = 0.010 ## TIMEOUT SET FOR .GET()
+    GET_TIMEOUT = 0.005 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
     input_matrix_z = 4
-    num_epoch = 3
+    num_epoch = 2
     batch_size = 300
 
     ## BY DEFAULT, KERAS MODEL ARE NOT SERIALIZABLE
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
             game_map = game.update_map()
 
-            logging.info("update_map time: {}".format(datetime.datetime.now()-main_start))
+            logging.info("hlt update_map time: {}".format(datetime.datetime.now()-main_start))
 
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
@@ -222,8 +222,6 @@ if __name__ == "__main__":
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
             myProjection.check_for_enemy()
-
-
 
 
 
@@ -249,9 +247,9 @@ if __name__ == "__main__":
             command_queue = []
 
             ## CURRENTLY FROM STARTER BOT MOVES
-            #moves.starter_bot_moves(game_map,command_queue)
-            myMoves = moves.MyMoves(myMap, EXP, game_map)
-            command_queue = myMoves.command_queue
+            moves.starter_bot_moves(game_map,command_queue)
+            #myMoves = moves.MyMoves(myMap, EXP, game_map)
+            #command_queue = myMoves.command_queue
 
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 

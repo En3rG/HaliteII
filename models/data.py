@@ -286,16 +286,39 @@ class MyMatrix():
             else:
                 value = Matrix_val.ENEMY_PLANET.value
 
-            ## INSTEAD OF FILLING JUST THE CENTER, FILL IN A BOX
-            #matrix[round(planet.y)][round(planet.x)] = value
-            matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius)+1, \
-                   round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)+1] = value
 
-            ## FILL IN MATRIX_HP WITH HP OF PLANET
-            matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
-                      round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health/Matrix_val.MAX_SHIP_HP.value
+            #matrix[round(planet.y)][round(planet.x)] = value
+            ## INSTEAD OF FILLING JUST THE CENTER, FILL IN A BOX
+            #matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius)+1, \
+            #       round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)+1] = value
+            ## FILLING A CIRCLE (BETTER)
+            matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
+
+            ## FILL IN MATRIX_HP WITH HP OF PLANET (BOX)
+            #matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
+            #          round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health/Matrix_val.MAX_SHIP_HP.value
+            ## FILLING A CIRCLE (BETTER)
+            matrix_hp = self.fill_circle(matrix_hp, planet.y, planet.x, planet.radius, planet.health/Matrix_val.MAX_SHIP_HP.value)
 
         return matrix, matrix_hp
+
+    def fill_circle(self,array, center_y, center_x, radius, value):
+        """
+        MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
+        """
+        height = self.game_map.height
+        width = self.game_map.width
+
+        ## y IS JUST AN ARRAY OF 1xY (ROWS)
+        ## x IS JUST AN ARRAY OF 1xX (COLS)
+        y, x = np.ogrid[-center_y:height-center_y, -center_x:width-center_x]
+        ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
+        mask = x*x + y*y <= radius*radius
+
+        array[mask] = value
+
+        return array
+
 
     def fill_ships_ally(self,matrix,matrix_hp,player):
         """

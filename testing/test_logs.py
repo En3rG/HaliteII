@@ -51,7 +51,6 @@ def log_myMap_ships(myMap):
     logging.debug("Ships (mining) (enemy): {}".format(myMap.ships_mining_enemy))
     logging.debug("Ships (attacking): {}".format(myMap.ships_attacking))
     logging.debug("Ships (defending): {}".format(myMap.ships_defending))
-    logging.debug("Ships (defending): {}".format(myMap.ships_defending))
     logging.debug("Ships (expanding): {}".format(myMap.ships_expanding))
     logging.debug("Ships (running): {}".format(myMap.ships_running))
 
@@ -76,3 +75,29 @@ def log_myID(game_map):
 def log_numPlayers(game_map):
     logging.debug("Number of players: {}".format(len(game_map._players)))
     logging.debug(" ")
+
+
+# import numpy as np
+#
+# def fill_circle(array, h, w, center_y, center_x, radius, value):
+#     """
+#     MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
+#     """
+#     height = h
+#     width = w
+#
+#     y, x = np.ogrid[-center_y:height - center_y, -center_x:width - center_x]
+#     ## y IS JUST AN ARRAY OF 1xY (ROWS)
+#     ## x IS JUST AN ARRAY OF 1xX (COLS)
+#     mask = x * x + y * y <= radius * radius
+#     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
+#
+#     array[mask] = value
+#
+#     return array
+#
+#
+# n = 10
+# array = np.ones((n, n))
+# array = fill_circle(array, n, n, 3,3, 3, 0)
+# print("Ans",array)

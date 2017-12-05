@@ -803,6 +803,12 @@ class Predicted():
 # from keras import regularizers
 # from keras.optimizers import SGD
 # import keras
+# import tensorflow as tf
+# import numpy as np
+# import time
+#
+# graph = tf.get_default_graph()
+#
 #
 # class NeuralNet():
 #     def __init__(self):
@@ -817,19 +823,37 @@ class Predicted():
 #     def neural_network_model(self,y,x,z,num_classes):
 #         model = None
 #         with graph.as_default():
+#             # model = Sequential()
+#             # model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
+#             # model.add(Conv2D(32, (3, 3), activation='relu'))
+#             # model.add(MaxPooling2D(pool_size=(2, 2)))
+#             # model.add(Dropout(0.25))
+#             # model.add(Conv2D(64, (3, 3), activation='relu'))
+#             # model.add(Conv2D(64, (3, 3), activation='relu'))
+#             # model.add(MaxPooling2D(pool_size=(2, 2)))
+#             # model.add(Dropout(0.25))
+#             # model.add(Flatten())
+#             # model.add(Dense(50, activation='relu'))
+#             # model.add(Dropout(0.5))
+#             # model.add(Dense(num_classes, activation='softmax'))
+#
+#
 #             model = Sequential()
-#             model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(y, x, z)))
-#             model.add(Conv2D(32, (3, 3), activation='relu'))
-#             model.add(MaxPooling2D(pool_size=(2, 2)))
-#             model.add(Dropout(0.25))
-#             model.add(Conv2D(64, (3, 3), activation='relu'))
-#             model.add(Conv2D(64, (3, 3), activation='relu'))
-#             model.add(MaxPooling2D(pool_size=(2, 2)))
-#             model.add(Dropout(0.25))
+#             model.add(Dense(100, input_shape=(y, x, z), activation='tanh', kernel_regularizer=regularizers.l2(0.01)))
 #             model.add(Flatten())
-#             model.add(Dense(50, activation='relu'))
-#             model.add(Dropout(0.5))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
+#             model.add(Dense(50, activation='tanh'))
 #             model.add(Dense(num_classes, activation='softmax'))
+#
+#
+#
 #             sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 #             model.compile(loss='categorical_crossentropy', optimizer=sgd)
 #

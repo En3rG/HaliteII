@@ -77,6 +77,9 @@ def log_numPlayers(game_map):
     logging.debug(" ")
 
 
+
+
+
 # import numpy as np
 #
 # def fill_circle(array, h, w, center_y, center_x, radius, value):
@@ -101,3 +104,17 @@ def log_numPlayers(game_map):
 # array = np.ones((n, n))
 # array = fill_circle(array, n, n, 3,3, 3, 0)
 # print("Ans",array)
+
+
+
+# from multiprocessing import freeze_support
+# from memory_profiler import memory_usage
+#
+# def f(x):
+#     return x*x
+#
+# if __name__ == "__main__":
+#     freeze_support()
+#
+#     mem_usage = memory_usage((f, (100,)))
+#     print("mem_usage: {}".format(mem_usage))

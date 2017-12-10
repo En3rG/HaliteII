@@ -525,24 +525,27 @@ class NeuralNet():
 
     @staticmethod
     def translate_predictions(predictions):
-        for player_id, dict in predictions.items():
+        if predictions:
+            for player_id, dict in predictions.items():
 
-            ## LOOPING WILL BE VERY SLOW, USE MAP!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                ## LOOPING WILL BE VERY SLOW, USE MAP!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            logging.debug("With player id: {}".format(player_id))
-            ship_ids, data = dict
+                logging.debug("Translate predictions with player id: {}".format(player_id))
+                ship_ids, data = dict
 
-            for id, pred in zip(ship_ids,data):
+                for id, pred in zip(ship_ids,data):
 
-                ## NO NEED TO RESHAPE. CAN JUST GET ARGMAX AND HAVE A DICTIONARY TO GET VALUES FASTER
-                # ncols = 15
-                # new = np.reshape(pred, (-1, ncols))  ## -1 TO AUTOMATICALLY CALCULATE #ROWS PER ncols GIVEN
+                    ## NO NEED TO RESHAPE. CAN JUST GET ARGMAX AND HAVE A DICTIONARY TO GET VALUES FASTER
+                    # ncols = 15
+                    # new = np.reshape(pred, (-1, ncols))  ## -1 TO AUTOMATICALLY CALCULATE #ROWS PER ncols GIVEN
 
-                argmax = np.argmax(pred)
+                    argmax = np.argmax(pred)
 
-                new_location = Predicted.get_new_location(argmax)
+                    new_location = Predicted.get_new_location(argmax)
 
-                logging.debug("Predicted ship id: {} new location: {} percentage: {}".format(id,new_location, max(pred)))
+                    logging.debug("Predicted ship id: {} new location: {} percentage: {}".format(id,new_location, max(pred)))
+        else:
+            logging.debug("Translate predictions is None")
 
 
     def testing_time(self):

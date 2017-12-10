@@ -18,6 +18,9 @@ import keras
 import datetime
 import os
 import signal
+from memory_profiler import profile       ## USING @profile PER FUNCTIONS, RUN WITH -m memory_profile FLAG
+from memory_profiler import memory_usage
+
 
 ## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'. N/A ANYMORE.
 
@@ -84,6 +87,7 @@ def get_predictions_queue(Q):
     logging.debug("Length of Q: {}".format(len(q)))
     return q
 
+
 def clean_predicting_args(MP):
     """
     SINCE PREDICTING COULD TAKE MORE TIME THAN WE WANT SOMETIMES
@@ -112,7 +116,14 @@ def clean_predicting_args(MP):
                 else:
                     break
             except:
+                garbage = None
+                logging.debug("Cleaned at exception {}".format(datetime.datetime.now()))
                 break
+
+        ## LETS TRY JUST SETTING IT TO NONE, THEN INITIALIZE QUEUE()
+        ## SETTING QUEUE TO NONE/QUEUE() DOESNT WORK (PIPE ERROR)
+        # MP.predictors[id]["args_queue"] = None
+        # MP.predictors[id]["args_queue"] = Queue()
 
     logging.debug("Done cleaning: {}".format(datetime.datetime.now()))
 
@@ -125,32 +136,77 @@ def model_handler(MP, turn, myMap, myMatrix):
 
     RETURNS PREDICTIONS AS DICTIONARY, WITH KEY OF ENEMY IDs
     """
-
     start = datetime.datetime.now()
 
     for id in MP.enemyIDs:
         logging.debug("Model handler for player: {}".format(id))
 
         ## GET DATA FOR TRAINING
-        x_train, y_train = NeuralNet.get_training_data(id, myMap, myMatrix)
-        if y_train is not None:
-            args = ("train_" + str(id) + "_" + str(turn), id, x_train,y_train)
-            MP.add_training(id, args)
+        get_data_training(id, myMap, myMatrix, MP, turn)
 
         ## GET DATA FOR PREDICTING
-        x_test, ship_ids = NeuralNet.get_predicting_data(id, myMap, myMatrix)
-        if x_test is not None:
-            args = ("pred_" + str(id) + "_" + str(turn), id, x_test, ship_ids)
-            MP.add_predicting(id, args)
-            logging.debug("Added to queue for predicting id: {} time: {}".format(str(id),datetime.datetime.now()))
-            #MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
+        get_data_predicting(id, myMap, myMatrix, MP, turn)
 
     ## GATHER/CLEANUP QUEUES
-    wait_predictions_queue(MP.predictions_queue,start)
+    predictions = gather_clean_predictions(MP,start,turn)
+
+    return predictions, turn + 1
+
+def get_data_training(id, myMap, myMatrix, MP, turn):
+    """
+    GET DATA FOR TRAINING
+    """
+    args = None
+
+    x_train, y_train = NeuralNet.get_training_data(id, myMap, myMatrix)
+    if y_train is not None:
+        args = ("train_" + str(id) + "_" + str(turn), id, x_train, y_train)
+        MP.add_training(id, args)
+
+    ## NO DIFFERENCE IN del OR SET TO None. EXCEPT del DELETE VARIABLE AS WELL
+    # del x_train
+    # del y_train
+    # del args
+    x_train, y_train, args = None, None, None
+
+def get_data_predicting(id, myMap, myMatrix, MP, turn):
+    """
+    GET DATA FOR PREDICTING
+    """
+    args = None
+
+    x_test, ship_ids = NeuralNet.get_predicting_data(id, myMap, myMatrix)
+    if x_test is not None:
+        args = ("pred_" + str(id) + "_" + str(turn), id, x_test, ship_ids)
+        MP.add_predicting(id, args)
+        logging.debug("Added to queue for predicting id: {} time: {}".format(str(id), datetime.datetime.now()))
+        # MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
+
+    ## NO DIFFERENCE IN del OR SET TO None. EXCEPT del DELETE VARIABLE AS WELL
+    # del x_test
+    # del ship_ids
+    # del args
+    x_test, ship_ids, args = None, None, None
+
+
+def gather_clean_predictions(MP,start,turn):
+    """
+    GATHER AND CLEAN UP PREDICTION QUEUES
+    """
+    wait_predictions_queue(MP.predictions_queue, start)
     predictions = get_predictions_queue(MP.predictions_queue)
     clean_predicting_args(MP)
 
-    return predictions, turn + 1
+    ## TERMINATE PREDICTORS THEN SPAWN THEM
+    ## THIS HELPS MINIMIZE MEMORY CONSUMPTION TO 1GB?? NOPE
+    ## ALSO LOG PER PREDICTORS ARE NOT TRACKED
+    ## SPAWNING COULD TAKE 2 SECS, THUS NEED TO SPAWN AND TERMINATE DIFFERENT PROCESSES PER TURN
+    ## THIS STILL CAUSES TO TAKE ALOT OF MEMORY!!!!
+    ## clear_session() FIXES THE ISSUE
+    #MP.terminate_predictors(turn%2) ## TERMINATE FOR THIS TURN
+    #MP.spawn_predictors((turn+1)%2) ## SPAWN FOR NEXT TURN
+
+    return predictions
 
 
 if __name__ == "__main__":
@@ -158,9 +214,9 @@ if __name__ == "__main__":
 
     ## UPDATABLE PARAMETERS
     disable_log = False
-    MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
-    WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
-    GET_TIMEOUT = 0.005 ## TIMEOUT SET FOR .GET()
+    MAX_DELAY = 1.8250 ## TO MAXIMIZE TIME PER TURN
+    WAIT_TIME = 1.1000 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.0075 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
     input_matrix_z = 4
@@ -235,6 +291,10 @@ if __name__ == "__main__":
 
             ## FOR TRAINING/PREDICTING MODEL
             predictions, turn = model_handler(MP,turn, myMap, myMatrix)
+
+            ## GETTING MEMORY USAGE IS QUITE SLOW (TIMES OUT)
+            # mem_usage = memory_usage((model_handler, (MP,turn, myMap, myMatrix)))
+            # logging.debug("mem_usage: {}".format(mem_usage))
 
             ## TRANSLATE PREDICTIONS
             NeuralNet.translate_predictions(predictions)

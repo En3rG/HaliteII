@@ -11,7 +11,11 @@ import copy
 import pickle
 from keras.models import model_from_json
 from keras.optimizers import SGD
+import keras
 import MyCommon
+import datetime
+import gc
+import tensorflow as tf
 
 class MyProcesses():
     def __init__(self,game,disable_log, wait_time, y, x, z, num_epoch, batch_size):
@@ -43,7 +47,7 @@ class MyProcesses():
         #self.model_queues = self.init_model_queues()
 
         self.spawn_trainers()
-        self.spawn_predictors()
+        self.spawn_predictors(1)
 
     def get_myID(self):
         """
@@ -154,7 +158,14 @@ class MyProcesses():
         logger.debug("Model loaded")
 
         ## LOAD WEIGHTS INTO MODEL
-        model.load_weights(str(id) + ".h5")
+        try:
+            model.load_weights(str(id) + ".h5")
+        except Exception as e:
+            ## FAILED (TRAINER POSSIBLY SAVING IT)
+            logger.debug("Error loading: {}.  Wait and try again".format(e))
+            time.sleep(0.05)
+            model.load_weights(str(id) + ".h5")
+
         logger.debug("Loaded weights")
         #sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         opt = NeuralNet.get_optimizer()
@@ -208,6 +219,10 @@ class MyProcesses():
         for id in self.enemyIDs:
             self.predictors[id] = {}
             self.predictors[id]["handler"] = None
+            ## IF HANDLER IS BASED ON TURNS
+            # self.predictors[id]["handler"] = {}
+            # self.predictors[id]["handler"][0] = None
+            # self.predictors[id]["handler"][1] = None
             self.predictors[id]["args_queue"] = Queue()
 
     def set_trainers(self):
@@ -231,7 +246,28 @@ class MyProcesses():
         ## CHANGING TO ADDING TO QUEUE
         self.predictors[id]["args_queue"].put(arguments)
 
-    def spawn_predictors(self):
+        ## MINIMIZE MEMORY CONSUMPTION (DOESNT REALLY DO ANYTHING)
+        arguments = None
+
+    def terminate_predictors(self,odd_even_turn):
+        """
+        TERMINATE ALL SPAWNED PREDICTORS
+
+        NO LONGER USED
+        """
+        logging.debug("About to terminate predictors at: {}".format(datetime.datetime.now()))
+        for id in self.enemyIDs:
+            self.predictors[id]["handler"].terminate()
+
+        ## WHEN WE HAVE 2 HANDLERS BASE ON TURN
+        # logging.debug("About to terminate predictors at: {}".format(datetime.datetime.now()))
+        # try:
+        #     for id in self.enemyIDs:
+        #         self.predictors[id]["handler"][odd_even_turn].terminate()
+        # except:
+        #     pass
+
+    def spawn_predictors(self,odd_even_turn):
         """
         STARTS HANDLER PROCESSES PER ENEMY ID
 
@@ -242,6 +278,12 @@ class MyProcesses():
             arguments = (id,)
             self.predictors[id]["handler"] = Process(target=self.predictor_handler, args=arguments)
             self.predictors[id]["handler"].start()
+
+        ## WHEN WE HAVE 2 HANDLERS BASE ON TURN
+        # for id in self.enemyIDs:
+        #     arguments = (id,)
+        #     self.predictors[id]["handler"][odd_even_turn] = Process(target=self.predictor_handler, args=arguments)
+        #     self.predictors[id]["handler"][odd_even_turn].start()
 
     def spawn_trainers(self):
         """
@@ -278,6 +320,15 @@ class MyProcesses():
                     # predictions = model.predict(x_train)
                     # logger.debug("Predictions done")
 
+
+                    ## IS THIS REALLY REQUIRED TO CLEAR SESSION?
+                    config = tf.ConfigProto(intra_op_parallelism_threads=4,
+                                            inter_op_parallelism_threads=4,
+                                            allow_soft_placement=True)
+                    session = tf.Session(config=config)
+                    keras.backend.set_session(session)
+
+
                     ## LOADING MODEL FROM FILE
                     model = self.load_model(id, logger)
                     logger.info("Loaded model")
@@ -285,6 +336,7 @@ class MyProcesses():
                     logger.info("Predictions done")
                     ## WHEN I WAS PASSING Q IN ARGUMENTS, IT SEEMS TO MESS UP THE OTHER QUEUES
                     ## WORKS FINE WHEN IT WAS ADDED TO MP AS PREDICTIONS_QUEUE
+
 
                     end = time.clock()
                     logger.info("Predictions took {}".format(end-start))
@@ -295,13 +347,19 @@ class MyProcesses():
                         self.predictions_queue.put((id, ship_ids, predictions))
                         logger.debug("Preditions placed in q")
 
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(str(e))
+
+                ## MINIMIZE MEMORY CONSUMPTION (NOT REALLY DOING ANYTHING)
+                arguments, model, predictions = None, None, None
+                keras.backend.clear_session() ## THIS REALLY HELPS THOUGH
+                gc.collect()
 
             else:
                 logger.debug("Waiting...")
 
-            time.sleep(0.05)
+            time.sleep(0.10)
+
 
         ## TERMINATE PROCESS
         self.predictors[id]["handler"].terminate()
@@ -421,6 +479,9 @@ class MyProcesses():
 
 
             time.sleep(0.05)
+            ## MINIMIZE MEMORY CONSUMPTION
+            arguments = None
+
 
         ## TERMINATE PROCESSES
         self.trainers[id]["processor"].terminate()
@@ -431,6 +492,9 @@ class MyProcesses():
         POPULATES THE QUEUE FROM THE MAIN PROCESS
         """
         self.trainers[id]["args_queue"].put(arguments)
+
+        ## MINIMIZE MEMORY CONSUMPTION (DOESNT REALLY DO ANYTHING)
+        arguments = None
 
     def worker_predict_model(self, name,id,x_train):
         """

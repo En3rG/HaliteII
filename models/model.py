@@ -525,12 +525,14 @@ class NeuralNet():
 
     @staticmethod
     def translate_predictions(predictions):
+        predicted_coords = {}
         if predictions:
             for player_id, dict in predictions.items():
 
                 ## LOOPING WILL BE VERY SLOW, USE MAP!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                logging.debug("Translate predictions with player id: {}".format(player_id))
+                predicted_coords[player_id] = {}
+
                 ship_ids, data = dict
 
                 for id, pred in zip(ship_ids,data):
@@ -539,13 +541,18 @@ class NeuralNet():
                     # ncols = 15
                     # new = np.reshape(pred, (-1, ncols))  ## -1 TO AUTOMATICALLY CALCULATE #ROWS PER ncols GIVEN
 
-                    argmax = np.argmax(pred)
+                    argmax = np.argmax(pred) ## GET INDEX WITH HIGHEST PROBABILITY
+                    new_location = Predicted.get_new_location(argmax) ## RETURN COORDINATE GIVEN THE ARGMAX
 
-                    new_location = Predicted.get_new_location(argmax)
+                    ## SET NEW COORD INTO THE DICTIONARY
+                    predicted_coords[player_id][id] = new_location
 
-                    logging.debug("Predicted ship id: {} new location: {} percentage: {}".format(id,new_location, max(pred)))
+                    logging.debug("Predicted ship id: {} new location: {} percentage: {}".format(id, new_location, max(pred)))
+
         else:
             logging.debug("Translate predictions is None")
+
+        return predicted_coords
 
 
     def testing_time(self):
@@ -691,8 +698,9 @@ class Predicted():
     def get_new_location(key):
         """
         RETURNS RELATIVE NEW LOCATION
+        BASE ON INDEX OR ARGMAX OF PREDICTION WITH HIGHEST PROBABILITY
 
-        IF RETURNING -1, 1.  MEANS PREDICTED LOCATION IS y-1, x+1
+        IF RETURNING -1, 1.  MEANS PREDICTED LOCATION IS y+-1, x+1
         WHERE y,x IS THE CURRENT LOCATION
 
         IF RETURNING -10, -10. SHIP PREDICTED TO DIE OR INVALID LOCATION

@@ -82,6 +82,7 @@ def get_predictions_queue(Q):
             else:
                 break
         except:
+            logging.warning("Q timed out")
             break
 
     logging.debug("Length of Q: {}".format(len(q)))
@@ -117,7 +118,7 @@ def clean_predicting_args(MP):
                     break
             except:
                 garbage = None
-                logging.debug("Cleaned at exception {}".format(datetime.datetime.now()))
+                logging.warning("Cleaned timed out {}".format(datetime.datetime.now()))
                 break
 
         ## LETS TRY JUST SETTING IT TO NONE, THEN INITIALIZE QUEUE()
@@ -214,9 +215,9 @@ if __name__ == "__main__":
 
     ## UPDATABLE PARAMETERS
     disable_log = False
-    MAX_DELAY = 1.8250 ## TO MAXIMIZE TIME PER TURN
-    WAIT_TIME = 1.1000 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
-    GET_TIMEOUT = 0.0075 ## TIMEOUT SET FOR .GET()
+    MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
+    WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.005 ## TIMEOUT SET FOR .GET()
     input_matrix_y = 27
     input_matrix_x = 27
     input_matrix_z = 4
@@ -253,27 +254,22 @@ if __name__ == "__main__":
         while True:
 
             main_start = datetime.datetime.now()
-
             logging.info("Turn # {} Calling update_map() at: {}".format(turn,datetime.datetime.now()))
 
             ## TURN START
             ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
             game_map = game.update_map()
-
             logging.info("hlt update_map time: {}".format(datetime.datetime.now()-main_start))
 
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
-
             logging.info("myMap completed {}".format(datetime.datetime.now()))
 
-
-
-
-            ## GET PRJECTIONS OF ENEMY SHIPS
+            ## GET PROJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(game_map,myMap)
-
             logging.info("myProjection completed {}".format(datetime.datetime.now()))
+
+
 
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
@@ -284,33 +280,28 @@ if __name__ == "__main__":
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(game_map,myMatrix_prev,input_matrix_y,input_matrix_x)
-
-
+            myMatrix = MyMatrix(game_map,myMap,myMatrix_prev,input_matrix_y,input_matrix_x)
             logging.info("myMatrix completed {}".format(datetime.datetime.now()))
 
             ## FOR TRAINING/PREDICTING MODEL
             predictions, turn = model_handler(MP,turn, myMap, myMatrix)
-
+            logging.info("model_handler completed {}".format(datetime.datetime.now()))
             ## GETTING MEMORY USAGE IS QUITE SLOW (TIMES OUT)
             # mem_usage = memory_usage((model_handler, (MP,turn, myMap, myMatrix)))
             # logging.debug("mem_usage: {}".format(mem_usage))
 
             ## TRANSLATE PREDICTIONS
-            NeuralNet.translate_predictions(predictions)
-
-            logging.info("model_handler completed {}".format(datetime.datetime.now()))
-
-
+            predicted_moves = NeuralNet.translate_predictions(predictions)
+            myMatrix.fill_prediction_matrix(predicted_moves)
+            logging.info("Predictions completed {}".format(datetime.datetime.now()))
 
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
-
             ## CURRENTLY FROM STARTER BOT MOVES
             moves.starter_bot_moves(game_map,command_queue)
+            ## MY MOVES
             #myMoves = moves.MyMoves(myMap, EXP, game_map)
             #command_queue = myMoves.command_queue
-
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 
             ## SAVE OLD DATA FOR NEXT TURN
@@ -320,15 +311,12 @@ if __name__ == "__main__":
 
             ## SET A DELAY PER TURN
             set_delay(main_start)
-
             logging.info("about to send commands {}".format(datetime.datetime.now()))
-
             logging.info("Command_queue: {}".format(command_queue))
 
             ## SEND OUR COMMANDS TO HALITE ENGINE THIS TURN
             game.send_command_queue(command_queue)
             ## TURN END
-
             logging.info("Commands send at {}".format(datetime.datetime.now()))
 
 

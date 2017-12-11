@@ -162,7 +162,7 @@ class MyProcesses():
             model.load_weights(str(id) + ".h5")
         except Exception as e:
             ## FAILED (TRAINER POSSIBLY SAVING IT)
-            logger.debug("Error loading: {}.  Wait and try again".format(e))
+            logger.error("Error loading: {}.  Wait and try again".format(e))
             time.sleep(0.05)
             model.load_weights(str(id) + ".h5")
 
@@ -321,7 +321,7 @@ class MyProcesses():
                     # logger.debug("Predictions done")
 
 
-                    ## IS THIS REALLY REQUIRED TO CLEAR SESSION?
+                    ## IS THIS REALLY REQUIRED TO clear_session? I DONT THINK SO
                     config = tf.ConfigProto(intra_op_parallelism_threads=4,
                                             inter_op_parallelism_threads=4,
                                             allow_soft_placement=True)
@@ -348,12 +348,12 @@ class MyProcesses():
                         logger.debug("Preditions placed in q")
 
                 except Exception as e:
-                    logger.error(str(e))
+                    logger.error("predictor_handler error: {}".format(str(e)))
 
-                ## MINIMIZE MEMORY CONSUMPTION (NOT REALLY DOING ANYTHING)
-                arguments, model, predictions = None, None, None
+                ## MINIMIZE MEMORY CONSUMPTION
+                arguments, model, predictions = None, None, None ## DOESNT REALLY DO MUCH
                 keras.backend.clear_session() ## THIS REALLY HELPS THOUGH
-                gc.collect()
+                gc.collect() ## DOESNT REALLY DO MUCH
 
             else:
                 logger.debug("Waiting...")
@@ -480,7 +480,7 @@ class MyProcesses():
 
             time.sleep(0.05)
             ## MINIMIZE MEMORY CONSUMPTION
-            arguments = None
+            arguments = None ## NOT REALLY DOING MUCH
 
 
         ## TERMINATE PROCESSES
@@ -493,12 +493,14 @@ class MyProcesses():
         """
         self.trainers[id]["args_queue"].put(arguments)
 
-        ## MINIMIZE MEMORY CONSUMPTION (DOESNT REALLY DO ANYTHING)
-        arguments = None
+        ## MINIMIZE MEMORY CONSUMPTION
+        arguments = None ## NOT REALLY DOING MUCH
 
     def worker_predict_model(self, name,id,x_train):
         """
         PREDICT MODEL ROM FILE
+
+        NO LONGER USED
         """
         logger = MyCommon.get_logger(name)
         MyCommon.disable_log(self.disable_log, logging)

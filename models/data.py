@@ -21,6 +21,10 @@ class Matrix_val(Enum):
     ENEMY_SHIP = -1
     MAX_SHIP_HP = 255
 
+    ## FOR MATRIX PREDICTIONS
+    PREDICTION_PLANET = -10000
+    PREDICTION_ENEMY_SHIP_DOCKED = 0.5
+
 class ShipTasks(Enum):
     """
     VALUES FOR SHIPS TASKS
@@ -214,11 +218,13 @@ class MyMatrix():
     MAX_NODES = 3
     NUM_NODES =0
 
-    def __init__(self, game_map, myMatrix_prev,input_matrix_y,input_matrix_x):
+    def __init__(self, game_map, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
         self.game_map = game_map
+        self.myMap = myMap
         self.matrix_prev = myMatrix_prev
         self.input_matrix_y = input_matrix_y
         self.input_matrix_x = input_matrix_x
+        self.prediction_matrix = None
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
         ## KEEP A LIMIT OF NODES IN MEMORY
@@ -245,7 +251,10 @@ class MyMatrix():
 
         for player in self.game_map.all_players():
             if player.id == self.game_map.my_id:
-                ## SKIPPING IF ITS ME
+                ## ONLY FILL PLANETS IF ITS MY ID
+                matrix_current = copy.deepcopy(matrix)
+                ## SET PLANET TO PREDICTION MATRIX
+                self.prediction_matrix = self.fill_planets_predictions(matrix_current)
                 continue
 
             matrix_current = copy.deepcopy(matrix)
@@ -268,7 +277,15 @@ class MyMatrix():
         return final_matrix
 
 
+    def fill_planets_predictions(self,matrix):
+        """
+        FILL PLANETS FOR PREDICTION MATRIX
+        """
+        for planet in self.game_map.all_planets():
+            value = Matrix_val.PREDICTION_PLANET.value
+            matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
 
+        return matrix
 
     def fill_planets(self,matrix,matrix_hp, player_id):
         """
@@ -302,7 +319,7 @@ class MyMatrix():
 
         return matrix, matrix_hp
 
-    def fill_circle(self,array, center_y, center_x, radius, value):
+    def fill_circle(self,array, center_y, center_x, radius, value, cummulative=False):
         """
         MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
         """
@@ -315,7 +332,11 @@ class MyMatrix():
         ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
         mask = x*x + y*y <= radius*radius
 
-        array[mask] = value
+
+        if cummulative:  ## VALUE KEEPS GETTING ADDED
+            array[mask] += value
+        else:
+            array[mask] = value
 
         return array
 
@@ -353,5 +374,41 @@ class MyMatrix():
             matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
+
+    def fill_prediction_matrix(self, predicted_coords):
+        """
+        FILL MATRIX WITH PREDICTED ENEMY SHIPS
+        ITS ACCUMULATIVE ATTACK POWER WILL
+
+        MATRIX SHOULD BE FILLED WITH PLANETS INFO ALREADY
+        """
+        for player_id, ships in predicted_coords.items():
+            for ship_id, coord in ships.items():
+                ## FILLS ATTACK AREA OF ENEMY SHIPS
+                ## 5 FOR SHIP RANGE, -1 FOR EACH ENEMY ATTACK RANGE
+                try:
+                    ## GET SHIPS ACTUAL COORDS
+                    ship_y = self.myMap.data_ships[player_id][ship_id]['y']
+                    ship_x = self.myMap.data_ships[player_id][ship_id]['x']
+                    pred_y = ship_y + coord[0]
+                    pred_x = ship_x + coord[1]
+
+                    if self.myMap.data_ships[player_id][ship_id]['dock_status'] == 0: ## UNDOCKED
+                        value = Matrix_val.ENEMY_SHIP.value
+                    else:
+                        value = Matrix_val.PREDICTION_ENEMY_SHIP_DOCKED.value
+                    logging.debug("Predicted ship id: {} new coord: {} {}".format(ship_id, pred_y, pred_x))
+                    self.prediction_matrix = self.fill_circle(self.prediction_matrix, pred_y, pred_x, 5, value, cummulative=True)
+                except Exception as e:
+                    logging.error("fill_prediction_matrix error: {}".format(e))
+
+        ## TEST PRINT OUT
+        ## ALSO UPDATING NUMPY PRINT OPTIONS
+        #np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
+        #logging.debug("prediction_matrix: {}".format(self.prediction_matrix))
+        #np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
+
+
+
 
 

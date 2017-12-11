@@ -82,7 +82,7 @@ def log_numPlayers(game_map):
 
 # import numpy as np
 #
-# def fill_circle(array, h, w, center_y, center_x, radius, value):
+# def fill_circle(array, h, w, center_y, center_x, radius, value, cummulative=False):
 #     """
 #     MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
 #     """
@@ -95,14 +95,18 @@ def log_numPlayers(game_map):
 #     mask = x * x + y * y <= radius * radius
 #     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
 #
-#     array[mask] = value
+#     if cummulative:
+#         array[mask] += -1
+#     else:
+#         array[mask] = value
 #
 #     return array
 #
 #
 # n = 10
 # array = np.ones((n, n))
-# array = fill_circle(array, n, n, 3,3, 3, 0)
+# array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
+# array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
 # print("Ans",array)
 
 

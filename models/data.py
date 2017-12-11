@@ -62,6 +62,9 @@ class MyMap():
         self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
 
         self.game_map = game_map
+        self.my_id = game_map.my_id
+        self.height = game_map.height
+        self.width = game_map.width
         self.myMap_prev = myMap_prev
         self.data_ships = self.get_ship_data()
         self.data_planets = {}
@@ -175,6 +178,7 @@ class MyMap():
                                        'radius': planet.radius, \
                                        'num_docks': planet.num_docking_spots, \
                                        'my_miners': set(), \
+                                       'health': planet.health, \
                                        'owner': None if planet.owner is None else planet.owner.id}
 
 
@@ -218,8 +222,7 @@ class MyMatrix():
     MAX_NODES = 3
     NUM_NODES =0
 
-    def __init__(self, game_map, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
-        self.game_map = game_map
+    def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
         self.myMap = myMap
         self.matrix_prev = myMatrix_prev
         self.input_matrix_y = input_matrix_y
@@ -246,11 +249,12 @@ class MyMatrix():
         GET MAP MATRIX PER PLAYER ID
         """
         final_matrix = {}
-        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        matrix_hp = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+        matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
+        matrix_hp = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
 
-        for player in self.game_map.all_players():
-            if player.id == self.game_map.my_id:
+        #for player in self.game_map.all_players():
+        for player_id, ships in self.myMap.data_ships.items():
+            if player_id == self.myMap.my_id:
                 ## ONLY FILL PLANETS IF ITS MY ID
                 matrix_current = copy.deepcopy(matrix)
                 ## SET PLANET TO PREDICTION MATRIX
@@ -259,20 +263,21 @@ class MyMatrix():
 
             matrix_current = copy.deepcopy(matrix)
             matrix_hp_current = copy.deepcopy(matrix_hp)
-            matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player.id)
+            matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player_id)
 
 
             ## FILL CURRENT PLAYER'S SHIPS
-            matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,player)
+            matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,ships)
 
-            for player_enemy in self.game_map.all_players():
-                if player_enemy.id == player.id:
+            #for player_enemy in self.game_map.all_players():
+            for player_enemy_id, enemy_ships in self.myMap.data_ships.items():
+                if player_enemy_id == player_id:
                     pass
                 else:
                     ## FILL CURRENT PLAYER'S ENEMY SHIPS
-                    matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, player_enemy)
+                    matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, enemy_ships)
 
-            final_matrix[player.id] = (matrix_current,matrix_hp_current)
+            final_matrix[player_id] = (matrix_current,matrix_hp_current)
 
         return final_matrix
 
@@ -281,9 +286,14 @@ class MyMatrix():
         """
         FILL PLANETS FOR PREDICTION MATRIX
         """
-        for planet in self.game_map.all_planets():
+        # for planet in self.game_map.all_planets():
+        #     value = Matrix_val.PREDICTION_PLANET.value
+        #     matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
+
+        ## JUST USING myMap, NOT game_map
+        for planet_id, planet in self.myMap.data_planets.items():
             value = Matrix_val.PREDICTION_PLANET.value
-            matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
+            matrix = self.fill_circle(matrix, planet['y'], planet['x'], planet['radius'], value)
 
         return matrix
 
@@ -295,10 +305,19 @@ class MyMatrix():
         FILL IN MATRIX_HP OF PLANETS HP
         HP IS A PERCENTAGE OF MAX_SHIP_HP
         """
-        for planet in self.game_map.all_planets():
-            if not planet.is_owned():
+        # for planet in self.game_map.all_planets():
+        #     if not planet.is_owned():
+        #         value = Matrix_val.UNOWNED_PLANET.value
+        #     elif planet.owner is not None and planet.owner.id == player_id:
+        #         value = Matrix_val.ALLY_PLANET.value
+        #     else:
+        #         value = Matrix_val.ENEMY_PLANET.value
+
+        ## JUST USING myMap, NOT game_map
+        for planet_id, planet in self.myMap.data_planets.items():
+            if planet['owner'] is None:
                 value = Matrix_val.UNOWNED_PLANET.value
-            elif planet.owner is not None and planet.owner.id == player_id:
+            elif planet['owner'] == player_id:
                 value = Matrix_val.ALLY_PLANET.value
             else:
                 value = Matrix_val.ENEMY_PLANET.value
@@ -309,13 +328,17 @@ class MyMatrix():
             #matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius)+1, \
             #       round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)+1] = value
             ## FILLING A CIRCLE (BETTER)
-            matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
+            #matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
+            ## JUST USING myMap, NOT game_map
+            matrix = self.fill_circle(matrix, planet['y'], planet['x'], planet['radius'], value)
 
             ## FILL IN MATRIX_HP WITH HP OF PLANET (BOX)
             #matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
             #          round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health/Matrix_val.MAX_SHIP_HP.value
             ## FILLING A CIRCLE (BETTER)
-            matrix_hp = self.fill_circle(matrix_hp, planet.y, planet.x, planet.radius, planet.health/Matrix_val.MAX_SHIP_HP.value)
+            #matrix_hp = self.fill_circle(matrix_hp, planet.y, planet.x, planet.radius, planet.health/Matrix_val.MAX_SHIP_HP.value)
+            ## JUST USING myMap, NOT game_map
+            matrix_hp = self.fill_circle(matrix_hp, planet['y'], planet['x'], planet['radius'],planet['health'] / Matrix_val.MAX_SHIP_HP.value)
 
         return matrix, matrix_hp
 
@@ -323,8 +346,8 @@ class MyMatrix():
         """
         MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
         """
-        height = self.game_map.height
-        width = self.game_map.width
+        height = self.myMap.height
+        width = self.myMap.width
 
         ## y IS JUST AN ARRAY OF 1xY (ROWS)
         ## x IS JUST AN ARRAY OF 1xX (COLS)
@@ -341,37 +364,37 @@ class MyMatrix():
         return array
 
 
-    def fill_ships_ally(self,matrix,matrix_hp,player):
+    def fill_ships_ally(self,matrix,matrix_hp,player_ships):
         """
         FILL MATRIX WHERE SHIP IS AT AND ITS HP
         HP IS A PERCENTAGE OF MAX_SHIP_HP
         """
-        for ship in player.all_ships():
-            if ship.docking_status.value == 0:  ## UNDOCKED
+        for ship_id, ship in player_ships.items():
+            if ship['dock_status'] == 0:  ## UNDOCKED
                 value = Matrix_val.ALLY_SHIP.value
             else:
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
-            matrix[round(ship.y)][round(ship.x)] = value
-            matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
+            matrix[round(ship['y'])][round(ship['x'])] = value
+            matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health']/Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 
-    def fill_ships_enemy(self, matrix, matrix_hp, player):
+    def fill_ships_enemy(self, matrix, matrix_hp, enemy_ships):
         """
         FILL MATRIX WHERE SHIP IS AT AND ITS HP
         HP IS A PERCENTAGE OF MAX_SHIP_HP
 
         value WILL DEPEND ON ENEMY, IF DOCKED OR NOT
         """
-        for ship in player.all_ships():
-            if ship.docking_status.value == 0:  ## UNDOCKED
+        for ship_id, ship in enemy_ships.items():
+            if ship['dock_status'] == 0:  ## UNDOCKED
                 value = Matrix_val.ENEMY_SHIP.value
             else:
                 value = Matrix_val.ENEMY_SHIP_DOCKED.value
 
-            matrix[round(ship.y)][round(ship.x)] = value
-            matrix_hp[round(ship.y)][round(ship.x)] = ship.health/Matrix_val.MAX_SHIP_HP.value
+            matrix[round(ship['y'])][round(ship['x'])] = value
+            matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 

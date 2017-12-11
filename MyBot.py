@@ -265,8 +265,11 @@ if __name__ == "__main__":
             myMap = MyMap(game_map,myMap_prev)
             logging.info("myMap completed {}".format(datetime.datetime.now()))
 
+            ## SAVE MEMORY? DOESNT DO MUCH
+            #game_map = None
+
             ## GET PROJECTIONS OF ENEMY SHIPS
-            myProjection = MyProjection(game_map,myMap)
+            myProjection = MyProjection(myMap)
             logging.info("myProjection completed {}".format(datetime.datetime.now()))
 
 
@@ -280,7 +283,7 @@ if __name__ == "__main__":
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(game_map,myMap,myMatrix_prev,input_matrix_y,input_matrix_x)
+            myMatrix = MyMatrix(myMap,myMatrix_prev,input_matrix_y,input_matrix_x)
             logging.info("myMatrix completed {}".format(datetime.datetime.now()))
 
             ## FOR TRAINING/PREDICTING MODEL
@@ -300,8 +303,9 @@ if __name__ == "__main__":
             ## CURRENTLY FROM STARTER BOT MOVES
             moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
-            #myMoves = moves.MyMoves(myMap, EXP, game_map)
-            #command_queue = myMoves.command_queue
+            ## DELETE GAME MAP MUCH SOONER, ONCE NOT USING STARTER_BOT_MOVES!!!!!!!!!!!!!!!!111
+            # myMoves = moves.MyMoves(myMap, EXP)
+            # command_queue = myMoves.command_queue
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 
             ## SAVE OLD DATA FOR NEXT TURN

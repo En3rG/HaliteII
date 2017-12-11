@@ -41,9 +41,8 @@ class MyMoves():
     'd 0 2'      ## DOCKING SHIP ID 0 TO PLANET 2
     't 1 3 353'  ## MOVE SHIP ID 1 WITH SPEED 3 AND ANGLE 353
     """
-    def __init__(self,myMap, EXP, game_map):
+    def __init__(self,myMap, EXP):
         self.command_queue = []
-        self.game_map = game_map
         self.EXP = EXP
         self.myMap = myMap
 
@@ -125,8 +124,8 @@ class MyMoves():
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
                 planet_x = self.myMap.data_planets[target_planet_id]['x']
 
-                ship_y = self.myMap.data_ships[self.game_map.my_id][ship_id]['y']
-                ship_x = self.myMap.data_ships[self.game_map.my_id][ship_id]['x']
+                ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
+                ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
 
                 angle = self.get_angle((ship_y,ship_x), (planet_y,planet_x))
                 thrust = 7
@@ -147,45 +146,47 @@ class MyMoves():
 
         else:
             ## NOT FIRST TURN
-            for ship in self.game_map.get_me().all_ships():
-                ship_id = ship.id
+            #for ship in self.game_map.get_me().all_ships():
+            for player_id, ships in self.myMap.data_ships.items():
+                if player_id == self.myMap.my_id:
+                    for ship_id, ship in ships.items():
 
-                target_planet_id = self.myMap.myMap_prev.data_ships[self.game_map.my_id][ship_id]['target'][1]
-                planet_y = self.myMap.data_planets[target_planet_id]['y']
-                planet_x = self.myMap.data_planets[target_planet_id]['x']
+                        target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target'][1]
+                        planet_y = self.myMap.data_planets[target_planet_id]['y']
+                        planet_x = self.myMap.data_planets[target_planet_id]['x']
 
 
-                angle = self.get_angle((ship.y, ship.x), (planet_y, planet_x))
-                thrust = 7
-                self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
+                        angle = self.get_angle((ship['y'], ship['x']), (planet_y, planet_x))
+                        thrust = 7
+                        self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
-                ## SET SHIP TARGET TO
-                self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
+                        ## SET SHIP TARGET TO
+                        self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
 
-                ## SET SHIP TASK TO
-                self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+                        ## SET SHIP TASK TO
+                        self.set_ship_task(ship_id, ShipTasks.EXPANDING)
 
-                ## SET PLANET MY MINER
-                self.set_planet_myminer(target_planet_id, ship_id)
+                        ## SET PLANET MY MINER
+                        self.set_planet_myminer(target_planet_id, ship_id)
 
-                ## GET DESTINATION COORDS (y,x)
-                self.set_ship_destination(ship_id, (ship.y, ship.x), angle, thrust)
+                        ## GET DESTINATION COORDS (y,x)
+                        self.set_ship_destination(ship_id, (ship['y'], ship['x']), angle, thrust)
 
     def set_ship_destination(self,ship_id, coords, angle, thrust):
-        self.myMap.data_ships[self.game_map.my_id][ship_id]['destination'] = \
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['destination'] = \
                self.get_destination((coords[0], coords[1]), angle, thrust)
 
     def set_ship_target(self,ship_id,target_type, target_id):
         """
         SET SHIP TARGET
         """
-        self.myMap.data_ships[self.game_map.my_id][ship_id]['target'] = (target_type, target_id)
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['target'] = (target_type, target_id)
 
     def set_ship_task(self,ship_id, ship_task):
         """
         SET SHIP TASK
         """
-        self.myMap.data_ships[self.game_map.my_id][ship_id]['task'] = ship_task
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['task'] = ship_task
 
     def set_planet_myminer(self,planet_id,ship_id):
         """

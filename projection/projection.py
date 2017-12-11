@@ -4,8 +4,7 @@ import logging
 from models.model import Matrix_val
 
 class MyProjection():
-    def __init__(self,game_map, myMap):
-        self.game_map = game_map
+    def __init__(self, myMap):
         self.myMap = myMap
         if myMap.myMap_prev == None:
             self.turns = {}
@@ -20,14 +19,14 @@ class MyProjection():
 
         ## INITIALIZE EMPTY MATRIX
         turns = {}
-        turns[1] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        turns[2] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        turns[3] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        turns[4] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
-        turns[5] = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float)
+        turns[1] = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
+        turns[2] = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
+        turns[3] = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
+        turns[4] = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
+        turns[5] = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
 
         for player_id, ships in self.myMap.data_ships.items():
-            if player_id != self.game_map.my_id:
+            if player_id != self.myMap.my_id:
                 for ship_id, ship_data in ships.items():
                     try:
                         current_x = ship_data['x']
@@ -71,7 +70,7 @@ class MyProjection():
         radius = 10
 
         for player_id, ships in self.myMap.data_ships.items():
-            if player_id == self.game_map.my_id:
+            if player_id == self.myMap.my_id:
                 for ship_id, ship_data in ships.items():
                     ## CHECK NEXT 5 TURNS
                     for turn in range(1, 6):

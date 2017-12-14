@@ -1,8 +1,8 @@
 from enum import Enum
-from initialization.explore import Exploration
 import numpy as np
 import copy
 import logging
+import MyCommon
 
 
 
@@ -22,7 +22,7 @@ class Matrix_val(Enum):
     MAX_SHIP_HP = 255
 
     ## FOR MATRIX PREDICTIONS
-    PREDICTION_PLANET = -10000
+    PREDICTION_PLANET = -100
     PREDICTION_ENEMY_SHIP_DOCKED = 0.5
 
 class ShipTasks(Enum):
@@ -209,8 +209,8 @@ class MyMap():
         """
         for ship_id in self.ships_new:
             for planet_id in self.planets_owned:
-                planet_coord = (self.data_planets[planet_id]['y'],self.data_planets[planet_id]['x'])
-                ship_coord = (self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
+                planet_coord = MyCommon.Coordinates(self.data_planets[planet_id]['y'],self.data_planets[planet_id]['x'])
+                ship_coord = MyCommon.Coordinates(self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
 
                 ## PLUS 2 SINCE SPAWN CAN BE AROUND THERE, MADE IT 3 TO BE SURE
                 if Exploration.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+3):
@@ -222,13 +222,13 @@ class MyMatrix():
     MAX_NODES = 3
     NUM_NODES =0
 
-    def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
+    def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x,EXP):
         self.myMap = myMap
         self.matrix_prev = myMatrix_prev
         self.input_matrix_y = input_matrix_y
         self.input_matrix_x = input_matrix_x
         self.prediction_matrix = None
-        self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
+        self.matrix = self.get_matrix(EXP)  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -243,22 +243,20 @@ class MyMatrix():
             self.matrix_prev.matrix_prev.matrix_prev = None
             MyMatrix.NUM_NODES -= 1
 
-    def get_matrix(self):
+    def get_matrix(self,EXP):
         """
         GET BASE MATRIX (WITH PLANETS INFO)
         GET MAP MATRIX PER PLAYER ID
         """
         final_matrix = {}
-        matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
-        matrix_hp = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float)
+        matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+        matrix_hp = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
 
         #for player in self.game_map.all_players():
         for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.myMap.my_id:
-                ## ONLY FILL PLANETS IF ITS MY ID
-                matrix_current = copy.deepcopy(matrix)
                 ## SET PLANET TO PREDICTION MATRIX
-                self.prediction_matrix = self.fill_planets_predictions(matrix_current)
+                self.prediction_matrix = copy.deepcopy(EXP.planet_matrix)
                 continue
 
             matrix_current = copy.deepcopy(matrix)
@@ -281,19 +279,27 @@ class MyMatrix():
 
         return final_matrix
 
+    @staticmethod
+    def fill_planets_predictions(matrix, game_map):
+        """
+        FILL PLANETS FOR PREDICTION MATRIX AND A* ALGORITHM
 
-    def fill_planets_predictions(self,matrix):
+        ADDING 1 FOR THE RADIUS
         """
-        FILL PLANETS FOR PREDICTION MATRIX
-        """
-        # for planet in self.game_map.all_planets():
-        #     value = Matrix_val.PREDICTION_PLANET.value
-        #     matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
+        for planet in game_map.all_planets():
+            value = Matrix_val.PREDICTION_PLANET.value
+            matrix = MyCommon.fill_circle(matrix, \
+                                          game_map.height, \
+                                          game_map.width, \
+                                          MyCommon.Coordinates(planet.y, planet.x), \
+                                          planet.radius + 1, \
+                                          value, \
+                                          cummulative=False)
 
         ## JUST USING myMap, NOT game_map
-        for planet_id, planet in self.myMap.data_planets.items():
-            value = Matrix_val.PREDICTION_PLANET.value
-            matrix = self.fill_circle(matrix, planet['y'], planet['x'], planet['radius'], value)
+        # for planet_id, planet in self.myMap.data_planets.items():
+        #     value = Matrix_val.PREDICTION_PLANET.value
+        #     matrix = self.fill_circle(matrix, planet['y'], planet['x'], planet['radius'], value)
 
         return matrix
 
@@ -330,7 +336,12 @@ class MyMatrix():
             ## FILLING A CIRCLE (BETTER)
             #matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
             ## JUST USING myMap, NOT game_map
-            matrix = self.fill_circle(matrix, planet['y'], planet['x'], planet['radius'], value)
+            matrix = MyCommon.fill_circle(matrix, \
+                                          self.myMap.height, \
+                                          self.myMap.width, \
+                                          MyCommon.Coordinates(planet['y'], planet['x']), \
+                                          planet['radius'], \
+                                          value)
 
             ## FILL IN MATRIX_HP WITH HP OF PLANET (BOX)
             #matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
@@ -338,30 +349,14 @@ class MyMatrix():
             ## FILLING A CIRCLE (BETTER)
             #matrix_hp = self.fill_circle(matrix_hp, planet.y, planet.x, planet.radius, planet.health/Matrix_val.MAX_SHIP_HP.value)
             ## JUST USING myMap, NOT game_map
-            matrix_hp = self.fill_circle(matrix_hp, planet['y'], planet['x'], planet['radius'],planet['health'] / Matrix_val.MAX_SHIP_HP.value)
+            matrix_hp = MyCommon.fill_circle(matrix_hp, \
+                                             self.myMap.height, \
+                                             self.myMap.width, \
+                                             MyCommon.Coordinates(planet['y'], planet['x']), \
+                                             planet['radius'], \
+                                             planet['health'] / Matrix_val.MAX_SHIP_HP.value)
 
         return matrix, matrix_hp
-
-    def fill_circle(self,array, center_y, center_x, radius, value, cummulative=False):
-        """
-        MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
-        """
-        height = self.myMap.height
-        width = self.myMap.width
-
-        ## y IS JUST AN ARRAY OF 1xY (ROWS)
-        ## x IS JUST AN ARRAY OF 1xX (COLS)
-        y, x = np.ogrid[-center_y:height-center_y, -center_x:width-center_x]
-        ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
-        mask = x*x + y*y <= radius*radius
-
-
-        if cummulative:  ## VALUE KEEPS GETTING ADDED
-            array[mask] += value
-        else:
-            array[mask] = value
-
-        return array
 
 
     def fill_ships_ally(self,matrix,matrix_hp,player_ships):
@@ -413,15 +408,20 @@ class MyMatrix():
                     ## GET SHIPS ACTUAL COORDS
                     ship_y = self.myMap.data_ships[player_id][ship_id]['y']
                     ship_x = self.myMap.data_ships[player_id][ship_id]['x']
-                    pred_y = ship_y + coord[0]
-                    pred_x = ship_x + coord[1]
+                    pred_y = ship_y + coord.y
+                    pred_x = ship_x + coord.x
 
                     if self.myMap.data_ships[player_id][ship_id]['dock_status'] == 0: ## UNDOCKED
                         value = Matrix_val.ENEMY_SHIP.value
                     else:
                         value = Matrix_val.PREDICTION_ENEMY_SHIP_DOCKED.value
                     logging.debug("Predicted ship id: {} new coord: {} {}".format(ship_id, pred_y, pred_x))
-                    self.prediction_matrix = self.fill_circle(self.prediction_matrix, pred_y, pred_x, 5, value, cummulative=True)
+                    self.prediction_matrix = MyCommon.fill_circle(self.prediction_matrix, \
+                                                                  self.myMap.height, \
+                                                                  self.myMap.width, \
+                                                                  MyCommon.Coordinates(pred_y,pred_x), \
+                                                                  5, value, \
+                                                                  cummulative=True)
                 except Exception as e:
                     logging.error("fill_prediction_matrix error: {}".format(e))
 

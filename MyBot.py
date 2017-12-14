@@ -237,6 +237,7 @@ if __name__ == "__main__":
     EXP = Exploration(game)
 
     ## INITIALIZE PROCESSES
+    ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
     MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
@@ -265,9 +266,6 @@ if __name__ == "__main__":
             myMap = MyMap(game_map,myMap_prev)
             logging.info("myMap completed {}".format(datetime.datetime.now()))
 
-            ## SAVE MEMORY? DOESNT DO MUCH
-            #game_map = None
-
             ## GET PROJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(myMap)
             logging.info("myProjection completed {}".format(datetime.datetime.now()))
@@ -277,13 +275,14 @@ if __name__ == "__main__":
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
             myProjection.check_for_enemy()
+            logging.info("myProjection.check_for_enemy completed {}".format(datetime.datetime.now()))
 
 
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(myMap,myMatrix_prev,input_matrix_y,input_matrix_x)
+            myMatrix = MyMatrix(myMap,myMatrix_prev,input_matrix_y,input_matrix_x,EXP)
             logging.info("myMatrix completed {}".format(datetime.datetime.now()))
 
             ## FOR TRAINING/PREDICTING MODEL
@@ -301,11 +300,10 @@ if __name__ == "__main__":
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
             ## CURRENTLY FROM STARTER BOT MOVES
-            moves.starter_bot_moves(game_map,command_queue)
+            #moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
-            ## DELETE GAME MAP MUCH SOONER, ONCE NOT USING STARTER_BOT_MOVES!!!!!!!!!!!!!!!!111
-            # myMoves = moves.MyMoves(myMap, EXP)
-            # command_queue = myMoves.command_queue
+            myMoves = moves.MyMoves(myMap, EXP)
+            command_queue = myMoves.command_queue
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 
             ## SAVE OLD DATA FOR NEXT TURN

@@ -3,6 +3,10 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
 import math
 import heapq
 import numpy as np
+import MyCommon
+from models.data import MyMatrix, Matrix_val
+from initialization.astar import a_star
+import datetime
 
 class Exploration():
     def __init__(self,game):
@@ -18,6 +22,11 @@ class Exploration():
         self.distances_from_me = self.get_distances_me()
         self.best_planet = self.get_planets_score()
 
+        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
+        self.planet_matrix = MyMatrix.fill_planets_predictions(matrix,self.game_map)
+
+        self.paths = self.get_paths()
+
     def get_planets(self):
         """
         GET ALL THE PLANETS AS IDs (INTs)
@@ -25,7 +34,7 @@ class Exploration():
         planets = {}
 
         for planet in self.game_map.all_planets():
-            planets[planet.id] = {'coords':(planet.y,planet.x), \
+            planets[planet.id] = {'coords':MyCommon.Coordinates(planet.y,planet.x), \
                                   'docks':planet.num_docking_spots}
 
         return planets
@@ -65,7 +74,7 @@ class Exploration():
         """
         CALCULATE DISTANCE BETWEEN 2 POINTS
         """
-        return math.sqrt((coords1[0] - coords2[0]) ** 2 + (coords1[1] - coords2[1]) ** 2)
+        return math.sqrt((coords1.y - coords2.y) ** 2 + (coords1.x - coords2.x) ** 2)
 
     def get_start_coords(self):
         """
@@ -96,7 +105,7 @@ class Exploration():
         sum_x = np.sum(data[:, 0])
         sum_y = np.sum(data[:, 1])
 
-        return (sum_y / length, sum_x / length)
+        return MyCommon.Coordinates(sum_y / length, sum_x / length)
 
     @classmethod
     def within_circle(self,point,center,radius):
@@ -105,7 +114,7 @@ class Exploration():
         WHETHER point IS INSIDE THE CIRCLE, AT center WITH radius provided
         point AND center HAVE (y,x) FORMAT
         """
-        return ( (point[0]-center[0])**2 + (point[1]-center[1])**2 ) < (radius**2)
+        return ((point.y - center.y) ** 2 + (point.x - center.x) ** 2) < (radius ** 2)
 
     def get_variance(self,arr):
         """
@@ -153,3 +162,18 @@ class Exploration():
         v = list(scores.values())
         k = list(scores.keys())
         return k[v.index(max(v))]
+
+    def get_paths(self):
+        """
+        GET A* PATHS
+        """
+        paths = {}
+
+        s = datetime.datetime.now()
+        path = a_star(self.planet_matrix, (0,0), (150,150))
+        end = datetime.datetime.now()
+        used = datetime.timedelta.total_seconds(end-s)
+        logging.info("took: {} path: {} ".format(used,path))
+
+
+        return paths

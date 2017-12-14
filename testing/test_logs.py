@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 def log_players(game_map):
     logging.debug("------Players Info------")
@@ -111,14 +112,3 @@ def log_numPlayers(game_map):
 
 
 
-# from multiprocessing import freeze_support
-# from memory_profiler import memory_usage
-#
-# def f(x):
-#     return x*x
-#
-# if __name__ == "__main__":
-#     freeze_support()
-#
-#     mem_usage = memory_usage((f, (100,)))
-#     print("mem_usage: {}".format(mem_usage))

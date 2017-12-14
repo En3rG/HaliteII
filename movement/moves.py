@@ -4,7 +4,7 @@ import hlt
 from enum import Enum
 import math
 from models.data import ShipTasks
-
+import MyCommon
 
 
 
@@ -62,7 +62,7 @@ class MyMoves():
         RETURNS ANGLE BETWEEN COORDS AND TARGET COORDS
         BOTH ARE IN (y,x) FORMAT
         """
-        angle = math.degrees(math.atan2(target_coords[0] - coords[0], target_coords[1] - coords[1])) % 360
+        angle = math.degrees(math.atan2(target_coords.y - coords.y, target_coords.x - coords.x)) % 360
         return round(angle)
 
     @classmethod
@@ -73,16 +73,16 @@ class MyMoves():
         start_coord HAVE (y,x) FORMAT
         """
         if angle == 0:
-            return (start_coord[0],start_coord[1] + thrust)
+            return MyCommon.Coordinates(start_coord.y, start_coord.x + thrust)
 
         elif angle < 90:
             angle_radian = math.radians(angle)
             rise = thrust * math.sin(angle_radian)
             run = thrust * math.cos(angle_radian)
-            return (start_coord[0] + rise, start_coord[1] + run)
+            return MyCommon.Coordinates(start_coord.y + rise, start_coord.x + run)
 
         elif angle == 90:
-            return (start_coord[0] - thrust, start_coord[1])
+            return MyCommon.Coordinates(start_coord.y - thrust, start_coord.x)
 
         elif angle < 180:
             angle = 180 - angle
@@ -90,10 +90,10 @@ class MyMoves():
 
             rise = thrust * math.sin(angle_radian)
             run = thrust * math.cos(angle_radian)
-            return (start_coord[0] + rise, start_coord[1] - run)
+            return MyCommon.Coordinates(start_coord.y + rise, start_coord.x - run)
 
         elif angle == 180:
-            return (start_coord[0], start_coord[1] - thrust)
+            return MyCommon.Coordinates(start_coord.y, start_coord.x - thrust)
 
         elif angle < 270:
             angle = angle - 180
@@ -101,10 +101,10 @@ class MyMoves():
 
             rise = thrust * math.sin(angle_radian)
             run = thrust * math.cos(angle_radian)
-            return (start_coord[0] - rise, start_coord[1] - run)
+            return MyCommon.Coordinates(start_coord.y - rise, start_coord.x - run)
 
         elif angle == 270:
-            return (start_coord[0] + thrust, start_coord[1])
+            return MyCommon.Coordinates(start_coord.y + thrust, start_coord.x)
 
         else:
             angle = 360 - angle
@@ -112,7 +112,7 @@ class MyMoves():
 
             rise = thrust * math.sin(angle_radian)
             run = thrust * math.cos(angle_radian)
-            return (start_coord[0] - rise, start_coord[1] + run)
+            return MyCommon.Coordinates(start_coord.y - rise, start_coord.x + run)
 
 
     def get_my_moves(self):
@@ -127,7 +127,7 @@ class MyMoves():
                 ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
                 ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
 
-                angle = self.get_angle((ship_y,ship_x), (planet_y,planet_x))
+                angle = self.get_angle(MyCommon.Coordinates(ship_y,ship_x), MyCommon.Coordinates(planet_y,planet_x))
                 thrust = 7
                 self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
@@ -141,40 +141,36 @@ class MyMoves():
                 self.set_planet_myminer(target_planet_id,ship_id)
 
                 ## GET DESTINATION COORDS (y,x)
-                self.set_ship_destination(ship_id,(ship_y,ship_x),angle,thrust)
+                self.set_ship_destination(ship_id,MyCommon.Coordinates(ship_y,ship_x),angle,thrust)
 
 
         else:
             ## NOT FIRST TURN
-            #for ship in self.game_map.get_me().all_ships():
-            for player_id, ships in self.myMap.data_ships.items():
-                if player_id == self.myMap.my_id:
-                    for ship_id, ship in ships.items():
+            for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
 
-                        target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target'][1]
-                        planet_y = self.myMap.data_planets[target_planet_id]['y']
-                        planet_x = self.myMap.data_planets[target_planet_id]['x']
+                target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target'][1]
+                planet_y = self.myMap.data_planets[target_planet_id]['y']
+                planet_x = self.myMap.data_planets[target_planet_id]['x']
 
+                angle = self.get_angle(MyCommon.Coordinates(ship['y'], ship['x']), MyCommon.Coordinates(planet_y, planet_x))
+                thrust = 7
+                self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
-                        angle = self.get_angle((ship['y'], ship['x']), (planet_y, planet_x))
-                        thrust = 7
-                        self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
+                ## SET SHIP TARGET TO
+                self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
 
-                        ## SET SHIP TARGET TO
-                        self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
+                ## SET SHIP TASK TO
+                self.set_ship_task(ship_id, ShipTasks.EXPANDING)
 
-                        ## SET SHIP TASK TO
-                        self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+                ## SET PLANET MY MINER
+                self.set_planet_myminer(target_planet_id, ship_id)
 
-                        ## SET PLANET MY MINER
-                        self.set_planet_myminer(target_planet_id, ship_id)
-
-                        ## GET DESTINATION COORDS (y,x)
-                        self.set_ship_destination(ship_id, (ship['y'], ship['x']), angle, thrust)
+                ## GET DESTINATION COORDS (y,x)
+                self.set_ship_destination(ship_id, MyCommon.Coordinates(ship['y'], ship['x']), angle, thrust)
 
     def set_ship_destination(self,ship_id, coords, angle, thrust):
         self.myMap.data_ships[self.myMap.my_id][ship_id]['destination'] = \
-               self.get_destination((coords[0], coords[1]), angle, thrust)
+               self.get_destination(coords, angle, thrust)
 
     def set_ship_target(self,ship_id,target_type, target_id):
         """

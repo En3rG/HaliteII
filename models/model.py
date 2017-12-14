@@ -41,6 +41,7 @@ import datetime
 from keras.optimizers import SGD
 from initialization.explore import Exploration
 from models.data import Matrix_val
+import MyCommon
 
 graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
 
@@ -281,7 +282,7 @@ class NeuralNet():
                     ship_prev = myMap.myMap_prev.myMap_prev.data_ships[player_id].get(ship_id)
 
 
-                    matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                    matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.int8)
                     if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY
 
 
@@ -303,7 +304,7 @@ class NeuralNet():
 
 
                     ## NEED TO GET y_train FOR THIS SHIP
-                    y_train_current = np.zeros((15, 15), dtype=np.float)
+                    y_train_current = np.zeros((15, 15), dtype=np.int8)
 
 
                     now_ship = myMap.data_ships[player_id].get(ship_id)
@@ -332,7 +333,7 @@ class NeuralNet():
 
 
                     ## ADD JUST THE SHIP IN A MATRIX (ONLY NECESSARY FOR 4 INPUT MATRIX)
-                    matrix_ship_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                    matrix_ship_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.int8)
                     matrix_ship_loc[7][7] = matrix_current[7][7]
 
                     ## GET 3D ARRAY FOR TRAINING
@@ -454,7 +455,7 @@ class NeuralNet():
                 ## CHECK IF SHIP EXIST BEFORE
                 ship_prev = myMap.myMap_prev.data_ships[player_id].get(ship_id)
 
-                matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                matrix_prev_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.int8)
                 if ship_prev:  ## WILL BE NONE IF SHIP DIDNT EXIST PREVIOUSLY
                     ## GET PREVIOUS LOCATION OF THIS SHIP
                     prev_x = ship_prev.get('x')
@@ -470,7 +471,7 @@ class NeuralNet():
                     matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
 
                 ## ADD JUST THE SHIP IN A MATRIX (ONLY NECESSARY FOR 4 INPUT MATRIX)
-                matrix_ship_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.float)
+                matrix_ship_loc = np.zeros((myMatrix.input_matrix_y, myMatrix.input_matrix_x), dtype=np.int8)
                 matrix_ship_loc[7][7] = matrix_current[7][7]
 
                 ## GET 3D ARRAY FOR PREDICTING
@@ -545,7 +546,10 @@ class NeuralNet():
                     new_location = Predicted.get_new_location(argmax) ## RETURN COORDINATE GIVEN THE ARGMAX
 
                     ## SET NEW COORD INTO THE DICTIONARY
-                    predicted_coords[player_id][id] = new_location
+                    if new_location == (-10,-10):
+                        predicted_coords[player_id][id] = MyCommon.Coordinates(0,0)
+                    else:
+                        predicted_coords[player_id][id] = MyCommon.Coordinates(new_location[0],new_location[1])
 
                     logging.debug("Predicted ship id: {} new location: {} percentage: {}".format(id, new_location, max(pred)))
 
@@ -611,7 +615,7 @@ class NeuralNet():
 
         start = time.clock()
 
-        array = np.zeros((5,5), dtype=np.int)
+        array = np.zeros((5,5), dtype=np.int8)
 
         print("Init numpy elapse:", time.clock() - start)
 

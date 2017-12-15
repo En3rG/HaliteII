@@ -1,6 +1,7 @@
 
 import numpy
 from heapq import *
+import logging
 
 ## SAW THIS A* ALGO ONLINE FROM Christian Careaga (christian.careaga7@gmail.com)
 ## UPDATED FOR CLARITY
@@ -34,6 +35,10 @@ def isBadNeighbor(array,neighbor):
         return True
 
 def a_star(array, start, goal):
+    ## MAKE SURE COORDS ARE ROUNDED AS INTS
+    start = (round(start[0]),round(start[1]))
+    goal = (round(goal[0]),round(goal[1]))
+
     ## NEIGHBORS IN NORTH, EAST, SOUTH, WEST DIRECTIONS, PLUS DIAGONALS
     neighbors = [(-1,0),(0,1),(1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]
 
@@ -55,11 +60,11 @@ def a_star(array, start, goal):
             while current_coord in came_from:
                 data.append(current_coord)
                 current_coord = came_from[current_coord]
-            return data
+            return data ## FIRST COORD WILL BE AT THE END!
 
         visited_coords.add(current_coord)
         for r, c in neighbors:
-            neighbor_coord = current_coord[0] + r, current_coord[1] + c
+            neighbor_coord = (current_coord[0] + r, current_coord[1] + c)
             tentative_g_score = gscore[current_coord] + heuristic(current_coord, neighbor_coord)
 
             if isBadNeighbor(array, neighbor_coord):
@@ -97,4 +102,5 @@ def a_star(array, start, goal):
 # start = datetime.datetime.now()
 # path = a_star(nmap, (0,0), (10,13))
 # print("Length: {} Path: {}".format(len(path),path))
+
 # print(used)

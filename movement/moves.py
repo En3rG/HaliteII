@@ -57,63 +57,6 @@ class MyMoves():
             logging.ERROR("Command Error Length")
 
 
-    def get_angle(self,coords, target_coords):
-        """
-        RETURNS ANGLE BETWEEN COORDS AND TARGET COORDS
-        BOTH ARE IN (y,x) FORMAT
-        """
-        angle = math.degrees(math.atan2(target_coords.y - coords.y, target_coords.x - coords.x)) % 360
-        return round(angle)
-
-    @classmethod
-    def get_destination(self, start_coord, angle, thrust):
-        """
-        GIVEN ANGLE AND THRUST, GET DESTINATION COORDS
-
-        start_coord HAVE (y,x) FORMAT
-        """
-        if angle == 0:
-            return MyCommon.Coordinates(start_coord.y, start_coord.x + thrust)
-
-        elif angle < 90:
-            angle_radian = math.radians(angle)
-            rise = thrust * math.sin(angle_radian)
-            run = thrust * math.cos(angle_radian)
-            return MyCommon.Coordinates(start_coord.y + rise, start_coord.x + run)
-
-        elif angle == 90:
-            return MyCommon.Coordinates(start_coord.y - thrust, start_coord.x)
-
-        elif angle < 180:
-            angle = 180 - angle
-            angle_radian = math.radians(angle)
-
-            rise = thrust * math.sin(angle_radian)
-            run = thrust * math.cos(angle_radian)
-            return MyCommon.Coordinates(start_coord.y + rise, start_coord.x - run)
-
-        elif angle == 180:
-            return MyCommon.Coordinates(start_coord.y, start_coord.x - thrust)
-
-        elif angle < 270:
-            angle = angle - 180
-            angle_radian = math.radians(angle)
-
-            rise = thrust * math.sin(angle_radian)
-            run = thrust * math.cos(angle_radian)
-            return MyCommon.Coordinates(start_coord.y - rise, start_coord.x - run)
-
-        elif angle == 270:
-            return MyCommon.Coordinates(start_coord.y + thrust, start_coord.x)
-
-        else:
-            angle = 360 - angle
-            angle_radian = math.radians(angle)
-
-            rise = thrust * math.sin(angle_radian)
-            run = thrust * math.cos(angle_radian)
-            return MyCommon.Coordinates(start_coord.y - rise, start_coord.x + run)
-
 
     def get_my_moves(self):
         if self.myMap.myMap_prev is None:
@@ -127,7 +70,7 @@ class MyMoves():
                 ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
                 ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
 
-                angle = self.get_angle(MyCommon.Coordinates(ship_y,ship_x), MyCommon.Coordinates(planet_y,planet_x))
+                angle = MyCommon.get_angle(MyCommon.Coordinates(ship_y,ship_x), MyCommon.Coordinates(planet_y,planet_x))
                 thrust = 7
                 self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
@@ -152,7 +95,7 @@ class MyMoves():
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
                 planet_x = self.myMap.data_planets[target_planet_id]['x']
 
-                angle = self.get_angle(MyCommon.Coordinates(ship['y'], ship['x']), MyCommon.Coordinates(planet_y, planet_x))
+                angle = MyCommon.get_angle(MyCommon.Coordinates(ship['y'], ship['x']), MyCommon.Coordinates(planet_y, planet_x))
                 thrust = 7
                 self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
@@ -170,7 +113,7 @@ class MyMoves():
 
     def set_ship_destination(self,ship_id, coords, angle, thrust):
         self.myMap.data_ships[self.myMap.my_id][ship_id]['destination'] = \
-               self.get_destination(coords, angle, thrust)
+               MyCommon.get_destination(coords, angle, thrust)
 
     def set_ship_target(self,ship_id,target_type, target_id):
         """

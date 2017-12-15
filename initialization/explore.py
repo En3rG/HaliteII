@@ -8,6 +8,19 @@ from models.data import MyMatrix, Matrix_val
 from initialization.astar import a_star
 import datetime
 
+
+class LaunchPads():
+    def __init__(self,fly_off_coord,land_on_coord):
+        self.fly_off = fly_off_coord ## COORDINATE
+        self.land_on = land_on_coord ## COORDINATE
+
+    ## OVERRIDE PRINTING FUNCTION
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "fly_off: {} land_on: {}".format(self.fly_off, self.land_on)
+
 class Exploration():
     def __init__(self,game):
         ## FOR TESTING ONLY
@@ -24,6 +37,7 @@ class Exploration():
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
         self.planet_matrix = MyMatrix.fill_planets_predictions(matrix,self.game_map)
+        self.get_launch_coords()
 
         self.paths = self.get_paths()
 
@@ -35,7 +49,8 @@ class Exploration():
 
         for planet in self.game_map.all_planets():
             planets[planet.id] = {'coords':MyCommon.Coordinates(planet.y,planet.x), \
-                                  'docks':planet.num_docking_spots}
+                                  'docks':planet.num_docking_spots, \
+                                  'radius':planet.radius}
 
         return planets
 
@@ -163,17 +178,60 @@ class Exploration():
         k = list(scores.keys())
         return k[v.index(max(v))]
 
+    def get_launch_coords(self):
+        """
+        DETERMINE LAUNCH COORDS PER START (PLANET) TO TARGET (PLANET)
+        """
+        launch_distance = 8  ## OFFSET FROM PLANET RADIUS
+
+        for planet_id, start_planet in self.planets.items():
+            for target_planet in self.game_map.all_planets():
+                ## GET FLY OFF COORD
+                angle = MyCommon.get_angle(start_planet['coords'],MyCommon.Coordinates(target_planet.y,target_planet.x))
+                distance = start_planet['radius'] + launch_distance
+                fly_off_coord = MyCommon.get_destination(start_planet['coords'], angle, distance)
+
+                ## GET LAND ON COORD
+                angle = MyCommon.get_angle(MyCommon.Coordinates(target_planet.y, target_planet.x),start_planet['coords'])
+                distance = target_planet.radius + launch_distance
+                land_on_coord = MyCommon.get_destination(MyCommon.Coordinates(target_planet.y, target_planet.x), angle, distance)
+
+                ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
+                self.planets[planet_id][target_planet.id] = LaunchPads(fly_off_coord,land_on_coord)
+
+
     def get_paths(self):
         """
         GET A* PATHS
         """
         paths = {}
+        done = set()
 
-        s = datetime.datetime.now()
-        path = a_star(self.planet_matrix, (0,0), (150,150))
+        start = datetime.datetime.now()
+
+        for planet_id, planet in self.planets.items():
+            for target_planet in self.game_map.all_planets():
+                if (planet_id,target_planet.id) not in done:
+                    fly_off_coords = (self.planets[planet_id][target_planet.id].fly_off.y, \
+                                      self.planets[planet_id][target_planet.id].fly_off.x)
+                    land_on_coords = (self.planets[planet_id][target_planet.id].land_on.y, \
+                                      self.planets[planet_id][target_planet.id].land_on.x)
+
+                    ## GET PATHS
+                    paths[(planet_id,target_planet.id)] = a_star(self.planet_matrix, \
+                                                                fly_off_coords, \
+                                                                land_on_coords)
+                    #paths[(target_planet.id,planet_id)] = reversed(paths[(planet_id,target_planet.id)])
+
+                    ## ADD TO DONE ALREADY
+                    done.add((planet_id,target_planet.id))
+                    done.add((target_planet.id,planet_id))
+
+
         end = datetime.datetime.now()
-        used = datetime.timedelta.total_seconds(end-s)
-        logging.info("took: {} path: {} ".format(used,path))
+        time_used = datetime.timedelta.total_seconds(end-start)
+        logging.info("A* algo took: {}".format(time_used))
 
 
         return paths
+

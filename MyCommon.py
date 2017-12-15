@@ -1,6 +1,7 @@
 import logging
 import datetime
 import numpy as np
+import math
 
 def disable_log(disable,log):
     """
@@ -44,7 +45,6 @@ class Coordinates():
 
 
 
-
 def fill_circle(array, height, width , center, radius, value, cummulative=False):
     """
     MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
@@ -64,3 +64,61 @@ def fill_circle(array, height, width , center, radius, value, cummulative=False)
         array[mask] = value
 
     return array
+
+
+def get_angle(coords, target_coords):
+    """
+    RETURNS ANGLE BETWEEN COORDS AND TARGET COORDS
+    BOTH ARE IN (y,x) FORMAT
+    """
+    angle = math.degrees(math.atan2(target_coords.y - coords.y, target_coords.x - coords.x)) % 360
+    return round(angle)
+
+
+def get_destination(start_coord, angle, thrust):
+    """
+    GIVEN ANGLE AND THRUST, GET DESTINATION COORDS
+
+    start_coord HAVE (y,x) FORMAT
+    """
+    if angle == 0:
+        return Coordinates(start_coord.y, start_coord.x + thrust)
+
+    elif angle < 90:
+        angle_radian = math.radians(angle)
+        rise = thrust * math.sin(angle_radian)
+        run = thrust * math.cos(angle_radian)
+        return Coordinates(start_coord.y + rise, start_coord.x + run)
+
+    elif angle == 90:
+        return Coordinates(start_coord.y - thrust, start_coord.x)
+
+    elif angle < 180:
+        angle = 180 - angle
+        angle_radian = math.radians(angle)
+
+        rise = thrust * math.sin(angle_radian)
+        run = thrust * math.cos(angle_radian)
+        return Coordinates(start_coord.y + rise, start_coord.x - run)
+
+    elif angle == 180:
+        return Coordinates(start_coord.y, start_coord.x - thrust)
+
+    elif angle < 270:
+        angle = angle - 180
+        angle_radian = math.radians(angle)
+
+        rise = thrust * math.sin(angle_radian)
+        run = thrust * math.cos(angle_radian)
+        return Coordinates(start_coord.y - rise, start_coord.x - run)
+
+    elif angle == 270:
+        return Coordinates(start_coord.y + thrust, start_coord.x)
+
+    else:
+        angle = 360 - angle
+        angle_radian = math.radians(angle)
+
+        rise = thrust * math.sin(angle_radian)
+        run = thrust * math.cos(angle_radian)
+        return Coordinates(start_coord.y - rise, start_coord.x + run)

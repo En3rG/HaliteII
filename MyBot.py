@@ -302,7 +302,10 @@ if __name__ == "__main__":
             ## CURRENTLY FROM STARTER BOT MOVES
             #moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
-            myMoves = moves.MyMoves(myMap, EXP)
+            try:
+                myMoves = moves.MyMoves(myMap, EXP)
+            except Exception as e:
+                loggin.error(e)
             command_queue = myMoves.command_queue
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 

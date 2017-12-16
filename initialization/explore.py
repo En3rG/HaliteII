@@ -36,7 +36,7 @@ class Exploration():
         self.best_planet = self.get_planets_score()
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
-        self.planet_matrix = MyMatrix.fill_planets_predictions(matrix,self.game_map)
+        self.planet_matrix = self.fill_planets_paths(matrix,self.game_map)
         self.get_launch_coords()
 
         self.paths = self.get_paths()
@@ -199,10 +199,27 @@ class Exploration():
                 ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
                 self.planets[planet_id][target_planet.id] = LaunchPads(fly_off_coord,land_on_coord)
 
+    def fill_planets_paths(self, matrix, game_map):
+        """
+        FILL PLANETS FOR A* MATRIX
+
+        ADDING 2.5 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
+        """
+        for planet in game_map.all_planets():
+            value = Matrix_val.PREDICTION_PLANET.value
+            matrix = MyCommon.fill_circle(matrix, \
+                                          game_map.height, \
+                                          game_map.width, \
+                                          MyCommon.Coordinates(planet.y, planet.x), \
+                                          planet.radius + 2.5, \
+                                          value, \
+                                          cummulative=False)
+
+        return matrix
 
     def get_paths(self):
         """
-        GET A* PATHS
+        GET A* PATHS FROM PLANET (START LAUNCHPAD) TO PLANET (TARGET LAUNCHPAD)
         """
         paths = {}
         done = set()
@@ -220,19 +237,19 @@ class Exploration():
                     ## GET PATHS
                     paths_coords = a_star(self.planet_matrix, fly_off_coords, land_on_coords)
                     simplified_paths = self.simplify_paths(paths_coords)
+                    path_table_1 = self.get_start_target_table(simplified_paths)
+                    path_table_2 = self.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
 
-                    paths[(planet_id,target_planet.id)] = simplified_paths
-                    paths[(target_planet.id,planet_id)] = simplified_paths.reverse()
+                    paths[(planet_id, target_planet.id)] = path_table_1
+                    paths[(target_planet.id, planet_id)] = path_table_2
 
                     ## ADD TO DONE ALREADY
                     done.add((planet_id,target_planet.id))
                     done.add((target_planet.id,planet_id))
 
-
         end = datetime.datetime.now()
         time_used = datetime.timedelta.total_seconds(end-start)
         logging.info("A* algo took: {}".format(time_used))
-
 
         return paths
 
@@ -241,9 +258,7 @@ class Exploration():
         SIMPLIFY PATH.  COMBINE MOVEMENT WITH THE SAME SLOPES
         NEED TO MAXIMIZE THRUST OF 7 (MAX)
         """
-
         #logging.info("Original path: {}".format(path_coords))
-
 
         if path_coords != []:
             simplified_path = [path_coords[-1]]
@@ -297,6 +312,19 @@ class Exploration():
 
         return []
 
+
+    def get_start_target_table(self,simplified_path):
+        """
+        TAKES SIMPLIFIED PATH AND GENERATE A HASH TABLE
+        KEY AS CURRENT COORD AND VALUE AS TARGET (DESTINATION) COORD
+        """
+        hash_table = {}
+
+        if simplified_path != []:
+            for i, coord in enumerate(simplified_path[:-1]): ## SKIPPING LAST ELEMENT
+                hash_table[coord] = simplified_path[i+1]
+
+        return hash_table
 
 
 

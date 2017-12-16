@@ -222,13 +222,13 @@ class MyMatrix():
     MAX_NODES = 3
     NUM_NODES =0
 
-    def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x,EXP):
+    def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
         self.myMap = myMap
         self.matrix_prev = myMatrix_prev
         self.input_matrix_y = input_matrix_y
         self.input_matrix_x = input_matrix_x
         self.prediction_matrix = None
-        self.matrix = self.get_matrix(EXP)  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
+        self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -243,7 +243,7 @@ class MyMatrix():
             self.matrix_prev.matrix_prev.matrix_prev = None
             MyMatrix.NUM_NODES -= 1
 
-    def get_matrix(self,EXP):
+    def get_matrix(self):
         """
         GET BASE MATRIX (WITH PLANETS INFO)
         GET MAP MATRIX PER PLAYER ID
@@ -256,7 +256,9 @@ class MyMatrix():
         for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.myMap.my_id:
                 ## SET PLANET TO PREDICTION MATRIX
-                self.prediction_matrix = copy.deepcopy(EXP.planet_matrix)
+                #self.prediction_matrix = copy.deepcopy(EXP.planet_matrix)
+                curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+                self.prediction_matrix = self.fill_planets_predictions(curr_matrix)
                 continue
 
             matrix_current = copy.deepcopy(matrix)
@@ -279,20 +281,18 @@ class MyMatrix():
 
         return final_matrix
 
-    @staticmethod
-    def fill_planets_predictions(matrix, game_map):
-        """
-        FILL PLANETS FOR PREDICTION MATRIX AND A* ALGORITHM
 
-        ADDING 1 FOR THE RADIUS
+    def fill_planets_predictions(self,matrix):
         """
-        for planet in game_map.all_planets():
+        FILL PLANETS FOR PREDICTION MATRIX
+        """
+        for planet_id, planet in self.myMap.data_planets.items():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
-                                          game_map.height, \
-                                          game_map.width, \
-                                          MyCommon.Coordinates(planet.y, planet.x), \
-                                          planet.radius + 1, \
+                                          self.myMap.height, \
+                                          self.myMap.width, \
+                                          MyCommon.Coordinates(planet['y'], planet['x']), \
+                                          planet['radius'], \
                                           value, \
                                           cummulative=False)
 

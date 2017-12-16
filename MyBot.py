@@ -240,6 +240,7 @@ if __name__ == "__main__":
     ## PERFORM INITIALIZATION PREP
     EXP = Exploration(game)
 
+
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
     time.sleep(2)
 
@@ -282,7 +283,7 @@ if __name__ == "__main__":
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(myMap,myMatrix_prev,input_matrix_y,input_matrix_x,EXP)
+            myMatrix = MyMatrix(myMap,myMatrix_prev,input_matrix_y,input_matrix_x)
             logging.info("myMatrix completed {}".format(datetime.datetime.now()))
 
             ## FOR TRAINING/PREDICTING MODEL

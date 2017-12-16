@@ -110,6 +110,3 @@ def log_numPlayers(game_map):
 # array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
 # print("Ans",array)
 
-
-
-

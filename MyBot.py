@@ -233,15 +233,15 @@ if __name__ == "__main__":
     game = hlt.Game("En3rG")
     logging.info("Starting my bot!")
 
-    ## PERFORM INITIALIZATION PREP
-    EXP = Exploration(game)
-
     ## INITIALIZE PROCESSES
     ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
     MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
 
+    ## PERFORM INITIALIZATION PREP
+    EXP = Exploration(game)
+
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
-    time.sleep(3)
+    time.sleep(2)
 
     predictions = {}
     turn = 0
@@ -302,10 +302,7 @@ if __name__ == "__main__":
             ## CURRENTLY FROM STARTER BOT MOVES
             #moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
-            try:
-                myMoves = moves.MyMoves(myMap, EXP)
-            except Exception as e:
-                loggin.error(e)
+            myMoves = moves.MyMoves(myMap, EXP)
             command_queue = myMoves.command_queue
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 

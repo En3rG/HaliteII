@@ -241,9 +241,7 @@ class Exploration():
         SIMPLIFY PATH.  COMBINE MOVEMENT WITH THE SAME SLOPES
         NEED TO MAXIMIZE THRUST OF 7 (MAX)
         """
-
         #logging.info("Original path: {}".format(path_coords))
-
 
         if path_coords != []:
             simplified_path = [path_coords[-1]]

@@ -56,11 +56,11 @@ def a_star(array, start, goal):
         current_coord = heappop(myheap)[1]
 
         if current_coord == goal: ## GOAL REACHED
-            data = []
+            data_coords = []
             while current_coord in came_from:
-                data.append(current_coord)
+                data_coords.append(current_coord)
                 current_coord = came_from[current_coord]
-            return data ## FIRST COORD WILL BE AT THE END!
+            return data_coords ## FIRST COORD WILL BE AT THE END!
 
         visited_coords.add(current_coord)
         for r, c in neighbors:
@@ -80,7 +80,7 @@ def a_star(array, start, goal):
                 fscore[neighbor_coord] = tentative_g_score + heuristic(neighbor_coord, goal)  ## GSCORE PLUS DISTANCE TO GOAL
                 heappush(myheap, (fscore[neighbor_coord], neighbor_coord))  ## PUSH NEIGHBOR TO HEAP
 
-    return False
+    return []
 
 '''Here is an example of using my algo with a numpy array,
    astar(array, start, destination)

@@ -37,7 +37,7 @@ class Target():
 
 class MyMoves():
     """
-    EX COMMAND QUEUE TO BE SENT:
+    EXAMPLE COMMAND QUEUE TO BE SENT TO HALITE ENGINE:
     'd 0 2'      ## DOCKING SHIP ID 0 TO PLANET 2
     't 1 3 353'  ## MOVE SHIP ID 1 WITH SPEED 3 AND ANGLE 353
     """
@@ -64,73 +64,116 @@ class MyMoves():
             for ship_id in self.myMap.ships_new:
                 ## GET BEST PLANET AND SET COMMAND QUEUE
                 target_planet_id = self.EXP.best_planet
+
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
                 planet_x = self.myMap.data_planets[target_planet_id]['x']
+                planet_coord = MyCommon.Coordinates(planet_y,planet_x)
 
                 ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
                 ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
+                ship_coord = MyCommon.Coordinates(ship_y,ship_x)
 
-                angle = MyCommon.get_angle(MyCommon.Coordinates(ship_y,ship_x), MyCommon.Coordinates(planet_y,planet_x))
-                thrust = 7
+                angle = MyCommon.get_angle(ship_coord, planet_coord)
+                thrust = self.get_thrust_to_planet(ship_coord, planet_coord, target_planet_id, angle)
                 self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
-                ## SET SHIP TARGET TO
+                ## SET SHIP'S TARGET
                 self.set_ship_target(ship_id,Target.PLANET, target_planet_id)
 
-                ## SET SHIP TASK TO
+                ## SET SHIP'S TASK
                 self.set_ship_task(ship_id,ShipTasks.EXPANDING)
 
-                ## SET PLANET MY MINER
+                ## SET PLANET'S MY MINER
                 self.set_planet_myminer(target_planet_id,ship_id)
 
                 ## GET DESTINATION COORDS (y,x)
-                self.set_ship_destination(ship_id,MyCommon.Coordinates(ship_y,ship_x),angle,thrust)
+                self.set_ship_destination(ship_id,ship_coord,angle,thrust)
 
 
         else:
             ## NOT FIRST TURN
             for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
 
-                target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target'][1]
+                target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
                 planet_x = self.myMap.data_planets[target_planet_id]['x']
+                planet_coord = MyCommon.Coordinates(planet_y, planet_x)
 
-                angle = MyCommon.get_angle(MyCommon.Coordinates(ship['y'], ship['x']), MyCommon.Coordinates(planet_y, planet_x))
-                thrust = 7
+                ship_coord = MyCommon.Coordinates(ship['y'], ship['x'])
+
+                angle = MyCommon.get_angle(ship_coord, planet_coord)
+                thrust = self.get_thrust_to_planet(ship_coord, planet_coord, target_planet_id, angle)
                 self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
 
-                ## SET SHIP TARGET TO
+                ## SET SHIP'S TARGET
                 self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
 
-                ## SET SHIP TASK TO
+                ## SET SHIP'S TASK
                 self.set_ship_task(ship_id, ShipTasks.EXPANDING)
 
-                ## SET PLANET MY MINER
+                ## SET PLANET'S MY MINER
                 self.set_planet_myminer(target_planet_id, ship_id)
 
                 ## GET DESTINATION COORDS (y,x)
-                self.set_ship_destination(ship_id, MyCommon.Coordinates(ship['y'], ship['x']), angle, thrust)
+                self.set_ship_destination(ship_id, ship_coord, angle, thrust)
+
+    def get_thrust_to_planet(self,ship_coord, planet_coord, target_planet_id, angle):
+        """
+        GET THRUST VALUE TOWARDS A PLANET ID PROVIDED
+
+        NEED TO TAKE INTO ACCOUNT THE PLANETS RADIUS + 1 (TO NOT CRASH AND TO MINE)
+        """
+        mining_coord = self.get_mining_coord(target_planet_id, planet_coord, angle)
+        distance = MyCommon.calculate_distance(ship_coord, mining_coord)
+
+        if distance > 7:
+            thrust =  7  ## STILL FAR, MAXIMIZE THRUST
+        else:
+            thrust = round(distance)
+
+        return thrust
+
+    def get_mining_coord(self, target_planet_id, planet_coord, angle):
+        """
+        GET SAFE COORD TO MINE
+        GIVEN PLANET ID AND THE REVERSE ANGLE (ANGLE OUTWARD THE CENTER OF THE PLANET
+        """
+        mining_distance = 2
+
+        planet_radius = self.myMap.data_planets[target_planet_id]['radius']
+        safe_distance = planet_radius + mining_distance
+        reversed_angle = MyCommon.get_reversed_angle(angle)
+        coord = MyCommon.get_destination_coord(planet_coord, reversed_angle, safe_distance)
+
+        return coord
+
 
     def set_ship_destination(self,ship_id, coords, angle, thrust):
+        """
+        SET SHIP DESTINATION IN MYMAP DATA SHIPS
+        WITH SHIP ID, ANGLE AND THRUST PROVIDED
+        """
         self.myMap.data_ships[self.myMap.my_id][ship_id]['destination'] = \
-               MyCommon.get_destination(coords, angle, thrust)
+               MyCommon.get_destination_coord(coords, angle, thrust)
 
     def set_ship_target(self,ship_id,target_type, target_id):
         """
-        SET SHIP TARGET
+        SET SHIP TARGET IN MYMAP DATA SHIPS
+        WITH SHIP ID, TARGET TYPE, AND TARGET ID PROVIDED
         """
-        self.myMap.data_ships[self.myMap.my_id][ship_id]['target'] = (target_type, target_id)
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'] = (target_type, target_id)
 
     def set_ship_task(self,ship_id, ship_task):
         """
-        SET SHIP TASK
+        SET SHIP TASK IN MYMAP DATA SHIPS
+        WITH SHIP ID AND TASK PROVIDED
         """
         self.myMap.data_ships[self.myMap.my_id][ship_id]['task'] = ship_task
 
     def set_planet_myminer(self,planet_id,ship_id):
         """
-        SET PLANET MY MINER
-        REGARDING SHIP GOING TO MINE THIS PLANET
+        SET PLANET MY MINER IN MYMAP DATA PLANETS
+        REGARDING MY SHIPS THAT ARE GOING TO MINE THIS PLANET
         """
         self.myMap.data_planets[planet_id]['my_miners'].add(ship_id)
 

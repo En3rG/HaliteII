@@ -75,7 +75,7 @@ def get_angle(coords, target_coords):
     return round(angle)
 
 
-def get_destination(start_coord, angle, thrust):
+def get_destination_coord(start_coord, angle, thrust):
     """
     GIVEN ANGLE AND THRUST, GET DESTINATION COORDS
 
@@ -175,5 +175,11 @@ def get_slope(prev_coord, current_coord):
             self.run = run
 
     slope = Slope(current_coord.y - prev_coord.y, current_coord.x - prev_coord.x)
-    
+
     return slope
+
+def get_reversed_angle(angle):
+    """
+    GIVEN AN ANGLE, RETURN ITS REVERSE/FLIP ANGLE
+    """
+    return (180+angle)%360

@@ -163,12 +163,12 @@ class Exploration():
                 ## GET FLY OFF COORD
                 angle = MyCommon.get_angle(start_planet['coords'],MyCommon.Coordinates(target_planet.y,target_planet.x))
                 distance = start_planet['radius'] + launch_distance
-                fly_off_coord = MyCommon.get_destination(start_planet['coords'], angle, distance)
+                fly_off_coord = MyCommon.get_destination_coord(start_planet['coords'], angle, distance)
 
                 ## GET LAND ON COORD
                 angle = MyCommon.get_angle(MyCommon.Coordinates(target_planet.y, target_planet.x),start_planet['coords'])
                 distance = target_planet.radius + launch_distance
-                land_on_coord = MyCommon.get_destination(MyCommon.Coordinates(target_planet.y, target_planet.x), angle, distance)
+                land_on_coord = MyCommon.get_destination_coord(MyCommon.Coordinates(target_planet.y, target_planet.x), angle, distance)
 
                 ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
                 self.planets[planet_id][target_planet.id] = LaunchPads(fly_off_coord,land_on_coord)

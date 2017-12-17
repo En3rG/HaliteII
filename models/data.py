@@ -113,7 +113,7 @@ class MyMap():
                                             'enemy_in_turn':[], \
                                             'enemy_coord':[],\
                                             'from_planet':None, \
-                                            'target':None, \
+                                            'target_id':None, \
                                             'destination':None, \
                                             'task':ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS

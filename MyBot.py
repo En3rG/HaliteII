@@ -29,9 +29,9 @@ def set_delay(start):
     DELAY TO MAXIMIZE 2 SECONDS PER TURN
     HELP MULTIPROCESSES COMPLETE ITS TASKS
 
-    USE TIMEDELTA BASE ON DATETIME INSTEAD OF TIME.CLOCK() FOR BETTER ACCURACY
-    HALITE ENGINE SEEMS TO TIME OUT.
-    SEEMS HALITE ENGINE SLOWS DOWN IF PREVIOUS TURN TOOK MORE THAN 2 SECS TO GET REPLY
+    USE TIMEDELTA BASE ON DATETIME INSTEAD OF TIME.CLOCK() FOR BETTER ACCURACY?
+    HALITE ENGINE SEEMS TO TIME OUT SOMETIMES
+    BUT MOST OF THE TIME WHEN IT TIMES OUT ITS BECAUSE MY PREVIOUS TURN TOOK MORE THAN 2 SECS
     """
     end = datetime.datetime.now()
     used = datetime.timedelta.total_seconds(end-start)
@@ -131,7 +131,7 @@ def clean_predicting_args(MP):
 def model_handler(MP, turn, myMap, myMatrix):
     """
     HANDLES TRAINING AND PREDICTING ENEMY MODELS, PER ENEMY ID
-    BEFORE WAS PASSING NN TO THE ARGUMENTS AND WAS CAUSING ISSUE
+    BEFORE, WAS PASSING NN TO THE ARGUMENTS AND WAS CAUSING ISSUE
     WHERE ITS TRAINING OLDER MODEL. NOW NO LONGER PASSING NN, GRAB NN
     FROM THE MODEL QUEUES TO ENSURE ITS THE LATEST ONE
 
@@ -240,9 +240,8 @@ if __name__ == "__main__":
     ## PERFORM INITIALIZATION PREP
     EXP = Exploration(game)
 
-
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
-    time.sleep(2)
+    time.sleep(1)
 
     predictions = {}
     turn = 0
@@ -254,7 +253,6 @@ if __name__ == "__main__":
 
     try:
         while True:
-
             main_start = datetime.datetime.now()
             logging.info("Turn # {} Calling update_map() at: {}".format(turn,datetime.datetime.now()))
 
@@ -336,8 +334,7 @@ if __name__ == "__main__":
             # log_players(game_map)
 
             ## CLEAN UP OBJECTS NO LONGER REQUIRED NEXT TURN
-            ## NECESSARY??
-
+            ## NECESSARY?? NOPE
 
     finally:
         ## TERMINATE MULTIPROCESSES

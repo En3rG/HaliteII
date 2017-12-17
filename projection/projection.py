@@ -2,6 +2,7 @@
 import numpy as np
 import logging
 from models.model import Matrix_val
+import MyCommon
 
 class MyProjection():
     def __init__(self, myMap):
@@ -14,7 +15,7 @@ class MyProjection():
     def get_projection(self):
         """
         GET WHERE ENEMY SHIPS ARE PROJECTED TO BE AT (UP TO NEXT 5 TURNS)
-        BASED ON SHIPS CURRENT VELOCITY
+        BASED ON SHIPS CURRENT VELOCITY (ANGLE AND THRUST)
         """
 
         ## INITIALIZE EMPTY MATRIX
@@ -31,34 +32,36 @@ class MyProjection():
                     try:
                         current_x = ship_data['x']
                         current_y = ship_data['y']
+                        curr_coord = MyCommon.Coordinates(current_y,current_x)
                         prev_x = self.myMap.myMap_prev.data_ships[player_id][ship_id]['x']
                         prev_y = self.myMap.myMap_prev.data_ships[player_id][ship_id]['y']
+                        prev_coord = MyCommon.Coordinates(prev_y, prev_x)
+
                     except:
                         ## SHIP DIDNT EXIST PREVIOUSLY
                         ## GO TO NEXT LOOP
                         continue
 
                     ## FILL IN MATRIX WITH ENEMY PROJECTION
-                    slope = self.get_slope(prev_y,prev_x,current_y,current_x)
-                    self.set_turn_projection(1, turns[1], slope, current_y, current_x)
-                    self.set_turn_projection(2, turns[2], slope, current_y, current_x)
-                    self.set_turn_projection(3, turns[3], slope, current_y, current_x)
-                    self.set_turn_projection(4, turns[4], slope, current_y, current_x)
-                    self.set_turn_projection(5, turns[5], slope, current_y, current_x)
+                    slope = MyCommon.get_slope(prev_coord,curr_coord)
+                    self.set_turn_projection(1, turns[1], slope, curr_coord)
+                    self.set_turn_projection(2, turns[2], slope, curr_coord)
+                    self.set_turn_projection(3, turns[3], slope, curr_coord)
+                    self.set_turn_projection(4, turns[4], slope, curr_coord)
+                    self.set_turn_projection(5, turns[5], slope, curr_coord)
 
 
         return turns
 
-    def get_slope(self,prev_y,prev_x,current_y,current_x):
-        return (current_y - prev_y, current_x - prev_x)
 
-    def set_turn_projection(self,multiplier,matrix,slope, current_y, current_x):
+
+    def set_turn_projection(self,multiplier,matrix,slope, curr_coord):
         """
         PLACE ENEMY_SHIP VALUE IN MATRIX PROVIDED
         DEPENDS ON MULTIPLIER AND SLOP PROVIDED AS WELL
         """
-        new_y = round(current_y + (slope[0] * multiplier))
-        new_x = round(current_x + (slope[1] * multiplier))
+        new_y = round(curr_coord.y + (slope.rise * multiplier))
+        new_x = round(curr_coord.x + (slope.run * multiplier))
 
         matrix[new_y][new_x] = Matrix_val.ENEMY_SHIP.value
 

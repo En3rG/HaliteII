@@ -213,7 +213,7 @@ class MyMap():
                 ship_coord = MyCommon.Coordinates(self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
 
                 ## PLUS 2 SINCE SPAWN CAN BE AROUND THERE, MADE IT 3 TO BE SURE
-                if Exploration.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+3):
+                if MyCommon.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+3):
                     self.data_ships[self.game_map.my_id][ship_id]['from_planet'] = planet_id
                     break
 

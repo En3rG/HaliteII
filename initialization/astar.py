@@ -3,8 +3,7 @@ import numpy
 from heapq import *
 import logging
 
-## SAW THIS A* ALGO ONLINE FROM Christian Careaga (christian.careaga7@gmail.com)
-## UPDATED FOR CLARITY
+
 
 OBSTRUCTION = -100
 
@@ -35,6 +34,12 @@ def isBadNeighbor(array,neighbor):
         return True
 
 def a_star(array, start, goal):
+    """
+    A* ALGO TO GET THE BEST PATH FROM start TO goal
+
+    SAW THIS A* ALGO ONLINE FROM Christian Careaga (christian.careaga7@gmail.com)
+    UPDATED FOR CLARITY
+    """
     ## MAKE SURE COORDS ARE ROUNDED AS INTS
     start = (round(start[0]),round(start[1]))
     goal = (round(goal[0]),round(goal[1]))

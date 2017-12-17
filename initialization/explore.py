@@ -10,9 +10,13 @@ import datetime
 
 
 class LaunchPads():
+    """
+    WILL CONTAIN THE COORDINATE OF START PLANET (FLY OFF COORD)
+    AND TARGET PLANET (LAND ON COORD)
+    """
     def __init__(self,fly_off_coord,land_on_coord):
-        self.fly_off = fly_off_coord ## COORDINATE
-        self.land_on = land_on_coord ## COORDINATE
+        self.fly_off = fly_off_coord ## COORDINATE OBJECT
+        self.land_on = land_on_coord ## COORDINATE OBJECT
 
     ## OVERRIDE PRINTING FUNCTION
     def __repr__(self):
@@ -22,6 +26,12 @@ class LaunchPads():
         return "fly_off: {} land_on: {}".format(self.fly_off, self.land_on)
 
 class Exploration():
+    """
+    GATHERS ALL PLANETS INFORMATION
+    GATHERS DISTANCE OF EACH PLANET TO EACH PLANET
+    GATHERS BEST PLANET TO CONQUER FIRST
+    GATHERS PATHS, EACH PLANET TO EACH PLANET
+    """
     def __init__(self,game):
         ## FOR TESTING ONLY
         #log_dimensions(game.map)
@@ -51,6 +61,8 @@ class Exploration():
             planets[planet.id] = {'coords':MyCommon.Coordinates(planet.y,planet.x), \
                                   'docks':planet.num_docking_spots, \
                                   'radius':planet.radius}
+                              ##  planet.id OF TARGET PLANETS WILL ALSO BE FILLED IN LATER WITH LAUNCHPAD DATA
+                              ##  planets[id1][id2] WILL CONTAIN LAUNCPPAD COORD FOR START ID1 TO TARGET ID2
 
         return planets
 
@@ -62,11 +74,11 @@ class Exploration():
 
         ## INITIALIZE MATRIX
         matrix = [[ 99999 for x in range(length) ] for y in range(length)]
-        matrix = self.calculate_distances(matrix)
+        matrix = self.calculate_distance_matrix(matrix)
 
         return matrix
 
-    def calculate_distances(self,matrix):
+    def calculate_distance_matrix(self,matrix):
         """
         FILLS THE MATRIX WITH ACTUAL DISTANCES BETWEEN PLANETS
         """
@@ -80,16 +92,12 @@ class Exploration():
                     ## ALREADY CALCULATED BEFORE
                     pass
                 else:
-                    matrix[id][id2] = self.calculate_distance(val['coords'],val2['coords'])
+                    matrix[id][id2] = MyCommon.calculate_distance(val['coords'],val2['coords'])
                     matrix[id2][id] = matrix[id][id2]
 
         return matrix
 
-    def calculate_distance(self,coords1,coords2):
-        """
-        CALCULATE DISTANCE BETWEEN 2 POINTS
-        """
-        return math.sqrt((coords1.y - coords2.y) ** 2 + (coords1.x - coords2.x) ** 2)
+
 
     def get_start_coords(self):
         """
@@ -101,42 +109,8 @@ class Exploration():
                 for ship in player.all_ships():
                     coords.append((ship.y,ship.x))
 
-        return self.calculate_centroid(coords)
+        return MyCommon.calculate_centroid(coords)
 
-    def calculate_centroid(self,arr):
-        """
-        CALCULATE CENTROID.  COORDS ARE IN (y,x) FORMAT
-        CALCULATE MIDDLE POINT OF A TRIANGLE (3 SHIPS)
-        BASED ON:
-        x = x1+x2+x3 / 3
-        y = y1+y2+y3 / 3
-
-        UPDATED TO CALCULATE CENTROID OF MULTIPLE POINTS, NOT JUST 3 POINTS
-        """
-
-        ## CONVERT ARR (LIST) TO NDARRAY
-        data = np.array(arr)
-        length = data.shape[0]
-        sum_x = np.sum(data[:, 0])
-        sum_y = np.sum(data[:, 1])
-
-        return MyCommon.Coordinates(sum_y / length, sum_x / length)
-
-    @classmethod
-    def within_circle(self,point,center,radius):
-        """
-        RETURNS TRUE OR FALSE
-        WHETHER point IS INSIDE THE CIRCLE, AT center WITH radius provided
-        point AND center HAVE (y,x) FORMAT
-        """
-        return ((point.y - center.y) ** 2 + (point.x - center.x) ** 2) < (radius ** 2)
-
-    def get_variance(self,arr):
-        """
-        RETURN VARIANCE OF THE LIST OF POINTS PROVIDED
-        """
-        data = np.array(arr)
-        return np.var(data)
 
     def get_distances_me(self):
         """
@@ -145,7 +119,7 @@ class Exploration():
         distances = {}
 
         for id, val in self.planets.items():
-            distances[id] = self.calculate_distance(val['coords'],self.myLocation)
+            distances[id] = MyCommon.calculate_distance(val['coords'],self.myLocation)
 
         return distances
 
@@ -201,17 +175,19 @@ class Exploration():
 
     def fill_planets_paths(self, matrix, game_map):
         """
-        FILL PLANETS FOR A* MATRIX
+        FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
 
         ADDING 2.5 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
         """
+        mining_area = 2.5
+
         for planet in game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
                                           game_map.height, \
                                           game_map.width, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
-                                          planet.radius + 2.5, \
+                                          planet.radius + mining_area, \
                                           value, \
                                           cummulative=False)
 
@@ -280,10 +256,10 @@ class Exploration():
                 else:
                     if tempCoord: ## BASE IT ON TEMP COORD, NOT PREV COORD
                         current_angle = MyCommon.get_angle(tempCoord, currentCoord)
-                        current_distance = self.calculate_distance(tempCoord, currentCoord)
+                        current_distance = MyCommon.calculate_distance(tempCoord, currentCoord)
                     else:
                         current_angle = MyCommon.get_angle(prevCoord, currentCoord)
-                        current_distance = self.calculate_distance(prevCoord, currentCoord)
+                        current_distance = MyCommon.calculate_distance(prevCoord, currentCoord)
 
                     ## IF THE SAME SLOPE/ANGLE AS BEFORE AND STILL BELOW 7, CAN CONTINUE TO COMBINE/SIMPLIFY
                     if distance + current_distance < 7 and \

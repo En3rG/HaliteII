@@ -32,6 +32,10 @@ class Exploration():
     GATHERS BEST PLANET TO CONQUER FIRST
     GATHERS PATHS, EACH PLANET TO EACH PLANET
     """
+    LAUNCH_DISTANCE = 8    ## OFFSET FROM PLANET RADIUS
+    MINING_AREA_BUFFER = 5  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
+
+
     def __init__(self,game):
         ## FOR TESTING ONLY
         #log_dimensions(game.map)
@@ -43,13 +47,14 @@ class Exploration():
         self.distance_matrix = self.get_distances()
         self.myLocation = self.get_start_coords()
         self.distances_from_me = self.get_distances_me()
-        self.best_planet = self.get_planets_score()
+        self.best_planet_id = self.get_planets_score()
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
         self.planet_matrix = self.fill_planets_paths(matrix,self.game_map)
         self.get_launch_coords()
 
         self.paths = self.get_paths()
+
 
     def get_planets(self):
         """
@@ -156,18 +161,17 @@ class Exploration():
         """
         DETERMINE LAUNCH COORDS PER START (PLANET) TO TARGET (PLANET)
         """
-        launch_distance = 8  ## OFFSET FROM PLANET RADIUS
 
         for planet_id, start_planet in self.planets.items():
             for target_planet in self.game_map.all_planets():
                 ## GET FLY OFF COORD
                 angle = MyCommon.get_angle(start_planet['coords'],MyCommon.Coordinates(target_planet.y,target_planet.x))
-                distance = start_planet['radius'] + launch_distance
+                distance = start_planet['radius'] + Exploration.LAUNCH_DISTANCE
                 fly_off_coord = MyCommon.get_destination_coord(start_planet['coords'], angle, distance)
 
                 ## GET LAND ON COORD
                 angle = MyCommon.get_angle(MyCommon.Coordinates(target_planet.y, target_planet.x),start_planet['coords'])
-                distance = target_planet.radius + launch_distance
+                distance = target_planet.radius + Exploration.LAUNCH_DISTANCE
                 land_on_coord = MyCommon.get_destination_coord(MyCommon.Coordinates(target_planet.y, target_planet.x), angle, distance)
 
                 ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
@@ -179,15 +183,13 @@ class Exploration():
 
         ADDING 4 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
         """
-        mining_area = 5
-
         for planet in game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
                                           game_map.height, \
                                           game_map.width, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
-                                          planet.radius + mining_area, \
+                                          planet.radius + Exploration.MINING_AREA_BUFFER, \
                                           value, \
                                           cummulative=False)
 
@@ -196,6 +198,8 @@ class Exploration():
     def get_paths(self):
         """
         GET A* PATHS FROM PLANET (START LAUNCHPAD) TO PLANET (TARGET LAUNCHPAD)
+
+        GET A* PATH FROM STARTING LOCATION (3 SHIPS) TO BEST PLANET
         """
         paths = {}
         done = set()
@@ -205,14 +209,14 @@ class Exploration():
         for planet_id, planet in self.planets.items():
             for target_planet in self.game_map.all_planets():
                 if (planet_id,target_planet.id) not in done:
-                    fly_off_coords = (self.planets[planet_id][target_planet.id].fly_off.y, \
+                    fly_off_point = (self.planets[planet_id][target_planet.id].fly_off.y, \
                                       self.planets[planet_id][target_planet.id].fly_off.x)
-                    land_on_coords = (self.planets[planet_id][target_planet.id].land_on.y, \
+                    land_on_point = (self.planets[planet_id][target_planet.id].land_on.y, \
                                       self.planets[planet_id][target_planet.id].land_on.x)
 
                     ## GET PATHS
-                    paths_coords = a_star(self.planet_matrix, fly_off_coords, land_on_coords)
-                    simplified_paths = self.simplify_paths(paths_coords)
+                    paths_points = a_star(self.planet_matrix, fly_off_point, land_on_point)
+                    simplified_paths = self.simplify_paths(paths_points)
                     path_table_1 = self.get_start_target_table(simplified_paths)
                     path_table_2 = self.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
 
@@ -222,6 +226,26 @@ class Exploration():
                     ## ADD TO DONE ALREADY
                     done.add((planet_id,target_planet.id))
                     done.add((target_planet.id,planet_id))
+
+
+        ## USE A* TO GET PATH FROM STARTING TO BEST PLANET
+        fly_off_point = (self.myLocation.y, self.myLocation.x)
+
+        for target_planet in self.game_map.all_planets():
+            if target_planet.id == self.best_planet_id:
+                ## GET LAND ON COORD
+                target_coord = MyCommon.Coordinates(target_planet.y, target_planet.x)
+                angle = MyCommon.get_angle(target_coord, self.myLocation)
+                distance = target_planet.radius + Exploration.LAUNCH_DISTANCE
+                land_on_coord = MyCommon.get_destination_coord(target_coord, angle, distance)
+                land_on_point = (land_on_coord.y, land_on_coord.x)
+
+                path_points = a_star(self.planet_matrix, fly_off_point, land_on_point)
+                simplified_paths = self.simplify_paths(path_points)
+                path_table_1 = self.get_start_target_table(simplified_paths)
+                paths[(-1, target_planet.id)] = path_table_1  ## -1 ID FOR STARTING POINT
+
+
 
         end = datetime.datetime.now()
         time_used = datetime.timedelta.total_seconds(end-start)

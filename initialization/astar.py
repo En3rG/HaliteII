@@ -41,8 +41,8 @@ def a_star(array, start, goal):
     UPDATED FOR CLARITY
     """
     ## MAKE SURE COORDS ARE ROUNDED AS INTS
-    start = (round(start[0]),round(start[1]))
-    goal = (round(goal[0]),round(goal[1]))
+    start = (int(round(start[0])),int(round(start[1])))
+    goal = (int(round(goal[0])),int(round(goal[1])))
 
     ## NEIGHBORS IN NORTH, EAST, SOUTH, WEST DIRECTIONS, PLUS DIAGONALS
     neighbors = [(-1,0),(0,1),(1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]

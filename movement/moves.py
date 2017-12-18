@@ -62,7 +62,7 @@ class MyMoves():
             ## FIRST TURN
             for ship_id in self.myMap.ships_new:
                 ## GET BEST PLANET AND SET COMMAND QUEUE
-                target_planet_id = self.EXP.best_planet
+                target_planet_id = self.EXP.best_planet_id
 
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
                 planet_x = self.myMap.data_planets[target_planet_id]['x']
@@ -160,12 +160,14 @@ class MyMoves():
         opposite = 1.5
 
         while True: ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
+            logging.info("Tetsing old_target_point: {}".format(old_target_point))
             target_coord = MyCommon.Coordinates(old_target_point[0],old_target_point[1])
             adjacent = MyCommon.calculate_distance(target_coord, planet_center)
             angle = math.degrees(math.atan(opposite/adjacent))
             hypotenuse = opposite / math.sin(math.radians(angle))
             new_angle = planet_angle + angle
-            new_target_point = MyCommon.get_destination_coord(planet_center, new_angle, hypotenuse)
+            new_target_coord = MyCommon.get_destination_coord(planet_center, new_angle, hypotenuse)
+            new_target_point = (new_target_coord.y, new_target_coord.x)
 
             if old_target_point not in self.myMap.all_target_coords:
                 break
@@ -225,6 +227,7 @@ class MyMoves():
 
         target_point = (round(new_target_coord.y), round(new_target_coord.x))
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_point'] = target_point
+        logging.info("testing target_point set: {}".format(target_point))
 
         ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle

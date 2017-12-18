@@ -20,6 +20,7 @@ import os
 import signal
 from memory_profiler import profile       ## USING @profile PER FUNCTIONS, RUN WITH -m memory_profile FLAG
 from memory_profiler import memory_usage
+import traceback
 
 
 ## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'. N/A ANYMORE.
@@ -240,6 +241,7 @@ if __name__ == "__main__":
     ## PERFORM INITIALIZATION PREP
     EXP = Exploration(game)
 
+
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
     time.sleep(1)
 
@@ -301,10 +303,7 @@ if __name__ == "__main__":
             ## CURRENTLY FROM STARTER BOT MOVES
             #moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
-            try:
-                myMoves = moves.MyMoves(myMap, EXP)
-            except Exception as e:
-                logging.error(e)
+            myMoves = moves.MyMoves(myMap, EXP)
             command_queue = myMoves.command_queue
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 
@@ -338,6 +337,14 @@ if __name__ == "__main__":
 
             ## CLEAN UP OBJECTS NO LONGER REQUIRED NEXT TURN
             ## NECESSARY?? NOPE
+
+    ## DELETE THIS LATER (FOR DEBUGGING ONLY)
+    except Exception as e:
+        logging.error("Error found: {}".format(e))
+
+        for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
+            fname, lineno, fn, text = frame
+            logging.error("Error in {} on line {}".format(fname, lineno))
 
     finally:
         ## TERMINATE MULTIPROCESSES

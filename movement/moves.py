@@ -57,7 +57,6 @@ class MyMoves():
             logging.ERROR("Command Error Length")
 
 
-
     def get_my_moves(self):
         if self.myMap.myMap_prev is None:
             ## FIRST TURN
@@ -73,22 +72,8 @@ class MyMoves():
                 ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
                 ship_coord = MyCommon.Coordinates(ship_y,ship_x)
 
-                angle = MyCommon.get_angle(ship_coord, planet_coord)
-                thrust = self.get_thrust_to_planet(ship_coord, planet_coord, target_planet_id, angle)
-                self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
-
-                ## SET SHIP'S TARGET
-                self.set_ship_target(ship_id,Target.PLANET, target_planet_id)
-
-                ## SET SHIP'S TASK
-                self.set_ship_task(ship_id,ShipTasks.EXPANDING)
-
-                ## SET PLANET'S MY MINER
-                self.set_planet_myminer(target_planet_id,ship_id)
-
-                ## GET DESTINATION COORDS (y,x)
-                self.set_ship_destination(ship_id,ship_coord,angle,thrust)
-
+                ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
+                self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
 
         else:
             ## NOT FIRST TURN
@@ -101,62 +86,154 @@ class MyMoves():
 
                 ship_coord = MyCommon.Coordinates(ship['y'], ship['x'])
 
-                angle = MyCommon.get_angle(ship_coord, planet_coord)
-                thrust = self.get_thrust_to_planet(ship_coord, planet_coord, target_planet_id, angle)
-                self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
+                ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
+                self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
 
-                ## SET SHIP'S TARGET
-                self.set_ship_target(ship_id, Target.PLANET, target_planet_id)
 
-                ## SET SHIP'S TASK
-                self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+    def set_moves(self,ship_coord, ship_id, planet_coord, target_planet_id):
+        """
+        ADD COMMAND TO COMMAND QUEUE
+        SET ALL STATUS
+        """
 
-                ## SET PLANET'S MY MINER
-                self.set_planet_myminer(target_planet_id, ship_id)
+        old_target_coord = self.check_duplicate_target(ship_id,target_planet_id)
 
-                ## GET DESTINATION COORDS (y,x)
-                self.set_ship_destination(ship_id, ship_coord, angle, thrust)
+        if old_target_coord:  ## USING OLD TARGET INFORMATION
+            angle = MyCommon.get_angle(ship_coord, old_target_coord)
+            ## PASS SAFE_COORD
+            thrust, new_target_coord = self.get_thrust_to_planet(ship_coord, planet_coord, target_planet_id, angle, old_target_coord)
+        else: ## NO OLD TARGET FOUND
+            angle = MyCommon.get_angle(ship_coord, planet_coord)
+            thrust, new_target_coord = self.get_thrust_to_planet(ship_coord, planet_coord, target_planet_id, angle)
 
-    def get_thrust_to_planet(self,ship_coord, planet_coord, target_planet_id, angle):
+        if thrust == 0:
+            ## START MINING
+            self.command_queue.append(self.convert_to_command_queue(ship_id, target_planet_id))
+        else:
+            ## MOVE
+            self.command_queue.append(self.convert_to_command_queue(ship_id, thrust, angle))
+
+        self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord)
+
+    def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord):
+        ## SET SHIP'S TARGET
+        self.set_ship_target_id(ship_id, Target.PLANET, target_planet_id)
+
+        ## SET SHIP'S TASK
+        self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+
+        ## SET PLANET'S MY MINER
+        self.set_planet_myminer(target_planet_id, ship_id)
+
+        ## GET DESTINATION COORDS (y,x)
+        self.set_ship_destination(ship_id, ship_coord, angle, thrust, new_target_coord)
+
+    def check_duplicate_target(self,ship_id,target_planet_id):
+        """
+        CHECKS IF TARGET IS ALREADY TAKEN BY ANOTHER SHIP
+
+        IF IT IS, GET A NEW TARGET POINT
+        """
+        try:
+            old_target_point = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_point']
+            old_angle = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_angle']
+        except:
+            return None
+
+        if old_target_point in self.myMap.all_target_coords:
+            ## GET NEW TARGET POINT
+            old_target_point = self.get_new_target_point(old_target_point, old_angle,target_planet_id)
+
+        ## RETURN OLD OR NEW TARGET POINT (COORD)
+        return MyCommon.Coordinates(old_target_point[0],old_target_point[1])
+
+
+    def get_new_target_point(self,old_target_point, old_angle, target_planet_id):
+        """
+        GET NEW TARGET POINT
+
+        MOVE CLOCKWISE (TAKE CURVATURE OF THE PLANET INTO ACCOUNT)
+        """
+        planet_center = MyCommon.Coordinates(self.myMap.data_planets[target_planet_id]['y'], \
+                                             self.myMap.data_planets[target_planet_id]['x'])
+        planet_angle = MyCommon.get_reversed_angle(old_angle)
+        opposite = 1.5
+
+        while True: ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
+            target_coord = MyCommon.Coordinates(old_target_point[0],old_target_point[1])
+            adjacent = MyCommon.calculate_distance(target_coord, planet_center)
+            angle = math.degrees(math.atan(opposite/adjacent))
+            hypotenuse = opposite / math.sin(math.radians(angle))
+            new_angle = planet_angle + angle
+            new_target_point = MyCommon.get_destination_coord(planet_center, new_angle, hypotenuse)
+
+            if old_target_point not in self.myMap.all_target_coords:
+                break
+            else:
+                ## UPDATE VALUES FOR NEXT ITERATION
+                old_target_point = new_target_point
+                planet_angle = new_angle
+
+        return new_target_point
+
+
+    def get_thrust_to_planet(self,ship_coord, planet_coord, target_planet_id, angle, safe_coord=None):
         """
         GET THRUST VALUE TOWARDS A PLANET ID PROVIDED
 
-        NEED TO TAKE INTO ACCOUNT THE PLANETS RADIUS + 1 (TO NOT CRASH AND TO MINE)
+        NEED TO TAKE INTO ACCOUNT THE PLANETS RADIUS + 3 (TO NOT CRASH AND TO MINE)
         """
-        mining_coord = self.get_mining_coord(target_planet_id, planet_coord, angle)
-        distance = MyCommon.calculate_distance(ship_coord, mining_coord)
+        if safe_coord: ## SAFE COORD ALREADY IDENTIFIED
+            target_coord = safe_coord
+        else:
+            target_coord = self.get_mining_coord(target_planet_id, planet_coord, angle)
+        distance = MyCommon.calculate_distance(ship_coord, target_coord)
 
         if distance > 7:
             thrust =  7  ## STILL FAR, MAXIMIZE THRUST
         else:
             thrust = round(distance)
 
-        return thrust
+        return thrust, target_coord
 
     def get_mining_coord(self, target_planet_id, planet_coord, angle):
         """
         GET SAFE COORD TO MINE
         GIVEN PLANET ID AND THE REVERSE ANGLE (ANGLE OUTWARD THE CENTER OF THE PLANET
         """
-        mining_distance = 2
+        mining_distance = 3
 
         planet_radius = self.myMap.data_planets[target_planet_id]['radius']
         safe_distance = planet_radius + mining_distance
         reversed_angle = MyCommon.get_reversed_angle(angle)
-        coord = MyCommon.get_destination_coord(planet_coord, reversed_angle, safe_distance)
+        safe_coord = MyCommon.get_destination_coord(planet_coord, reversed_angle, safe_distance)
 
-        return coord
+        return safe_coord
 
 
-    def set_ship_destination(self,ship_id, coords, angle, thrust):
+    def set_ship_destination(self,ship_id, coords, angle, thrust, new_target_coord):
         """
         SET SHIP DESTINATION IN MYMAP DATA SHIPS
+        BOTH TENTATIVE DESTINATION AND FINAL DESTINATION
         WITH SHIP ID, ANGLE AND THRUST PROVIDED
         """
-        self.myMap.data_ships[self.myMap.my_id][ship_id]['destination'] = \
-               MyCommon.get_destination_coord(coords, angle, thrust)
+        tentative_coord = MyCommon.get_destination_coord(coords, angle, thrust)
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_coord'] = tentative_coord
 
-    def set_ship_target(self,ship_id,target_type, target_id):
+        tentative_point = (round(tentative_coord.y), round(tentative_coord.x))
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_point'] = tentative_point
+
+        target_point = (round(new_target_coord.y), round(new_target_coord.x))
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['target_point'] = target_point
+
+        ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle
+
+        ## ADD THIS DESTINATION TO ALL TARGET COORDS
+        self.myMap.all_target_coords.add(target_point)
+
+
+    def set_ship_target_id(self,ship_id,target_type, target_id):
         """
         SET SHIP TARGET IN MYMAP DATA SHIPS
         WITH SHIP ID, TARGET TYPE, AND TARGET ID PROVIDED

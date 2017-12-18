@@ -66,6 +66,7 @@ class MyMap():
         self.height = game_map.height
         self.width = game_map.width
         self.myMap_prev = myMap_prev
+        self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
         self.data_ships = self.get_ship_data()
         self.data_planets = {}
         self.set_planet_status()
@@ -111,10 +112,13 @@ class MyMap():
                                             'health': ship.health, \
                                             'dock_status': ship.docking_status.value, \
                                             'enemy_in_turn':[], \
-                                            'enemy_coord':[],\
+                                            'enemy_coords':[],\
                                             'from_planet':None, \
                                             'target_id':None, \
-                                            'destination':None, \
+                                            'target_angle':None, \
+                                            'target_point':None, \
+                                            'tentative_coord':None, \
+                                            'tentative_point':None, \
                                             'task':ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS
 

@@ -101,7 +101,7 @@ class MyProjection():
                         list_coords[:,0] += starting_y
                         list_coords[:,1] += starting_x
 
-                        self.myMap.data_ships[self.myMap.my_id][ship_id]['enemy_coord'].append(list_coords)
+                        self.myMap.data_ships[self.myMap.my_id][ship_id]['enemy_coords'].append(list_coords)
                         logging.debug("Enemy detected in coords: {}".format(list_coords))
 
 #

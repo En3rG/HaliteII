@@ -177,9 +177,9 @@ class Exploration():
         """
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
 
-        ADDING 2.5 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
+        ADDING 4 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
         """
-        mining_area = 2.5
+        mining_area = 5
 
         for planet in game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value

@@ -5,7 +5,7 @@ from enum import Enum
 import math
 from models.data import ShipTasks
 import MyCommon
-
+import heapq
 
 
 
@@ -78,8 +78,11 @@ class MyMoves():
         else:
             ## NOT FIRST TURN
             for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
+                try:
+                    target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
+                except: ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
+                    target_planet_id = self.get_next_target_planet(ship_id)
 
-                target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
                 planet_y = self.myMap.data_planets[target_planet_id]['y']
                 planet_x = self.myMap.data_planets[target_planet_id]['x']
                 planet_coord = MyCommon.Coordinates(planet_y, planet_x)
@@ -88,6 +91,22 @@ class MyMoves():
 
                 ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
                 self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
+
+    def get_next_target_planet(self,ship_id):
+        """
+        GET NEXT PLANET TO CONQUER
+        """
+        from_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['from_planet']
+        distances_to_other_planets = self.EXP.distance_matrix[from_planet_id]
+        length = len(distances_to_other_planets)
+
+        ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+        least_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
+
+        for distance, planet_id in least_order:
+            if planet_id in self.myMap.planets_unowned:
+                return planet_id
+
 
 
     def set_moves(self,ship_coord, ship_id, planet_coord, target_planet_id):
@@ -227,7 +246,6 @@ class MyMoves():
 
         target_point = (round(new_target_coord.y), round(new_target_coord.x))
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_point'] = target_point
-        logging.info("testing target_point set: {}".format(target_point))
 
         ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle

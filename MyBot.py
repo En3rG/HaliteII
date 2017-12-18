@@ -340,7 +340,7 @@ if __name__ == "__main__":
 
     ## DELETE THIS LATER (FOR DEBUGGING ONLY)
     except Exception as e:
-        logging.error("Error found: {}".format(e))
+        logging.error("Error found: ==>{}".format(e))
 
         for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
             fname, lineno, fn, text = frame

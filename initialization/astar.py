@@ -47,7 +47,7 @@ def a_star(array, start, goal):
     ## NEIGHBORS IN NORTH, EAST, SOUTH, WEST DIRECTIONS, PLUS DIAGONALS
     neighbors = [(-1,0),(0,1),(1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]
 
-    visited_coords = set()
+    visited_points = set()
     came_from = {}
     gscore = {start:0} ## ACTUAL DISTANCE FROM START
     fscore = {start:heuristic(start, goal)} ## GSCORE PLUS DISTANCE TO GOAL
@@ -58,32 +58,33 @@ def a_star(array, start, goal):
 
     while myheap:
 
-        current_coord = heappop(myheap)[1]
+        current_point = heappop(myheap)[1]
 
-        if current_coord == goal: ## GOAL REACHED
-            data_coords = []
-            while current_coord in came_from:
-                data_coords.append(current_coord)
-                current_coord = came_from[current_coord]
-            return data_coords ## FIRST COORD WILL BE AT THE END!
+        if current_point == goal: ## GOAL REACHED
+            data_points = []
+            while current_point in came_from:
+                data_points.append(current_point)
+                current_point = came_from[current_point]
+            data_points.append(start) ## APPEND STARTING LOCATION
+            return data_points ## FIRST COORD WILL BE AT THE END!
 
-        visited_coords.add(current_coord)
+        visited_points.add(current_point)
         for r, c in neighbors:
-            neighbor_coord = (current_coord[0] + r, current_coord[1] + c)
-            tentative_g_score = gscore[current_coord] + heuristic(current_coord, neighbor_coord)
+            neighbor_point = (current_point[0] + r, current_point[1] + c)
+            tentative_g_score = gscore[current_point] + heuristic(current_point, neighbor_point)
 
-            if isBadNeighbor(array, neighbor_coord):
+            if isBadNeighbor(array, neighbor_point):
                 continue
 
-            if neighbor_coord in visited_coords and tentative_g_score >= gscore.get(neighbor_coord, 0): ## 0 DEFAULT VALUE
+            if neighbor_point in visited_points and tentative_g_score >= gscore.get(neighbor_point, 0): ## 0 DEFAULT VALUE
                 continue
 
             ## IF A BETTER GSCORE IF FOUND FOR THAT NEIGHBOR COORD OR NEIGHBOR COORD NOT IN HEAP
-            if  tentative_g_score < gscore.get(neighbor_coord, 0) or neighbor_coord not in (i[1] for i in myheap):
-                came_from[neighbor_coord] = current_coord   ## NEIGHBOR COORD CAME FROM CURRENT COORD
-                gscore[neighbor_coord] = tentative_g_score  ## NEIGHBOR DISTANCE FROM START
-                fscore[neighbor_coord] = tentative_g_score + heuristic(neighbor_coord, goal)  ## GSCORE PLUS DISTANCE TO GOAL
-                heappush(myheap, (fscore[neighbor_coord], neighbor_coord))  ## PUSH NEIGHBOR TO HEAP
+            if  tentative_g_score < gscore.get(neighbor_point, 0) or neighbor_point not in (i[1] for i in myheap):
+                came_from[neighbor_point] = current_point   ## NEIGHBOR COORD CAME FROM CURRENT COORD
+                gscore[neighbor_point] = tentative_g_score  ## NEIGHBOR DISTANCE FROM START
+                fscore[neighbor_point] = tentative_g_score + heuristic(neighbor_point, goal)  ## GSCORE PLUS DISTANCE TO GOAL
+                heappush(myheap, (fscore[neighbor_point], neighbor_point))  ## PUSH NEIGHBOR TO HEAP
 
     return []
 

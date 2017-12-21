@@ -32,8 +32,8 @@ class Exploration():
     GATHERS BEST PLANET TO CONQUER FIRST
     GATHERS PATHS, EACH PLANET TO EACH PLANET
     """
-    LAUNCH_DISTANCE = 8    ## OFFSET FROM PLANET RADIUS
-    MINING_AREA_BUFFER = 5  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
+    LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
+    MINING_AREA_BUFFER = 1  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
 
 
     def __init__(self,game):
@@ -54,6 +54,9 @@ class Exploration():
         self.get_launch_coords()
 
         self.paths = self.get_paths()
+
+        for k,v in self.paths.items():
+            logging.info("k: {} v: {}".format(k,v))
 
 
     def get_planets(self):
@@ -217,11 +220,13 @@ class Exploration():
                     ## GET PATHS
                     paths_points = a_star(self.planet_matrix, fly_off_point, land_on_point)
                     simplified_paths = self.simplify_paths(paths_points)
-                    path_table_1 = self.get_start_target_table(simplified_paths)
-                    path_table_2 = self.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
+                    path_table_forward = self.get_start_target_table(simplified_paths)
+                    path_table_reverse = self.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
 
-                    paths[(planet_id, target_planet.id)] = path_table_1
-                    paths[(target_planet.id, planet_id)] = path_table_2
+                    paths[(planet_id, target_planet.id)] = path_table_forward
+                    paths[(target_planet.id, planet_id)] = path_table_reverse
+
+                    logging.debug("Get Paths Testing. On: {} fly_off_point: {} land_on_point: {} path_table_forward: {}".format((planet_id,target_planet.id),fly_off_point,land_on_point,path_table_forward))
 
                     ## ADD TO DONE ALREADY
                     done.add((planet_id,target_planet.id))
@@ -230,21 +235,28 @@ class Exploration():
 
         ## USE A* TO GET PATH FROM STARTING TO BEST PLANET
         fly_off_point = (self.myLocation.y, self.myLocation.x)
+        logging.debug("At EXP testing fly_off_point: {}".format(fly_off_point))
 
         for target_planet in self.game_map.all_planets():
             if target_planet.id == self.best_planet_id:
                 ## GET LAND ON COORD
                 target_coord = MyCommon.Coordinates(target_planet.y, target_planet.x)
+                logging.debug("At EXP testing target_coord: {}".format(target_coord))
                 angle = MyCommon.get_angle(target_coord, self.myLocation)
+                logging.debug("At EXP testing angle: {}".format(angle))
                 distance = target_planet.radius + Exploration.LAUNCH_DISTANCE
+                logging.debug("At EXP testing distance: {}".format(distance))
                 land_on_coord = MyCommon.get_destination_coord(target_coord, angle, distance)
+                logging.debug("At EXP testing land_on_coord: {}".format(land_on_coord))
                 land_on_point = (land_on_coord.y, land_on_coord.x)
+                logging.debug("At EXP testing land_on_point: {}".format(land_on_point))
 
                 path_points = a_star(self.planet_matrix, fly_off_point, land_on_point)
+                logging.debug("At EXP testing path_points: {}".format(path_points))
                 simplified_paths = self.simplify_paths(path_points)
-                path_table_1 = self.get_start_target_table(simplified_paths)
-                paths[(-1, target_planet.id)] = path_table_1  ## -1 ID FOR STARTING POINT
-
+                path_table_forward = self.get_start_target_table(simplified_paths)
+                paths[(-1, target_planet.id)] = path_table_forward  ## -1 ID FOR STARTING POINT
+                logging.debug("At EXP testing path_table_forward: {}".format(path_table_forward))
 
 
         end = datetime.datetime.now()

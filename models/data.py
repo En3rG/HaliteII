@@ -3,7 +3,7 @@ import numpy as np
 import copy
 import logging
 import MyCommon
-
+from movement import grouping
 
 
 class Matrix_val(Enum):
@@ -61,6 +61,8 @@ class MyMap():
         self.ships_expanding = set()  ## THESE ARE CURRENTLY NOT USED
         self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
 
+        self.ships_moved_already = set()  ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
+
         self.game_map = game_map
         self.my_id = game_map.my_id
         self.height = game_map.height
@@ -72,6 +74,8 @@ class MyMap():
         self.set_planet_status()
         self.set_ships_status()
         self.set_from_planet()  ## ASSOCIATE NEW SHIPS TO A PLANET
+
+        self.groups = grouping.Groups(self)
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -119,6 +123,8 @@ class MyMap():
                                             'target_point':None, \
                                             'tentative_coord':None, \
                                             'tentative_point':None, \
+                                            'Astar_path_key': None, \
+                                            'Astar_path_table': None, \
                                             'task':ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS
 

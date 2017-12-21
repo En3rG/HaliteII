@@ -132,7 +132,7 @@ def get_variance(arr):
     return np.var(data)
 
 
-def calculate_centroid(arr):
+def calculate_centroid(arr_points):
     """
     CALCULATE CENTROID.  COORDS ARE IN (y,x) FORMAT
     CALCULATE MIDDLE POINT OF A TRIANGLE (3 SHIPS)
@@ -144,10 +144,10 @@ def calculate_centroid(arr):
     """
 
     ## CONVERT ARR (LIST) TO NDARRAY
-    data = np.array(arr)
+    data = np.array(arr_points)
     length = data.shape[0]
-    sum_x = np.sum(data[:, 0])
-    sum_y = np.sum(data[:, 1])
+    sum_y = np.sum(data[:, 0])
+    sum_x = np.sum(data[:, 1])
 
     return Coordinates(sum_y / length, sum_x / length)
 
@@ -183,3 +183,26 @@ def get_reversed_angle(angle):
     GIVEN AN ANGLE, RETURN ITS REVERSE/FLIP ANGLE
     """
     return (180+angle)%360
+
+def get_angle_thrust(start_coord, target_coord):
+    """
+    RETURN ANGLE AND THRUST
+    BASED ON START AND TARGET COORDS GIVEN
+    """
+    angle = get_angle(start_coord, target_coord)
+    thrust = calculate_distance(start_coord, target_coord)
+
+    return angle, int(thrust)
+
+
+def convert_for_command_queue(*args):
+    if len(args) == 2:
+        if args[1] is None:
+            default_planet_id = 0
+            return "d {} {}".format(args[0], default_planet_id)
+        else:
+            return "d {} {}".format(args[0], args[1])
+    elif len(args) == 3:
+        return "t {} {} {}".format(args[0], args[1], args[2])
+    else:
+        logging.ERROR("Command Error Length")

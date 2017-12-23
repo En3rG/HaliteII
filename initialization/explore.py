@@ -7,6 +7,7 @@ import MyCommon
 from models.data import MyMatrix, Matrix_val
 from initialization.astar import a_star
 import datetime
+import initialization.astar as astar
 
 
 class LaunchPads():
@@ -33,6 +34,7 @@ class Exploration():
     GATHERS PATHS, EACH PLANET TO EACH PLANET
     """
     LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
+    LAUNCH_ON_DISTANCE = 4
     MINING_AREA_BUFFER = 1  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
 
 
@@ -44,19 +46,21 @@ class Exploration():
 
         self.game_map = game.map
         self.planets = self.get_planets()
-        self.distance_matrix = self.get_distances()
-        self.myLocation = self.get_start_coords()
-        self.distances_from_me = self.get_distances_me()
+        self.planets_distance_matrix = self.get_distances()
+        self.myStartCoords = self.get_start_coords()
+        self.distances_from_start = self.get_start_distances()
         self.best_planet_id = self.get_planets_score()
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
-        self.planet_matrix = self.fill_planets_paths(matrix,self.game_map)
+        self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS
+        self.all_planet_matrix = self.fill_planets_for_paths(matrix, self.game_map)
         self.get_launch_coords()
 
-        self.paths = self.get_paths()
+        self.A_paths = self.get_paths()
 
-        for k,v in self.paths.items():
-            logging.info("k: {} v: {}".format(k,v))
+
+        for k,v in self.A_paths.items():
+            logging.debug("k: {} v: {}".format(k,v))
 
 
     def get_planets(self):
@@ -120,14 +124,14 @@ class Exploration():
         return MyCommon.calculate_centroid(coords)
 
 
-    def get_distances_me(self):
+    def get_start_distances(self):
         """
         GET DISTANCES FROM MY LOCATION TO ALL THE PLANETS
         """
         distances = {}
 
         for id, val in self.planets.items():
-            distances[id] = MyCommon.calculate_distance(val['coords'],self.myLocation)
+            distances[id] = MyCommon.calculate_distance(val['coords'],self.myStartCoords)
 
         return distances
 
@@ -138,9 +142,9 @@ class Exploration():
         TOTAL DOCKS / TOTAL DISTANCES
         """
         scores = {}
-        for id, dist in self.distances_from_me.items():
+        for id, dist in self.distances_from_start.items():
             ## GET 2 SMALLEST DISTANCE
-            list_dist = heapq.nsmallest(2, ((d, i) for i, d in enumerate(self.distance_matrix[id])))
+            list_dist = heapq.nsmallest(2, ((d, i) for i, d in enumerate(self.planets_distance_matrix[id])))
             ## INFO FOR PLANET WITH dist AWAY FROM MY STARTING LOCATION
             docks = self.planets[id]['docks']
             distances = dist
@@ -174,13 +178,13 @@ class Exploration():
 
                 ## GET LAND ON COORD
                 angle = MyCommon.get_angle(MyCommon.Coordinates(target_planet.y, target_planet.x),start_planet['coords'])
-                distance = target_planet.radius + Exploration.LAUNCH_DISTANCE
+                distance = target_planet.radius + Exploration.LAUNCH_ON_DISTANCE
                 land_on_coord = MyCommon.get_destination_coord(MyCommon.Coordinates(target_planet.y, target_planet.x), angle, distance)
 
                 ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
                 self.planets[planet_id][target_planet.id] = LaunchPads(fly_off_coord,land_on_coord)
 
-    def fill_planets_paths(self, matrix, game_map):
+    def fill_planets_for_paths(self, matrix, game_map):
         """
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
 
@@ -196,7 +200,29 @@ class Exploration():
                                           value, \
                                           cummulative=False)
 
+            ## FILL THIS SPECIFIC PLANET
+            self.fill_one_planet(planet, game_map)
+
+
         return matrix
+
+    def fill_one_planet(self, planet, game_map):
+        """
+        FILL ONE SPECIFIC PLANET
+        """
+        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.int8)
+        value = Matrix_val.PREDICTION_PLANET.value
+        matrix = MyCommon.fill_circle(matrix, \
+                                      game_map.height, \
+                                      game_map.width, \
+                                      MyCommon.Coordinates(planet.y, planet.x), \
+                                      planet.radius + Exploration.MINING_AREA_BUFFER, \
+                                      #planet.radius, \
+                                      value, \
+                                      cummulative=False)
+
+        self.planet_matrix[planet.id] = matrix
+
 
     def get_paths(self):
         """
@@ -209,6 +235,7 @@ class Exploration():
 
         start = datetime.datetime.now()
 
+        ## GET A* PATHS FROM A PLANET TO EACH PLANET
         for planet_id, planet in self.planets.items():
             for target_planet in self.game_map.all_planets():
                 if (planet_id,target_planet.id) not in done:
@@ -218,45 +245,59 @@ class Exploration():
                                       self.planets[planet_id][target_planet.id].land_on.x)
 
                     ## GET PATHS
-                    paths_points = a_star(self.planet_matrix, fly_off_point, land_on_point)
-                    simplified_paths = self.simplify_paths(paths_points)
-                    path_table_forward = self.get_start_target_table(simplified_paths)
-                    path_table_reverse = self.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
+                    path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, fly_off_point, land_on_point)
+                    path_table_reverse = astar.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
 
                     paths[(planet_id, target_planet.id)] = path_table_forward
                     paths[(target_planet.id, planet_id)] = path_table_reverse
 
-                    logging.debug("Get Paths Testing. On: {} fly_off_point: {} land_on_point: {} path_table_forward: {}".format((planet_id,target_planet.id),fly_off_point,land_on_point,path_table_forward))
+                    #logging.debug("Get Paths Testing. On: {} fly_off_point: {} land_on_point: {} path_table_forward: {}".format((planet_id,target_planet.id),fly_off_point,land_on_point,path_table_forward))
 
                     ## ADD TO DONE ALREADY
                     done.add((planet_id,target_planet.id))
                     done.add((target_planet.id,planet_id))
 
 
-        ## USE A* TO GET PATH FROM STARTING TO BEST PLANET
-        fly_off_point = (self.myLocation.y, self.myLocation.x)
-        logging.debug("At EXP testing fly_off_point: {}".format(fly_off_point))
+        ## USE A* TO GET PATH FROM STARTING CENTROID TO BEST PLANET
 
-        for target_planet in self.game_map.all_planets():
-            if target_planet.id == self.best_planet_id:
-                ## GET LAND ON COORD
-                target_coord = MyCommon.Coordinates(target_planet.y, target_planet.x)
-                logging.debug("At EXP testing target_coord: {}".format(target_coord))
-                angle = MyCommon.get_angle(target_coord, self.myLocation)
-                logging.debug("At EXP testing angle: {}".format(angle))
-                distance = target_planet.radius + Exploration.LAUNCH_DISTANCE
-                logging.debug("At EXP testing distance: {}".format(distance))
-                land_on_coord = MyCommon.get_destination_coord(target_coord, angle, distance)
-                logging.debug("At EXP testing land_on_coord: {}".format(land_on_coord))
-                land_on_point = (land_on_coord.y, land_on_coord.x)
-                logging.debug("At EXP testing land_on_point: {}".format(land_on_point))
+        target_planet = self.planets[self.best_planet_id]
+        ## GET ANGLE OF CENTROID TO BEST PLANET
+        target_coord = MyCommon.Coordinates(target_planet['coords'].y, target_planet['coords'].x)
+        angle = MyCommon.get_angle(self.myStartCoords, target_coord)
 
-                path_points = a_star(self.planet_matrix, fly_off_point, land_on_point)
-                logging.debug("At EXP testing path_points: {}".format(path_points))
-                simplified_paths = self.simplify_paths(path_points)
-                path_table_forward = self.get_start_target_table(simplified_paths)
-                paths[(-1, target_planet.id)] = path_table_forward  ## -1 ID FOR STARTING POINT
-                logging.debug("At EXP testing path_table_forward: {}".format(path_table_forward))
+        ## FOR CENTROID TARGET ONLY
+        # fly_off_point = (self.myStartCoords.y, self.myStartCoords.x)
+        # distance = target_planet['radius'] + Exploration.LAUNCH_DISTANCE
+        # land_on_coord = MyCommon.get_destination_coord(target_coord, angle, distance)
+        # land_on_point = (land_on_coord.y, land_on_coord.x)
+        #
+        # path_points = a_star(self.all_planet_matrix, fly_off_point, land_on_point)
+        # simplified_paths = self.simplify_paths(path_points)
+        # path_table_forward = self.get_start_target_table(simplified_paths)
+        # paths[(-1, self.best_planet_id)] = path_table_forward  ## -1 ID FOR STARTING POINT
+
+        ## GET A* FOR EACH SHIPS
+        matrix = self.planet_matrix[self.best_planet_id]
+        looking_for_val = Matrix_val.PREDICTION_PLANET.value
+        ## GO THROUGH EACH OF OUR SHIPS
+        for player in self.game_map.all_players():
+            if player.id == self.game_map.my_id:
+                for ship in player.all_ships():
+                    starting_point = (ship.y, ship.x)
+                    starting_coord = MyCommon.Coordinates(ship.y, ship.x)
+                    closest_coord = MyCommon.get_coord_closest_value(matrix, starting_coord, looking_for_val, angle)
+
+                    if closest_coord:
+                        reverse_angle = MyCommon.get_reversed_angle(angle) ## REVERSE DIRECTION/ANGLE
+                        destination_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, 1) ## MOVE BACK 1
+                        closest_point = (destination_coord.y, destination_coord.x)
+
+                        path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, starting_point, closest_point)
+                        paths[(-1, ship.id, self.best_planet_id)] = path_table_forward  ## -1 ID FOR STARTING POINT
+
+                    else:
+                        ## DIDNT FIND. SHOULDNT HAPPEN FOR THE STARTING 3 SHIPS
+                        logging.error("One of the starting ships didnt see the best planet, given the angle.")
 
 
         end = datetime.datetime.now()
@@ -265,78 +306,7 @@ class Exploration():
 
         return paths
 
-    def simplify_paths(self,path_coords):
-        """
-        SIMPLIFY PATH.  COMBINE MOVEMENT WITH THE SAME SLOPES
-        NEED TO MAXIMIZE THRUST OF 7 (MAX)
-        """
-        #logging.info("Original path: {}".format(path_coords))
 
-        if path_coords != []:
-            simplified_path = [path_coords[-1]]
-            prev_coord = path_coords[-1]
-            prev_angle = None
-            tempCoord = None
-            distance = 0
-            length = len(path_coords) - 1 ## MINUS THE PREVIOUS
-
-            ## SINCE STARTING IS AT THE END, SKIP LAST ONE (PREV COORD)
-            for i, current_coord in enumerate(path_coords[-2::-1], start=1):
-                ## GATHER PREVIOUS AND CURRENT COORD
-                prevCoord = MyCommon.Coordinates(prev_coord[0],prev_coord[1])
-                currentCoord = MyCommon.Coordinates(current_coord[0],current_coord[1])
-
-                if i == length:  ## IF ITS THE LAST ITEM
-                    ## ADD LAST ITEM TO SIMPLIFIED LIST
-                    simplified_path.append((currentCoord.y, currentCoord.x))
-                else:
-                    if tempCoord: ## BASE IT ON TEMP COORD, NOT PREV COORD
-                        current_angle = MyCommon.get_angle(tempCoord, currentCoord)
-                        current_distance = MyCommon.calculate_distance(tempCoord, currentCoord)
-                    else:
-                        current_angle = MyCommon.get_angle(prevCoord, currentCoord)
-                        current_distance = MyCommon.calculate_distance(prevCoord, currentCoord)
-
-                    ## IF THE SAME SLOPE/ANGLE AS BEFORE AND STILL BELOW 7, CAN CONTINUE TO COMBINE/SIMPLIFY
-                    if distance + current_distance < 7 and \
-                            (prev_angle is None or prev_angle == current_angle):
-                        tempCoord = currentCoord
-                        distance = distance + current_distance
-
-                    else: ## CANT COMBINE, NEED TO CHANGE DIRECTION
-                        if tempCoord:
-                            simplified_path.append((tempCoord.y,tempCoord.x))
-                            current_angle = MyCommon.get_angle(tempCoord, currentCoord)  ## NEW ANGLE FROM TEMP TO CURRENT
-                        else:
-                            prevCoord = MyCommon.Coordinates(prev_coord[0], prev_coord[1])
-                            current_angle = MyCommon.get_angle(prevCoord,currentCoord)  ## NEW ANGLE FROM TEMP TO CURRENT
-
-                        currentCoord = MyCommon.Coordinates(current_coord[0], current_coord[1])
-                        prev_coord = current_coord
-                        prev_angle = current_angle
-                        simplified_path.append((currentCoord.y, currentCoord.x))
-                        distance = current_distance ## RESET DISTANCE
-                        tempCoord = None ## RESET
-
-            #logging.info("simplified path: {}".format(simplified_path))
-
-            return simplified_path
-
-        return []
-
-
-    def get_start_target_table(self,simplified_path):
-        """
-        TAKES SIMPLIFIED PATH AND GENERATE A HASH TABLE
-        KEY AS CURRENT COORD AND VALUE AS TARGET (DESTINATION) COORD
-        """
-        hash_table = {}
-
-        if simplified_path != []:
-            for i, coord in enumerate(simplified_path[:-1]): ## SKIPPING LAST ELEMENT
-                hash_table[coord] = simplified_path[i+1]
-
-        return hash_table
 
 
 

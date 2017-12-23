@@ -42,7 +42,7 @@ class MyMap():
     CONVERT GAME_MAP TO DICTIONARY
     ACCESS WITH PLAYER IDs AND SHIP IDs
     """
-    MAX_NODES = 3
+    MAX_NODES = 2
     NUM_NODES = 0
 
     def __init__(self,game_map, myMap_prev):
@@ -62,6 +62,7 @@ class MyMap():
         self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
 
         self.ships_moved_already = set()  ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
+        self.taken_coords = set()
 
         self.game_map = game_map
         self.my_id = game_map.my_id
@@ -125,6 +126,7 @@ class MyMap():
                                             'tentative_point':None, \
                                             'Astar_path_key': None, \
                                             'Astar_path_table': None, \
+                                            'Astar_dest_point': None, \
                                             'task':ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS
 
@@ -229,8 +231,8 @@ class MyMap():
 
 
 class MyMatrix():
-    MAX_NODES = 3
-    NUM_NODES =0
+    MAX_NODES = 2
+    NUM_NODES = 0
 
     def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
         self.myMap = myMap
@@ -266,7 +268,7 @@ class MyMatrix():
         for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.myMap.my_id:
                 ## SET PLANET TO PREDICTION MATRIX
-                #self.prediction_matrix = copy.deepcopy(EXP.planet_matrix)
+                #self.prediction_matrix = copy.deepcopy(EXP.all_planet_matrix)
                 curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
                 self.prediction_matrix = self.fill_planets_predictions(curr_matrix)
                 continue
@@ -287,7 +289,7 @@ class MyMatrix():
                     ## FILL CURRENT PLAYER'S ENEMY SHIPS
                     matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, enemy_ships)
 
-            final_matrix[player_id] = (matrix_current,matrix_hp_current)
+            final_matrix[player_id] = (matrix_current,matrix_hp_current) ## TUPLE OF 2 MATRIXES
 
         return final_matrix
 
@@ -410,6 +412,8 @@ class MyMatrix():
 
         MATRIX SHOULD BE FILLED WITH PLANETS INFO ALREADY
         """
+        attack_radius = 5
+
         for player_id, ships in predicted_coords.items():
             for ship_id, coord in ships.items():
                 ## FILLS ATTACK AREA OF ENEMY SHIPS
@@ -430,7 +434,8 @@ class MyMatrix():
                                                                   self.myMap.height, \
                                                                   self.myMap.width, \
                                                                   MyCommon.Coordinates(pred_y,pred_x), \
-                                                                  5, value, \
+                                                                  attack_radius, \
+                                                                  value, \
                                                                   cummulative=True)
                 except Exception as e:
                     logging.error("fill_prediction_matrix error: {}".format(e))

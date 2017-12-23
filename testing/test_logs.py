@@ -1,5 +1,6 @@
 import logging
 import datetime
+import numpy as np
 
 def log_players(game_map):
     logging.debug("------Players Info------")
@@ -11,7 +12,6 @@ def log_players(game_map):
             logging.debug("Y: {}".format(ship.y))
             logging.debug("Health: {}".format(ship.health))
             logging.debug("Docking status: {}".format(ship.docking_status))  ## UNDOCKED, DOCKED, DOCKING, UNDOCKING
-
     logging.debug(" ")
 
 def log_planets(game_map):
@@ -81,27 +81,26 @@ def log_numPlayers(game_map):
 
 
 
-# import numpy as np
 #
 # def fill_circle(array, h, w, center_y, center_x, radius, value, cummulative=False):
-#     """
-#     MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
-#     """
-#     height = h
-#     width = w
+#, """
+#, MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
+#, """
+#, height = h
+#, width = w
 #
-#     y, x = np.ogrid[-center_y:height - center_y, -center_x:width - center_x]
-#     ## y IS JUST AN ARRAY OF 1xY (ROWS)
-#     ## x IS JUST AN ARRAY OF 1xX (COLS)
-#     mask = x * x + y * y <= radius * radius
-#     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
+#, y, x = np.ogrid[-center_y:height - center_y, -center_x:width - center_x]
+#, ## y IS JUST AN ARRAY OF 1xY (ROWS)
+#, ## x IS JUST AN ARRAY OF 1xX (COLS)
+#, mask = x * x + y * y <= radius * radius
+#, ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
 #
-#     if cummulative:
-#         array[mask] += -1
-#     else:
-#         array[mask] = value
+#, if cummulative:
+#,, array[mask] += -1
+#, else:
+#,, array[mask] = value
 #
-#     return array
+#, return array
 #
 #
 # n = 10
@@ -109,4 +108,86 @@ def log_numPlayers(game_map):
 # array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
 # array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
 # print("Ans",array)
+
+
+
+
+
+
+
+a = [
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+]
+#
+# start = datetime.datetime.now()
+#
+# print(a)
+#
+# ## REPLACE X WITH A '2'
+# a = np.array([[int(i) for i in row] for row in a.strip().replace('X', '2').split()], dtype=np.uint8)
+#
+# x = np.argwhere(a==2)[0]  ## COORDINATE OF X
+# y = np.argwhere(a==1), ## COORDINATES OF 1s
+# d = y-x
+#
+# phi = 195 # 255 has no solutions
+#
+# on_ray = np.abs(d@(np.sin(np.radians(-phi-90)), np.cos(np.radians(-phi-90))))<np.sqrt(0.5)  ## TRUE/FALSE IF ITS ON THE RAY
+#
+# show_ray = np.zeros_like(a),   ## A COPY OF ARRAY 'a' BUT ZEROS ONLY
+# show_ray[tuple(y[on_ray].T)] = 1  ## ADD THE 1s ON SHOW_RAY
+#,,,,,,,,   ## y[on_ray] ==> HOW DID THIS FILL THE ONES THERE
+#,,,,,,,,   ## TOOK ALL COORDS OF Y WITH TRUE TO BE 1?
+# #print(show_ray)
+#
+# ymin=y[on_ray][np.argmin(np.einsum('ij,ij->i', d[on_ray], d[on_ray]))] ## GET THE CLOSEST 1
+# print(ymin)
+#
+# end = datetime.datetime.now()
+# used = datetime.timedelta.total_seconds(end-start)
+# print(used)
+#
+#
+# a = np.zeros((350, 350), dtype=np.int)
+#
+
+
+# start = datetime.datetime.now()
+#
+# phi = 165
+#
+# start_coord = [1,25]
+# change_in_coord = -np.cos(np.radians(-phi-90)), -np.sin(np.radians(-phi-90))
+# print(change_in_coord)
+# multiplier = 1
+#
+# try:
+#     while True:
+#         new_coord = [start_coord[0] + multiplier*change_in_coord[0], start_coord[1] + multiplier*change_in_coord[1]]
+#         round_new_coord = (int(round(new_coord[0])),int(round(new_coord[1])))
+#         val = a[round_new_coord[0]][round_new_coord[1]]
+#
+#         multiplier += 1
+#
+#         if val == 1:
+#             print(val, "at", round_new_coord)
+#             break
+# except:
+#     print("No '1' found.  Out of bounds now!")
+#
+# end = datetime.datetime.now()
+# used = datetime.timedelta.total_seconds(end-start)
+# print(used)
+
 

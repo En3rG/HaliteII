@@ -44,7 +44,6 @@ class Coordinates():
 
 
 
-
 def fill_circle(array, height, width , center, radius, value, cummulative=False):
     """
     MASK A CIRCLE ON THE ARRAY SPECIFIED WITH VALUE PROVIDED
@@ -72,7 +71,7 @@ def get_angle(coords, target_coords):
     BOTH ARE IN (y,x) FORMAT
     """
     angle = math.degrees(math.atan2(target_coords.y - coords.y, target_coords.x - coords.x)) % 360
-    return round(angle)
+    return int(round(angle))
 
 
 def get_destination_coord(start_coord, angle, thrust):
@@ -91,7 +90,8 @@ def get_destination_coord(start_coord, angle, thrust):
         return Coordinates(start_coord.y + rise, start_coord.x + run)
 
     elif angle == 90:
-        return Coordinates(start_coord.y - thrust, start_coord.x)
+        #return Coordinates(start_coord.y - thrust, start_coord.x)
+        return Coordinates(start_coord.y + thrust, start_coord.x)
 
     elif angle < 180:
         angle = 180 - angle
@@ -113,7 +113,8 @@ def get_destination_coord(start_coord, angle, thrust):
         return Coordinates(start_coord.y - rise, start_coord.x - run)
 
     elif angle == 270:
-        return Coordinates(start_coord.y + thrust, start_coord.x)
+        #return Coordinates(start_coord.y + thrust, start_coord.x)
+        return Coordinates(start_coord.y - thrust, start_coord.x)
 
     else:
         angle = 360 - angle
@@ -165,8 +166,11 @@ def calculate_distance(coords1, coords2):
     """
     CALCULATE DISTANCE BETWEEN 2 POINTS
     """
-    return math.sqrt((coords1.y - coords2.y) ** 2 + (coords1.x - coords2.x) ** 2)
-
+    y1 = int(round(coords1.y))
+    y2 = int(round(coords2.y))
+    x1 = int(round(coords1.x))
+    x2 = int(round(coords2.x))
+    return int(math.sqrt((y1 - y2) ** 2 + (x1 - x2) ** 2))
 
 def get_slope(prev_coord, current_coord):
     class Slope:
@@ -192,7 +196,7 @@ def get_angle_thrust(start_coord, target_coord):
     angle = get_angle(start_coord, target_coord)
     thrust = calculate_distance(start_coord, target_coord)
 
-    return angle, int(thrust)
+    return angle, thrust
 
 
 def convert_for_command_queue(*args):
@@ -203,6 +207,71 @@ def convert_for_command_queue(*args):
         else:
             return "d {} {}".format(args[0], args[1])
     elif len(args) == 3:
+        ## SHIP ID, THRUST (INT), ANGLE (INT)
         return "t {} {} {}".format(args[0], args[1], args[2])
     else:
         logging.ERROR("Command Error Length")
+
+
+def get_coord_closest_value(matrix, starting_coord, looking_for_val, angle):
+    """
+    GIVEN THE ANGLE, FIND THE CLOSEST VALUE
+    FOLLOWING THE PATH OF THE UNIT VECTOR
+
+    RETURN COORD OF THE CLOSEST VALUE (looking_for)
+
+    RETURN NONE IF NOTHING IS FOUND
+
+    90 DEGREES GOING DOWN, 270 DEGREES GOING UP
+    """
+    unit_vector = -np.cos(np.radians(-angle - 90)), -np.sin(np.radians(-angle - 90))
+    multiplier = 1
+    start_point = [starting_coord.y, starting_coord.x]
+
+    try:
+        while True:
+            new_coord = [start_point[0] + multiplier * unit_vector[0],
+                         start_point[1] + multiplier * unit_vector[1]]
+            round_new_coord = (int(round(new_coord[0])), int(round(new_coord[1])))
+
+            ## GET VALUE
+            val = matrix[round_new_coord[0]][round_new_coord[1]]
+
+            ## INCREASE MULTIPLIER
+            multiplier += 1
+
+            if val == looking_for_val:
+                found_coord = Coordinates(round_new_coord[0], round_new_coord[1])
+                return found_coord
+
+    except:
+        ## OUT OF BOUNDS
+        ## DID NOT FIND WHAT WE WERE LOOKING FOR
+        return None
+
+
+## TESTING
+# start = Coordinates(37,60)
+# end = Coordinates(40,57)
+# print(calculate_distance(start,end))
+# print(get_angle(start,end))
+
+## TESTING DOCKING STATIONS
+# start = Coordinates(-4,0)
+# print(get_destination_coord(start,58,3))
+# print(get_destination_coord(start,60,2))
+# print(get_destination_coord(start,90,3))
+# print(get_destination_coord(start,120,2))
+# print(get_destination_coord(start,122,3))
+#
+# print(get_destination_coord(start,38,5))
+# print(get_destination_coord(start,148,5))
+
+
+# start = Coordinates(62,86)
+# target = Coordinates(61,85)
+# print(get_angle_thrust(start,target))
+#
+# start = Coordinates(61.5346,85.5386)
+# target = Coordinates(61,85)
+# print(get_angle_thrust(start,target))

@@ -234,12 +234,23 @@ if __name__ == "__main__":
     game = hlt.Game("En3rG")
     logging.info("Starting my bot!")
 
-    ## INITIALIZE PROCESSES
-    ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
-    MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
 
-    ## PERFORM INITIALIZATION PREP
-    EXP = Exploration(game)
+    try:
+
+        ## INITIALIZE PROCESSES
+        ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
+        MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
+
+        ## PERFORM INITIALIZATION PREP
+        EXP = Exploration(game)
+
+
+    except Exception as e:
+        logging.error("Error found: ==> {}".format(e))
+
+        for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
+            fname, lineno, fn, text = frame
+            logging.error("Error in {} on line {}".format(fname, lineno))
 
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
@@ -340,7 +351,7 @@ if __name__ == "__main__":
 
     ## DELETE THIS LATER (FOR DEBUGGING ONLY)
     except Exception as e:
-        logging.error("Error found: ==>{}".format(e))
+        logging.error("Error found: ==> {}".format(e))
 
         for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
             fname, lineno, fn, text = frame

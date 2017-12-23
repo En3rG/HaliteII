@@ -6,10 +6,7 @@ import math
 from models.data import ShipTasks
 import MyCommon
 import heapq
-from initialization.astar import a_star
-
-
-
+import initialization.astar as astar
 
 
 
@@ -21,11 +18,6 @@ when deciding where to go, should we place -1 on all enemy ranges, and if 2 enem
 it will then have -2.  This can help us decide whether to move there or not. Or whether we can win or not
 
 """
-
-
-
-
-
 
 
 
@@ -49,19 +41,18 @@ class MyMoves():
         self.get_my_moves()
 
 
-
-
     def get_my_moves(self):
         if self.myMap.myMap_prev is None:
-            ## FIRST TURN
+            # # FIRST TURN
+            #
+            # ## GET BEST PLANET
+            # target_planet_id = self.EXP.best_planet_id
+            #
+            # planet_y = self.myMap.data_planets[target_planet_id]['y']
+            # planet_x = self.myMap.data_planets[target_planet_id]['x']
+            # planet_coord = MyCommon.Coordinates(planet_y, planet_x)
+            #
             # for ship_id in self.myMap.ships_new:
-            #     ## GET BEST PLANET AND SET COMMAND QUEUE
-            #     target_planet_id = self.EXP.best_planet_id
-            #
-            #     planet_y = self.myMap.data_planets[target_planet_id]['y']
-            #     planet_x = self.myMap.data_planets[target_planet_id]['x']
-            #     planet_coord = MyCommon.Coordinates(planet_y,planet_x)
-            #
             #     ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
             #     ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
             #     ship_coord = MyCommon.Coordinates(ship_y,ship_x)
@@ -69,15 +60,13 @@ class MyMoves():
             #     ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
             #     #self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
             #
-            #
             #     ## USE A* PATH FOUND EARLIER
-            #     path_key = (-1,target_planet_id)
+            #     path_key = (-1, ship_id, target_planet_id)
             #     self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = path_key
-            #     path_table = self.EXP.paths[path_key]
-            #     logging.info("TESTIGNGGGG: path_key: {} path_table: {}".format(path_key,path_table))
-            #     logging.info("testing::::::: {}".format((int(round(self.EXP.myLocation.y)), int(round(self.EXP.myLocation.x)))))
-            #     tentative_destination = path_table.get((int(round(self.EXP.myLocation.y)), int(round(self.EXP.myLocation.x))), None)
-            #     logging.info("tentative_destination: {}".format(tentative_destination))
+            #     path_table = self.EXP.A_paths[path_key]
+            #
+            #     tentative_destination = path_table.get((int(round(self.EXP.myStartCoords.y)), int(round(self.EXP.myStartCoords.x))), None)
+            #
             #     angle, thrust = MyCommon.get_angle_thrust(ship_coord, MyCommon.Coordinates(tentative_destination[0],tentative_destination[1]))
             #
             #     self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
@@ -86,35 +75,69 @@ class MyMoves():
             #     self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord)
 
 
-            ## FIRST TURN
-            ## GET ALL SHIPS
-            members_id = [ ship_id for ship_id in self.myMap.ships_new ]
 
+            # ## FIRST TURN
+            # ## GET ALL SHIPS (USING CENTROID)
+            # members_id = [ ship_id for ship_id in self.myMap.ships_new ]
+            #
+            # ## GET BEST PLANET
+            # target_planet_id = self.EXP.best_planet_id
+            #
+            # ## USE A* PATH FOUND EARLIER DURING EXPLORATION/INITIALIZATION
+            # path_key = (-1, target_planet_id)
+            #
+            # ## ADD/CREATE GROUP
+            # self.myMap.groups.add_group(members_id, keep_location=True)
+            #
+            # ## ADD ASTAR PATH KEY TO THE GROUP
+            # self.myMap.groups.add_value_to_group(-1, 'Astar_path_key', path_key)
+            # self.myMap.groups.add_value_to_group(-1, 'target_id', target_planet_id)
+            #
+            # ## ADD ASTAR PATH KEY TO EACH SHIP OF THE GROUP
+            # self.myMap.groups.add_value_to_group_members(-1, 'Astar_path_key', path_key)
+            # self.myMap.groups.add_value_to_group_members(-1, 'target_id', target_planet_id)
+            #
+            # ## GET ANGLE AND THRUST FROM PATH KEY
+            # angle, thrust = self.get_angle_thrust_from_path_key(path_key, self.EXP.myStartCoords)
+            #
+            # ## ADD TO COMMAND QUEUE
+            # self.command_queue.extend(self.myMap.groups.get_move_group(-1, thrust, angle))
+            #
+            # ## SET SHIP STATUSES
+            # for ship_id in self.myMap.groups.groups_dict[-1].members_id:
+            #     ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
+            #     ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
+            #     ship_coord = MyCommon.Coordinates(ship_y,ship_x)
+            #     self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord=None)
+
+
+            # FIRST TURN
             ## GET BEST PLANET
             target_planet_id = self.EXP.best_planet_id
 
-            ## USE A* PATH FOUND EARLIER
-            path_key = (-1, target_planet_id)
+            for ship_id in self.myMap.ships_new:
+                ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
+                ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
+                ship_coord = MyCommon.Coordinates(ship_y, ship_x)
 
-            ## ADD GROUP
-            self.myMap.groups.add_group(members_id, keep_location=True)
+                # ## USE A* PATH FOUND EARLIER DURING EXPLORATION/INITIALIZATION
+                path_key = (-1, ship_id, target_planet_id)
 
-            ## ADD ASTAR PATH KEY TO THE GROUP
-            self.myMap.groups.add_value_to_group(-1, 'Astar_path_key', path_key)
-            self.myMap.groups.add_value_to_group(-1, 'target_id', target_planet_id)
+                ## ADD/CREATE GROUP (NO LONGER CREATING GROUP?)
 
-            ## ADD ASTAR PATH KEY TO EACH SHIP OF THE GROUP
-            self.myMap.groups.add_value_to_group_members(-1, 'Astar_path_key', path_key)
-            self.myMap.groups.add_value_to_group_members(-1, 'target_id', target_planet_id)
+                ## SET TARGET
+                self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'] = target_planet_id
 
-            ## GET ANGLE AND THRUST FROM PATH KEY
-            angle, thrust = self.get_angle_thrust_from_path_key(path_key, self.EXP.myLocation)
+                ## SET A* PATH KEY
+                self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = path_key
 
-            ## ADD TO COMMAND QUEUE
-            self.command_queue.extend(self.myMap.groups.get_move_group(-1, thrust, angle))
+                ## GET ANGLE AND THRUST FROM PATH KEY
+                angle, thrust = self.get_angle_thrust_from_path_key(ship_id, path_key, ship_coord)
 
-            ## SET SHIP STATUSES
-            for ship_id in self.myMap.groups.groups_dict[-1].members_id:
+                ## ADD TO COMMAND QUEUE
+                self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
+
+                ## SET SHIP STATUSES
                 ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
                 ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
                 ship_coord = MyCommon.Coordinates(ship_y,ship_x)
@@ -123,58 +146,79 @@ class MyMoves():
         else:
             ## NOT FIRST TURN
 
-            ## UPDATE GROUPS FROM PREV TURN
-            self.myMap.groups.get_and_update_prev_group()
+            ## NO LONGER USING GROUPS???
+            # ## UPDATE GROUPS FROM PREV TURN
+            # self.myMap.groups.get_and_update_prev_group()
+            #
+            # ## MOVE GROUPS
+            # for group_id, group in self.myMap.groups.groups_dict.items():
+            #     path_key = self.myMap.myMap_prev.groups.groups_dict[group_id].Astar_path_key
+            #     target_planet_id = self.myMap.myMap_prev.groups.groups_dict[group_id].target_id
+            #
+            #     ## GET ANGLE AND THRUST FROM PATH KEY
+            #     angle, thrust = self.get_angle_thrust_from_path_key(path_key, group.centroid_coord)
+            #
+            #     self.myMap.groups.add_value_to_group(group_id, 'Astar_path_key', path_key)
+            #     self.myMap.groups.add_value_to_group(group_id, 'target_id', target_planet_id)
+            #
+            #     ## ADD TO COMMAND QUEUE
+            #     self.command_queue.extend(self.myMap.groups.get_move_group(-1, thrust, angle))
+            #
+            #     ## SET SHIP STATUSES
+            #     for ship_id in self.myMap.groups.groups_dict[group_id].members_id:
+            #         ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
+            #         ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
+            #         ship_coord = MyCommon.Coordinates(ship_y, ship_x)
+            #         self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord=None)
 
-            ## MOVE GROUPS
-            for group_id, group in self.myMap.groups.groups_dict.items():
-                path_key = self.myMap.myMap_prev.groups.groups_dict[group_id].Astar_path_key
-                target_planet_id = self.myMap.myMap_prev.groups.groups_dict[group_id].target_id
 
-                ## GET ANGLE AND THRUST FROM PATH KEY
-                angle, thrust = self.get_angle_thrust_from_path_key(path_key, group.centroid_coord)
+            ## MOVE MINING SHIPS FIRST
 
-                self.myMap.groups.add_value_to_group(group_id, 'Astar_path_key', path_key)
-                self.myMap.groups.add_value_to_group(group_id, 'target_id', target_planet_id)
-
-                ## ADD TO COMMAND QUEUE
-                self.command_queue.extend(self.myMap.groups.get_move_group(-1, thrust, angle))
-
-                ## SET SHIP STATUSES
-                for ship_id in self.myMap.groups.groups_dict[group_id].members_id:
-                    ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
-                    ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
-                    ship_coord = MyCommon.Coordinates(ship_y, ship_x)
-                    self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord=None)
+            logging.info("self.myMap.ships_mining_ally: {}".format(self.myMap.ships_mining_ally))
+            for ship_id in self.myMap.ships_mining_ally:
+                y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
+                x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
+                ship_coord = MyCommon.Coordinates(y, x)
+                point = (int(round(ship_coord.y)), int(round(ship_coord.x)))
+                self.myMap.taken_coords.add(point)
+                logging.info("Adding point: {} to taken_coords".format(point))
+                self.myMap.ships_moved_already.add(ship_id)
 
             ## MOVE OTHERS
             for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
                 if ship_id not in self.myMap.ships_moved_already:
+                    ship_coord = MyCommon.Coordinates(ship['y'], ship['x'])
+
                     try:
                         target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
                     except: ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
                         target_planet_id = self.get_next_target_planet(ship_id)
 
-                    planet_y = self.myMap.data_planets[target_planet_id]['y']
-                    planet_x = self.myMap.data_planets[target_planet_id]['x']
-                    planet_coord = MyCommon.Coordinates(planet_y, planet_x)
+                    if target_planet_id is None:
+                        ## NO MORE PLANETS TO CONQUER AT THIS TIME
+                        break
+                    else:
+                        planet_y = self.myMap.data_planets[target_planet_id]['y']
+                        planet_x = self.myMap.data_planets[target_planet_id]['x']
+                        planet_coord = MyCommon.Coordinates(planet_y, planet_x)
 
-                    ship_coord = MyCommon.Coordinates(ship['y'], ship['x'])
-
-                    ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
-                    self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
+                        ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
+                        self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
 
 
 
-    def get_angle_thrust_from_path_key(self, path_key, coord):
+    def get_angle_thrust_from_path_key(self, ship_id, path_key, coord):
         """
         GET ANGLE AND THRUST FROM PATH KEY PROVIDED
+
+        ONLY USED IN FIRST TURN? SINCE COULD BE A LITTLE OFF DUE TO ROUNDING SOMETIMES
         """
         if path_key is None:
             return None, None
 
-        path_table = self.EXP.paths[path_key]
+        path_table = self.EXP.A_paths[path_key]
         tentative_destination = path_table.get((int(round(coord.y)), int(round(coord.x))), None)
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point'] = tentative_destination
         angle, thrust = MyCommon.get_angle_thrust(coord, MyCommon.Coordinates(tentative_destination[0],
                                                                               tentative_destination[1]))
 
@@ -185,7 +229,7 @@ class MyMoves():
         GET NEXT PLANET TO CONQUER
         """
         from_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['from_planet']
-        distances_to_other_planets = self.EXP.distance_matrix[from_planet_id]
+        distances_to_other_planets = self.EXP.planets_distance_matrix[from_planet_id]
         length = len(distances_to_other_planets)
 
         ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
@@ -195,6 +239,7 @@ class MyMoves():
             if planet_id in self.myMap.planets_unowned:
                 return planet_id
 
+        return None ## NO MORE PLANETS
 
 
     def set_moves(self,ship_coord, ship_id, planet_coord, target_planet_id):
@@ -203,8 +248,10 @@ class MyMoves():
 
         SET ALL STATUS
         """
+        old_target_coord = None
+        #old_target_coord = self.check_duplicate_target(ship_id,target_planet_id)
 
-        old_target_coord = self.check_duplicate_target(ship_id,target_planet_id)
+
 
         ## JUST GOING STRAIGHT TO TARGET
         # if old_target_coord:  ## USING OLD TARGET INFORMATION
@@ -226,42 +273,81 @@ class MyMoves():
                                                                  old_target_coord)
         else:
             ## INSTEAD OF GOING DIRECTLY TO TARGET, USE A* PATH GENERATED EARLIER
-            if self.myMap.data_ships[self.myMap.my_id][ship_id]['from_planet'] is not None: ## NEW SHIP
-                from_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['from_planet']
-                self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = self.EXP.planets[from_planet_id][target_planet_id]
+            from_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['from_planet']
+
+
+            if from_planet_id is not None: ## NEW SHIP
+                path_key = (from_planet_id, target_planet_id)
+                self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = path_key
 
                 ## USE A* TO GET TO LAUNCHPAD FLY OFF COORD
-                path_table = self.get_set_path_table(ship_id,ship_coord,from_planet_id,target_planet_id)
+                path_table = self.get_set_path_table_toward_launch(ship_id,ship_coord,from_planet_id,target_planet_id)
 
                 tentative_destination = path_table[(int(round(ship_coord.y)),int(round(ship_coord.x)))]
+                self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point'] = tentative_destination
                 angle, thrust = MyCommon.get_angle_thrust(ship_coord, MyCommon.Coordinates(tentative_destination[0], tentative_destination[1]))
 
-            else: ## USE EXISTING Astar path table
+                logging.debug("Angle: {} thrust: {}".format(angle,thrust))
+                logging.debug("New ship: ship_id: {} data: {}".format(ship_id, self.myMap.data_ships[self.myMap.my_id][ship_id]))
+
+                ## NEW SHIP APPEARED ON LAUNCH OFF
+                ## FOLLOW ITS PATH KEY
+                if thrust == 0:
+                    logging.debug("Path key: {}".format(path_key))
+                    tentative_destination = self.EXP.A_paths[path_key].get(tentative_destination, None)
+                    self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point'] = tentative_destination
+                    angle, thrust = MyCommon.get_angle_thrust(ship_coord, MyCommon.Coordinates(tentative_destination[0],
+                                                                                               tentative_destination[1]))
+
+            else: ## USE EXISTING Astar path table, IF ONE EXISTS
+                path_key = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id].get('Astar_path_key', None)
                 path_table = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id].get('Astar_path_table', None)
+                tentative_destination = None
 
                 if path_table:
-                    tentative_destination = path_table.get((int(round(ship_coord.y)), int(round(ship_coord.x))),None)
-                else:
-                    path_key = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['Astar_path_key']
+                    logging.debug("path_table not None")
+                    # tentative_destination = path_table.get((int(round(ship_coord.y)), int(round(ship_coord.x))), None)
+                    # if not(tentative_destination): ## POSSIBLY OFF BY A LITTLE, USE PREV A* DEST POINT
+                    prev_dest_point = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point']
+                    tentative_destination = path_table.get(prev_dest_point, None)
+                    logging.debug("got old dest point, now tentative_destination: {}".format(tentative_destination))
+
+                if path_table is None or tentative_destination is None:
+                    logging.debug("path_table or tentative_destination is None")
+                    ## CHECK A* PATH KEY IF IT EXISTS
                     if path_key:
-                        tentative_destination = self.EXP.paths[path_key].get((int(round(ship_coord.y)), int(round(ship_coord.x))), None)
+                        # tentative_destination = self.EXP.A_paths[path_key].get((int(round(ship_coord.y)), int(round(ship_coord.x))), None)
+                        # if not(tentative_destination): ## POSSIBLY OFF BY A LITTLE, USE PREV A* DEST POINT
+                        prev_dest_point = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point']
+                        tentative_destination = self.EXP.A_paths[path_key].get(prev_dest_point, None)
+                        logging.debug("got old dest point, now tentative_destination: {}".format(tentative_destination))
                         path_table = None
+
                     else: ## PATH KEY DOESNT EXIST OR NONE
                         tentative_destination = None
 
                 if tentative_destination: ## DIDNT GET TO DESTINATION YET
+                    self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point'] = tentative_destination
                     self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_table'] = path_table
-                    self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['Astar_path_key']
+                    self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = path_key
                     angle, thrust = MyCommon.get_angle_thrust(ship_coord, MyCommon.Coordinates(tentative_destination[0], tentative_destination[1]))
+
+                    ## !!!!!!!!!!!!!!!!111
+                    ## IF MOVING BY 1 THRUST, IT IS POSSIBLE THAT THE ROUNDED COORDINATE DOESNT MOVE AT ALL
+                    ## THIS THINKS THRUST IS 0, AND WILL TRY TO DOCK!!!!!
+
                 else: ## GOT TO FINAL DESTINATION
+                    logging.debug("Docking???")
                     thrust = 0
                     angle = 0
 
-            new_target_coord = None
+                logging.debug("Old ship: ship_id: {} data: {}".format(ship_id, self.myMap.data_ships[self.myMap.my_id][ship_id]))
+
+            #new_target_coord = None
 
         if thrust == 0:
             ## START MINING
-            self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+            self.get_mining_spot(ship_id, target_planet_id)
         else:
             ## MOVE
             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
@@ -269,21 +355,77 @@ class MyMoves():
         ## ADD TO SHIPS MOVED
         self.myMap.ships_moved_already.add(ship_id)
 
-        self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord)
+        self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord=None)
 
-    def get_set_path_table(self,ship_id,ship_coord,from_planet_id,target_planet_id):
+    def get_mining_spot(self, ship_id, target_planet_id):
+        """
+        AT THE LAUNCH ON COORD, FIND A MINING SAFE SPOT
+
+                               -4,0
+
+                         -2, -1      2,1
+           -1,-4   -1,-2       -1, 0     -1,2     -1,4
+        """
+        # print(get_destination_coord(start, 58, 3))
+        # print(get_destination_coord(start, 90, 3))
+        # print(get_destination_coord(start, 60, 2))
+        # print(get_destination_coord(start, 122, 3))
+        # print(get_destination_coord(start, 120, 2))
+
+        # print(get_destination_coord(start, 38, 5))
+        # print(get_destination_coord(start, 148, 5))
+
+        ## CHECK PREVIOUS Astar path_key
+        logging.info("At ship_id: {}".format(ship_id))
+
+        if self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] is None \
+                   or len(self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['Astar_path_key']) == 3:
+                ## FIRST 3 SHIPS OR READY TO MINE
+                self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+        else:
+            ## REACHED LAUNCH ON COORD
+            self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_key'] = None ## SO IT"LL DOCK NEXT TURN
+
+            start = MyCommon.Coordinates(self.myMap.data_ships[self.myMap.my_id][ship_id]['y'], \
+                                         self.myMap.data_ships[self.myMap.my_id][ship_id]['x'])
+            target = MyCommon.Coordinates(self.myMap.data_planets[target_planet_id]['y'], \
+                                          self.myMap.data_planets[target_planet_id]['x'])
+            angle = MyCommon.get_angle(start, target)
+
+            values = [(angle-32, 3), \
+                      (angle, 3), \
+                      (angle+32, 3), \
+                      (angle-52, 5), \
+                      (angle+58, 5), \
+                      (angle - 30, 2), \
+                      (angle + 30, 2)]
+
+            for new_angle, new_thrust in values:
+                new_angle = new_angle%360 ## KEEP IT FROM 0-360 RANGE
+                new_destination_coord = MyCommon.get_destination_coord(start, new_angle, new_thrust)
+                new_destination_point = (int(round(new_destination_coord.y)), int(round(new_destination_coord.x)))
+
+                logging.info("Going for new_destination_point: {}".format(new_destination_point))
+
+                if new_destination_point not in self.myMap.taken_coords:
+                    logging.info("Good")
+                    self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, new_thrust, new_angle))
+                    break
+
+    def get_set_path_table_toward_launch(self,ship_id,ship_coord,from_planet_id,target_planet_id):
         """
         GET PATH FROM SPAWN TO FLY OFF COORD
 
         SET ASTAR PATH TABLE
         """
         launch_pad = self.EXP.planets[from_planet_id][target_planet_id]  ## GET LAUNCH PAD
-        paths_points = a_star(self.EXP.planet_matrix, ship_coord, launch_pad.fly_off_point)
-        simplified_paths = self.EXP.simplify_paths(paths_points)
-        path_table = self.EXP.get_start_target_table(simplified_paths)
-        self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_table'] = path_table
+        fly_off_point = (launch_pad.fly_off.y, launch_pad.fly_off.x)
+        ship_point = (ship_coord.y, ship_coord.x)
 
-        return path_table
+        path_table_forward, simplified_paths = astar.get_Astar_table(self.EXP.all_planet_matrix, ship_point, fly_off_point)
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_path_table'] = path_table_forward
+
+        return path_table_forward
 
 
     def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord):
@@ -396,15 +538,15 @@ class MyMoves():
         tentative_coord = MyCommon.get_destination_coord(coords, angle, thrust)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_coord'] = tentative_coord
 
-        tentative_point = (round(tentative_coord.y), round(tentative_coord.x))
+        tentative_point = (int(round(tentative_coord.y)), int(round(tentative_coord.x)))
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_point'] = tentative_point
 
         if new_target_coord:
             target_point = (round(new_target_coord.y), round(new_target_coord.x))
             self.myMap.data_ships[self.myMap.my_id][ship_id]['target_point'] = target_point
 
-            ## ADD THIS DESTINATION TO ALL TARGET COORDS
-            self.myMap.all_target_coords.add(target_point)
+        ## ADD THIS DESTINATION TO ALL TARGET COORDS
+        self.myMap.taken_coords.add(tentative_point)
 
         ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle
@@ -476,7 +618,4 @@ def starter_bot_moves(game_map,command_queue):
             break
 
 
-## y 40, x 60, angle 149, thrust 7
-## should give y 43.60 x 53.99
-# a = MyMoves.get_destination((40,60),149,7)
-# print(a)
+

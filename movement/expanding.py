@@ -1,0 +1,215 @@
+
+import heapq
+import MyCommon
+import initialization.astar as astar
+import math
+import logging
+import sys
+import traceback
+
+
+def get_next_target_planet(MyMoves, ship_id):
+    """
+    GET NEXT PLANET TO CONQUER
+
+    GETS CALLED BY NEW SHIPS
+    """
+    try:
+        from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
+
+        logging.debug("from_planet_id: {} ship_id: {}".format(from_planet_id, ship_id))
+
+        distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
+        length = len(distances_to_other_planets)
+
+        ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+        least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
+
+        for distance, planet_id in least_distance_order:
+            ## NOT OWNED BY ANYBODY YET
+            if planet_id in MyMoves.myMap.planets_unowned:
+                return planet_id
+            ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
+            elif planet_id in MyMoves.myMap.planets_owned:
+                len_miners = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
+                max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
+
+                logging.debug("My planet!! len_miners: {} max_docks: {}".format(len_miners, max_docks))
+
+                if len_miners < max_docks:
+                    return planet_id
+
+    except Exception as e:
+        logging.error("Error found: ==> {}".format(e))
+
+        for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
+            fname, lineno, fn, text = frame
+            logging.error("Error in {} on line {}".format(fname, lineno))
+
+        return None  ## NO MORE PLANETS
+
+
+def get_mining_spot(MyMoves, ship_id, target_planet_id):
+    """
+    AT THE LAUNCH LAND ON COORD, FIND A MINING SAFE SPOT
+
+                               (-4,0)
+
+                        (-2,-1)      (2,1)
+       (-1,-4)   (-1,-2)       (-1,0)     (-1,2)     (-1,4)
+    """
+    # print(get_destination_coord(start, 58, 3))
+    # print(get_destination_coord(start, 90, 3))
+    # print(get_destination_coord(start, 60, 2))
+    # print(get_destination_coord(start, 122, 3))
+    # print(get_destination_coord(start, 120, 2))
+
+    # print(get_destination_coord(start, 38, 5))
+    # print(get_destination_coord(start, 148, 5))
+
+    ## CHECK PREVIOUS Astar path_key
+
+    if MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key'] is None \
+            or len(MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key']) == 3:
+        ## FIRST 3 SHIPS OR READY TO MINE
+        MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+    else:
+        ## REACHED LAUNCH ON COORD
+        MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key'] = None  ## SO IT"LL DOCK NEXT TURN
+
+        start = MyCommon.Coordinates(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['y'], \
+                                     MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['x'])
+        target = MyCommon.Coordinates(MyMoves.myMap.data_planets[target_planet_id]['y'], \
+                                      MyMoves.myMap.data_planets[target_planet_id]['x'])
+        angle = MyCommon.get_angle(start, target)
+
+        values = [(angle, 3), \
+                  (angle - 32, 3), \
+                  (angle + 32, 3), \
+                  (angle - 52, 5), \
+                  (angle + 58, 5), \
+                  (angle - 30, 2), \
+                  (angle + 30, 2)]
+
+        for new_angle, new_thrust in values:
+            new_angle = new_angle % 360  ## KEEP IT FROM 0-360 RANGE
+            new_destination_coord = MyCommon.get_destination_coord(start, new_angle, new_thrust)
+            new_destination_point = (int(round(new_destination_coord.y)), int(round(new_destination_coord.x)))
+
+            if new_destination_point not in MyMoves.myMap.taken_coords:
+                MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, new_thrust, new_angle))
+                break
+
+
+def get_set_path_table_toward_launch(MyMoves, ship_id, ship_coord, from_planet_id, target_planet_id):
+    """
+    GET PATH FROM SPAWN TO FLY OFF COORD
+
+    SET ASTAR PATH TABLE
+    """
+    launch_pad = MyMoves.EXP.planets[from_planet_id][target_planet_id]  ## GET LAUNCH PAD
+    fly_off_point = (launch_pad.fly_off.y, launch_pad.fly_off.x)
+    ship_point = (ship_coord.y, ship_coord.x)
+
+    path_table_forward, simplified_paths = astar.get_Astar_table(MyMoves.EXP.all_planet_matrix, ship_point, fly_off_point)
+    MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_table'] = path_table_forward
+
+    return path_table_forward
+
+
+def check_duplicate_target(MyMoves, ship_id, target_planet_id):
+    """
+    CHECKS IF TARGET IS ALREADY TAKEN BY ANOTHER SHIP
+
+    IF IT IS, GET A NEW TARGET POINT
+
+    NO LONGER USED!!!
+    """
+    try:
+        old_target_point = MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['target_point']
+        old_angle = MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['target_angle']
+    except:
+        old_target_point = None
+
+    if old_target_point is None:
+        return None
+    elif old_target_point in MyMoves.myMap.all_target_coords:
+        ## GET NEW TARGET POINT
+        old_target_point = get_new_point_on_planet(MyMoves, old_target_point, old_angle, target_planet_id)
+
+    ## RETURN OLD OR NEW TARGET POINT (COORD)
+    return MyCommon.Coordinates(old_target_point[0], old_target_point[1])
+
+
+def get_new_point_on_planet(MyMoves, old_target_point, old_angle, target_planet_id):
+    """
+    GET NEW TARGET POINT
+
+    MOVE CLOCKWISE (TAKE CURVATURE OF THE PLANET INTO ACCOUNT)
+
+    NO LONGER USED!!!
+    """
+    planet_center = MyCommon.Coordinates(MyMoves.myMap.data_planets[target_planet_id]['y'], \
+                                         MyMoves.myMap.data_planets[target_planet_id]['x'])
+    planet_angle = MyCommon.get_reversed_angle(old_angle)
+    opposite = 1.5
+
+    while True:  ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
+        target_coord = MyCommon.Coordinates(old_target_point[0], old_target_point[1])
+        adjacent = MyCommon.calculate_distance(target_coord, planet_center)
+        angle = math.degrees(math.atan(opposite / adjacent))
+        hypotenuse = opposite / math.sin(math.radians(angle))
+        new_angle = planet_angle + angle
+        new_target_coord = MyCommon.get_destination_coord(planet_center, new_angle, hypotenuse)
+        new_target_point = (new_target_coord.y, new_target_coord.x)
+
+        if old_target_point not in MyMoves.myMap.all_target_coords:
+            break
+        else:
+            ## UPDATE VALUES FOR NEXT ITERATION
+            old_target_point = new_target_point
+            planet_angle = new_angle
+
+    return new_target_point
+
+
+def get_thrust_to_planet(MyMoves, ship_coord, planet_coord, target_planet_id, angle, safe_coord=None):
+    """
+    GET THRUST VALUE TOWARDS A PLANET ID PROVIDED
+
+    NEED TO TAKE INTO ACCOUNT THE PLANETS RADIUS + 3 (TO NOT CRASH AND TO MINE)
+
+    NO LONGER USED!!!
+    """
+    if safe_coord:  ## SAFE COORD ALREADY IDENTIFIED
+        target_coord = safe_coord
+    else:
+        target_coord = get_mining_coord(MyMoves, target_planet_id, planet_coord, angle)
+    distance = MyCommon.calculate_distance(ship_coord, target_coord)
+
+    if distance > 7:
+        thrust = 7  ## STILL FAR, MAXIMIZE THRUST
+    else:
+        thrust = round(distance)
+
+    return thrust, target_coord
+
+
+def get_mining_coord(MyMoves, target_planet_id, planet_coord, angle):
+    """
+    GET SAFE COORD TO MINE
+    GIVEN PLANET ID AND THE REVERSE ANGLE (ANGLE OUTWARD THE CENTER OF THE PLANET
+
+    NO LONGER USED!!!
+    """
+    mining_distance = 3
+
+    planet_radius = MyMoves.myMap.data_planets[target_planet_id]['radius']
+    safe_distance = planet_radius + mining_distance
+    reversed_angle = MyCommon.get_reversed_angle(angle)
+    safe_coord = MyCommon.get_destination_coord(planet_coord, reversed_angle, safe_distance)
+
+    return safe_coord
+
+
+

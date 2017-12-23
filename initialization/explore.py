@@ -36,7 +36,7 @@ class Exploration():
     LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
     LAUNCH_ON_DISTANCE = 4
     MINING_AREA_BUFFER = 1  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
-
+    MOVE_BACK_DISTANCE = 1
 
     def __init__(self,game):
         ## FOR TESTING ONLY
@@ -52,15 +52,15 @@ class Exploration():
         self.best_planet_id = self.get_planets_score()
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
-        self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS
+        self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix = self.fill_planets_for_paths(matrix, self.game_map)
         self.get_launch_coords()
 
         self.A_paths = self.get_paths()
 
 
-        for k,v in self.A_paths.items():
-            logging.debug("k: {} v: {}".format(k,v))
+        # for k,v in self.A_paths.items():
+        #     logging.debug("k: {} v: {}".format(k,v))
 
 
     def get_planets(self):
@@ -85,7 +85,7 @@ class Exploration():
         length = len(self.planets)
 
         ## INITIALIZE MATRIX
-        matrix = [[ 99999 for x in range(length) ] for y in range(length)]
+        matrix = [[ 0 for x in range(length) ] for y in range(length)]
         matrix = self.calculate_distance_matrix(matrix)
 
         return matrix
@@ -100,7 +100,7 @@ class Exploration():
                 if id == id2:
                     ## DISTANCE TO ITSELF WILL STAY 99999
                     pass
-                elif matrix[id][id2] != 99999:
+                elif matrix[id][id2] != 0:
                     ## ALREADY CALCULATED BEFORE
                     pass
                 else:
@@ -108,7 +108,6 @@ class Exploration():
                     matrix[id2][id] = matrix[id][id2]
 
         return matrix
-
 
 
     def get_start_coords(self):
@@ -142,9 +141,12 @@ class Exploration():
         TOTAL DOCKS / TOTAL DISTANCES
         """
         scores = {}
+        include_planets = 3
+
         for id, dist in self.distances_from_start.items():
             ## GET 2 SMALLEST DISTANCE
-            list_dist = heapq.nsmallest(2, ((d, i) for i, d in enumerate(self.planets_distance_matrix[id])))
+            ## ITS 3 INCLUDING ITSELF
+            list_dist = heapq.nsmallest(include_planets, ((d, i) for i, d in enumerate(self.planets_distance_matrix[id])))
             ## INFO FOR PLANET WITH dist AWAY FROM MY STARTING LOCATION
             docks = self.planets[id]['docks']
             distances = dist
@@ -231,18 +233,35 @@ class Exploration():
         GET A* PATH FROM STARTING LOCATION (3 SHIPS) TO BEST PLANET
         """
         paths = {}
-        done = set()
 
         start = datetime.datetime.now()
 
         ## GET A* PATHS FROM A PLANET TO EACH PLANET
+        paths = self.get_planet_to_planet_paths(paths)
+
+        ## GET A* FROM EACH OF THE STARTING SHIPS TO BEST PLANET
+        paths = self.get_starting_ships_paths(paths)
+
+        end = datetime.datetime.now()
+        time_used = datetime.timedelta.total_seconds(end-start)
+        logging.info("A* algo took: {}".format(time_used))
+
+        return paths
+
+
+    def get_planet_to_planet_paths(self, paths):
+        """
+        GET A* PATHS FROM FLY OFF TO LAND OFF LAUNCH COORDS
+        """
+        done = set()
+
         for planet_id, planet in self.planets.items():
             for target_planet in self.game_map.all_planets():
-                if (planet_id,target_planet.id) not in done:
+                if (planet_id, target_planet.id) not in done:
                     fly_off_point = (self.planets[planet_id][target_planet.id].fly_off.y, \
-                                      self.planets[planet_id][target_planet.id].fly_off.x)
+                                     self.planets[planet_id][target_planet.id].fly_off.x)
                     land_on_point = (self.planets[planet_id][target_planet.id].land_on.y, \
-                                      self.planets[planet_id][target_planet.id].land_on.x)
+                                     self.planets[planet_id][target_planet.id].land_on.x)
 
                     ## GET PATHS
                     path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, fly_off_point, land_on_point)
@@ -251,12 +270,18 @@ class Exploration():
                     paths[(planet_id, target_planet.id)] = path_table_forward
                     paths[(target_planet.id, planet_id)] = path_table_reverse
 
-                    #logging.debug("Get Paths Testing. On: {} fly_off_point: {} land_on_point: {} path_table_forward: {}".format((planet_id,target_planet.id),fly_off_point,land_on_point,path_table_forward))
+                    # logging.debug("Get Paths Testing. On: {} fly_off_point: {} land_on_point: {} path_table_forward: {}".format((planet_id,target_planet.id),fly_off_point,land_on_point,path_table_forward))
 
                     ## ADD TO DONE ALREADY
-                    done.add((planet_id,target_planet.id))
-                    done.add((target_planet.id,planet_id))
+                    done.add((planet_id, target_planet.id))
+                    done.add((target_planet.id, planet_id))
 
+        return paths
+
+    def get_starting_ships_paths(self, paths):
+        """
+        GET A* PATHS FROM EACH OF THE STARTING SHIPS TO THE BEST PLANET
+        """
 
         ## USE A* TO GET PATH FROM STARTING CENTROID TO BEST PLANET
 
@@ -276,7 +301,7 @@ class Exploration():
         # path_table_forward = self.get_start_target_table(simplified_paths)
         # paths[(-1, self.best_planet_id)] = path_table_forward  ## -1 ID FOR STARTING POINT
 
-        ## GET A* FOR EACH SHIPS
+        ## GET A* FOR EACH STARTING SHIPS
         matrix = self.planet_matrix[self.best_planet_id]
         looking_for_val = Matrix_val.PREDICTION_PLANET.value
         ## GO THROUGH EACH OF OUR SHIPS
@@ -288,8 +313,8 @@ class Exploration():
                     closest_coord = MyCommon.get_coord_closest_value(matrix, starting_coord, looking_for_val, angle)
 
                     if closest_coord:
-                        reverse_angle = MyCommon.get_reversed_angle(angle) ## REVERSE DIRECTION/ANGLE
-                        destination_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, 1) ## MOVE BACK 1
+                        reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
+                        destination_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, Exploration.MOVE_BACK_DISTANCE)  ## MOVE BACK
                         closest_point = (destination_coord.y, destination_coord.x)
 
                         path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, starting_point, closest_point)
@@ -300,20 +325,5 @@ class Exploration():
                         logging.error("One of the starting ships didnt see the best planet, given the angle.")
 
 
-        end = datetime.datetime.now()
-        time_used = datetime.timedelta.total_seconds(end-start)
-        logging.info("A* algo took: {}".format(time_used))
-
         return paths
-
-
-
-
-
-
-
-
-
-
-
 

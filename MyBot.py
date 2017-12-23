@@ -82,7 +82,8 @@ def get_predictions_queue(Q):
                 q[id] = (ship_ids,data)
             else:
                 break
-        except:
+        except Exception as e:
+            logging.warning("{}".format(e))
             logging.warning("Q timed out")
             break
 
@@ -117,7 +118,8 @@ def clean_predicting_args(MP):
                     logging.debug("Cleaned at {}".format(datetime.datetime.now()))
                 else:
                     break
-            except:
+            except Exception as e:
+                logging.warning("{}".format(e))
                 garbage = None
                 logging.warning("Cleaned timed out {}".format(datetime.datetime.now()))
                 break

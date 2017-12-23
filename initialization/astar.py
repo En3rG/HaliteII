@@ -5,8 +5,8 @@ import logging
 import MyCommon
 
 
-
 OBSTRUCTION = -100
+
 
 def heuristic(a, b):
     """
@@ -147,8 +147,6 @@ def simplify_paths(path_coords):
 
 
         #logging.info("simplified path: {}".format(simplified_path))
-
-
 
         return simplified_path
 

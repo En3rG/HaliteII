@@ -4,6 +4,8 @@ import copy
 import logging
 import MyCommon
 from movement import grouping
+import traceback
+import sys
 
 
 class Matrix_val(Enum):
@@ -144,7 +146,6 @@ class MyMap():
                     if docked:
                         self.ships_mining_enemy.add(ship_id)
 
-
         return data
 
     def set_planet_status(self):
@@ -219,13 +220,16 @@ class MyMap():
         """
         ASSOCIATE NEW SHIPS WITH A PLANET ORIGIN
         """
+
+        ## PLUS 2 SINCE SPAWN CAN BE AROUND THERE, MADE IT 3 TO BE SURE
+        spawn_radius = 3
+
         for ship_id in self.ships_new:
             for planet_id in self.planets_owned:
                 planet_coord = MyCommon.Coordinates(self.data_planets[planet_id]['y'],self.data_planets[planet_id]['x'])
                 ship_coord = MyCommon.Coordinates(self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
 
-                ## PLUS 2 SINCE SPAWN CAN BE AROUND THERE, MADE IT 3 TO BE SURE
-                if MyCommon.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+3):
+                if MyCommon.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+spawn_radius):
                     self.data_ships[self.game_map.my_id][ship_id]['from_planet'] = planet_id
                     break
 
@@ -308,11 +312,6 @@ class MyMatrix():
                                           value, \
                                           cummulative=False)
 
-        ## JUST USING myMap, NOT game_map
-        # for planet_id, planet in self.myMap.data_planets.items():
-        #     value = Matrix_val.PREDICTION_PLANET.value
-        #     matrix = self.fill_circle(matrix, planet['y'], planet['x'], planet['radius'], value)
-
         return matrix
 
     def fill_planets(self,matrix,matrix_hp, player_id):
@@ -323,14 +322,6 @@ class MyMatrix():
         FILL IN MATRIX_HP OF PLANETS HP
         HP IS A PERCENTAGE OF MAX_SHIP_HP
         """
-        # for planet in self.game_map.all_planets():
-        #     if not planet.is_owned():
-        #         value = Matrix_val.UNOWNED_PLANET.value
-        #     elif planet.owner is not None and planet.owner.id == player_id:
-        #         value = Matrix_val.ALLY_PLANET.value
-        #     else:
-        #         value = Matrix_val.ENEMY_PLANET.value
-
         ## JUST USING myMap, NOT game_map
         for planet_id, planet in self.myMap.data_planets.items():
             if planet['owner'] is None:
@@ -339,7 +330,6 @@ class MyMatrix():
                 value = Matrix_val.ALLY_PLANET.value
             else:
                 value = Matrix_val.ENEMY_PLANET.value
-
 
             #matrix[round(planet.y)][round(planet.x)] = value
             ## INSTEAD OF FILLING JUST THE CENTER, FILL IN A BOX
@@ -407,7 +397,7 @@ class MyMatrix():
 
     def fill_prediction_matrix(self, predicted_coords):
         """
-        FILL MATRIX WITH PREDICTED ENEMY SHIPS
+        FILL MATRIX WITH PREDICTED ENEMY SHIPS COORDS
         ITS ACCUMULATIVE ATTACK POWER WILL
 
         MATRIX SHOULD BE FILLED WITH PLANETS INFO ALREADY
@@ -438,7 +428,11 @@ class MyMatrix():
                                                                   value, \
                                                                   cummulative=True)
                 except Exception as e:
-                    logging.error("fill_prediction_matrix error: {}".format(e))
+                    logging.error("Error found: ==> {}".format(e))
+
+                    for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
+                        fname, lineno, fn, text = frame
+                        logging.error("Error in {} on line {}".format(fname, lineno))
 
         ## TEST PRINT OUT
         ## ALSO UPDATING NUMPY PRINT OPTIONS

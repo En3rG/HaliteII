@@ -208,7 +208,7 @@ def convert_for_command_queue(*args):
             return "d {} {}".format(args[0], args[1])
     elif len(args) == 3:
         ## SHIP ID, THRUST (INT), ANGLE (INT)
-        return "t {} {} {}".format(args[0], args[1], args[2])
+        return "t {} {} {}".format(args[0], args[1], args[2]%360) ## KEEP ANGLE 0-359 RANGE
     else:
         logging.ERROR("Command Error Length")
 
@@ -244,7 +244,9 @@ def get_coord_closest_value(matrix, starting_coord, looking_for_val, angle):
                 found_coord = Coordinates(round_new_coord[0], round_new_coord[1])
                 return found_coord
 
-    except:
+    except Exception as e:
+        logging.warning("{}".format(e))
+        logging.warning("get_coord_closest_value DID NOT FIND ANY!")
         ## OUT OF BOUNDS
         ## DID NOT FIND WHAT WE WERE LOOKING FOR
         return None

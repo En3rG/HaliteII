@@ -89,38 +89,6 @@ def log_numPlayers(game_map):
 
 
 
-#
-# def fill_circle(array, h, w, center_y, center_x, radius, value, cummulative=False):
-#, """
-#, MASK A CIRCLE ON THE ARRAY WITH VALUE PROVIDED
-#, """
-#, height = h
-#, width = w
-#
-#, y, x = np.ogrid[-center_y:height - center_y, -center_x:width - center_x]
-#, ## y IS JUST AN ARRAY OF 1xY (ROWS)
-#, ## x IS JUST AN ARRAY OF 1xX (COLS)
-#, mask = x * x + y * y <= radius * radius
-#, ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
-#
-#, if cummulative:
-#,, array[mask] += -1
-#, else:
-#,, array[mask] = value
-#
-#, return array
-#
-#
-# n = 10
-# array = np.ones((n, n))
-# array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
-# array = fill_circle(array, n, n, 3,3, 3, 0, cummulative=True)
-# print("Ans",array)
-
-
-
-
-
 
 
 # a = [
@@ -197,4 +165,9 @@ def log_numPlayers(game_map):
 # used = datetime.timedelta.total_seconds(end-start)
 # print(used)
 
+
+# a = np.zeros((100, 100), dtype=np.int8)
+# coord = (100,100)
+#
+# print(coord[0]//10,coord[1]//10)
 

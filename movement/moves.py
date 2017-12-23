@@ -188,22 +188,12 @@ class MyMoves():
                     ship_coord = MyCommon.Coordinates(ship['y'], ship['x'])
 
                     try:
-                        target = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id']
+                        target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
                     except:
                         ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
+                        ## OR
+                        ## SHIP HAS NO TARGET SET
                         target_planet_id = expanding.get_next_target_planet(self, ship_id)
-
-
-                    ## NOT A NEW SHIP BUT DIDNT GET TARGET PLANET ID YET
-                    if ship_id not in self.myMap.ships_new:
-                        if target:
-                            target_planet_id = target[1]  ## GET THE TARGET ID OF PLANET
-                                                          ## [0] WILL BE TARGET KEY
-                        else:
-                            ## NEED TO ADD FUNCTIONALITY HERE LATER!!!!!!!!1
-                            ## !!!!!!!!!!!!!!1
-                            ## !!!!!!!!!!!!!!
-                            logging.warning("ship_id: {} has no target!!!".format(ship_id))
 
 
                     if target_planet_id is None:

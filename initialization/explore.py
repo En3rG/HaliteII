@@ -38,6 +38,8 @@ class Exploration():
     MINING_AREA_BUFFER = 1  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
     MOVE_BACK_DISTANCE = 1
 
+    NUM_SECTIONS = 16
+
     def __init__(self,game):
         ## FOR TESTING ONLY
         #log_dimensions(game.map)
@@ -46,6 +48,15 @@ class Exploration():
 
         self.game_map = game.map
         self.planets = self.get_planets()
+        self.sections_distance_table = self.get_distances_section()  ## DISTANCES FROM SECTION TO SECTION
+        self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
+
+        for curr_section, data in self.sections_planet_distance_table.items():
+            logging.info("Curr_section: {}".format(curr_section))
+            for planet_id, distance in data.items():
+                logging.info("  planet_id: {} distance: {}".format(planet_id, distance))
+
+
         self.planets_distance_matrix = self.get_distances()
         self.myStartCoords = self.get_start_coords()
         self.distances_from_start = self.get_start_distances()
@@ -108,6 +119,79 @@ class Exploration():
                     matrix[id2][id] = matrix[id][id2]
 
         return matrix
+
+    def get_distances_section(self):
+        """
+        GET DISTANCES OF EACH SECTIONS TO ONE ANOTHER
+
+        table[curr_section][target_section] = distance
+        """
+        table = {}
+
+        row_length = self.game_map.height//Exploration.NUM_SECTIONS
+        col_length = self.game_map.width//Exploration.NUM_SECTIONS
+
+        for r in range(row_length):
+            for c in range(col_length):
+                curr_section = (r,c)
+                table[curr_section] = self.calculate_distance_sections(curr_section, row_length, col_length)
+
+        return table
+
+    def calculate_distance_sections(self, curr_section, row_length, col_length):
+        """
+        GENERATES A TABLE WITH ACTUAL DISTANCES BETWEEN SECTIONS
+        """
+        ## INITIALIZE MATRIX
+
+        dict = {}
+        dict[curr_section] = 0 ## DISTANCE TO ITSELF IS 0
+
+        for r in range(row_length):
+            for c in range(col_length):
+                if dict.get((r, c)):
+                    ## ALREADY EXISTS
+                    ## CALCULATED ALREADY
+                    pass
+                else:
+                    coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
+                    coord2 = MyCommon.Coordinates(r, c)
+                    dict[(r, c)] = MyCommon.calculate_distance(coord1, coord2)
+
+        return dict
+
+    def get_distances_section_to_planet(self):
+        """
+        GET TABLE OF EACH SECTION'S DISTANCE TO EACH PLANETS
+
+        table[curr_section][planet_id] = distance
+        """
+        table = {}
+
+        row_length = self.game_map.height // Exploration.NUM_SECTIONS
+        col_length = self.game_map.width // Exploration.NUM_SECTIONS
+
+        for r in range(row_length):
+            for c in range(col_length):
+                curr_section = (r, c)
+                table[curr_section] = self.calculate_distance_to_planets(curr_section)
+
+        return table
+
+    def calculate_distance_to_planets(self, curr_section):
+        """
+        GET FROM CURRENT SECTION TO EACH PLANETS
+        """
+        dict = {}
+
+        for planet_id, planet in self.planets.items():
+            planet_coords = planet['coords']
+            planet_section = (planet_coords.y//Exploration.NUM_SECTIONS, planet_coords.x//Exploration.NUM_SECTIONS)
+
+            distance = self.sections_distance_table[curr_section][planet_section]
+            dict[planet_id] = distance
+
+        return dict
 
 
     def get_start_coords(self):

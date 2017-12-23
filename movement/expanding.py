@@ -17,10 +17,18 @@ def get_next_target_planet(MyMoves, ship_id):
     try:
         from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
 
-        logging.debug("from_planet_id: {} ship_id: {}".format(from_planet_id, ship_id))
-
-        distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
-        length = len(distances_to_other_planets)
+        if from_planet_id:
+            distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
+            length = len(distances_to_other_planets)
+        else:
+            ## from_planet_id IS NONE
+            ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
+            ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
+            ## 11!!!!!!!!!!!!!!!!!!!!!!
+            ## !!!!!!!!!!!!!!!!!!
+            ## !!!!!!!!!!!!!!!!!!!!1
+            ## NEED TO IMPLEMENT BOX FRAME TO FIGURE OUT WHERE THIS SHIP IS AND WHERE TO GO'
+            pass ## NEED TO IMPLEMENT LATER!!!!!!!!!!!!!!!!!111
 
         ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
         least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))

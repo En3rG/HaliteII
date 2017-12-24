@@ -8,6 +8,8 @@ import traceback
 import sys
 
 
+
+
 class Matrix_val(Enum):
     """
     VALUES PLACED ON THE MATRIX
@@ -116,6 +118,8 @@ class MyMap():
                 ship_id = ship.id
                 data[player_id][ship_id] = {'x': ship.x, \
                                             'y': ship.y, \
+                                            'coords': MyCommon.Coordinates(ship.y, ship.x), \
+                                            'point': (int(round(ship.y)), int(round(ship.x))), \
                                             'health': ship.health, \
                                             'dock_status': ship.docking_status.value, \
                                             'enemy_in_turn':[], \
@@ -188,6 +192,8 @@ class MyMap():
         ## NEED TO ADD SHIPS TASKED TO EXPANDING
         self.data_planets[planet.id] = {'y': planet.y, \
                                        'x': planet.x, \
+                                        'coords': MyCommon.Coordinates(planet.y, planet.x), \
+                                        'point': (int(round(planet.y)), int(round(planet.x))), \
                                        'radius': planet.radius, \
                                        'num_docks': planet.num_docking_spots, \
                                        'my_miners': set(), \
@@ -226,13 +232,24 @@ class MyMap():
 
         for ship_id in self.ships_new:
             for planet_id in self.planets_owned:
-                planet_coord = MyCommon.Coordinates(self.data_planets[planet_id]['y'],self.data_planets[planet_id]['x'])
-                ship_coord = MyCommon.Coordinates(self.data_ships[self.game_map.my_id][ship_id]['y'],self.data_ships[self.game_map.my_id][ship_id]['x'])
+                planet_coord = self.data_planets[planet_id]['coords']
+                ship_coord = self.data_ships[self.game_map.my_id][ship_id]['coords']
 
                 if MyCommon.within_circle(ship_coord,planet_coord,self.data_planets[planet_id]['radius']+spawn_radius):
                     self.data_ships[self.game_map.my_id][ship_id]['from_planet'] = planet_id
                     break
 
+    def can_dock(self, ship_id, planet_id):
+        """
+        RETURNS TRUE IF CAN DOCK PLANET ID
+        """
+        ship_coord = self.data_ships[self.my_id][ship_id]['coords']
+        planet_coord = self.data_planets[planet_id]['coords']
+        radius = self.data_planets[planet_id]['radius']
+
+        distance = MyCommon.calculate_distance(ship_coord, planet_coord)
+
+        return distance <= radius + MyCommon.Constants.DOCK_RADIUS
 
 class MyMatrix():
     MAX_NODES = 2
@@ -307,7 +324,7 @@ class MyMatrix():
             matrix = MyCommon.fill_circle(matrix, \
                                           self.myMap.height, \
                                           self.myMap.width, \
-                                          MyCommon.Coordinates(planet['y'], planet['x']), \
+                                          planet['coords'], \
                                           planet['radius'], \
                                           value, \
                                           cummulative=False)
@@ -341,7 +358,7 @@ class MyMatrix():
             matrix = MyCommon.fill_circle(matrix, \
                                           self.myMap.height, \
                                           self.myMap.width, \
-                                          MyCommon.Coordinates(planet['y'], planet['x']), \
+                                          planet['coords'], \
                                           planet['radius'], \
                                           value)
 
@@ -354,7 +371,7 @@ class MyMatrix():
             matrix_hp = MyCommon.fill_circle(matrix_hp, \
                                              self.myMap.height, \
                                              self.myMap.width, \
-                                             MyCommon.Coordinates(planet['y'], planet['x']), \
+                                             planet['coords'], \
                                              planet['radius'], \
                                              planet['health'] / Matrix_val.MAX_SHIP_HP.value)
 
@@ -402,7 +419,6 @@ class MyMatrix():
 
         MATRIX SHOULD BE FILLED WITH PLANETS INFO ALREADY
         """
-        attack_radius = 5
 
         for player_id, ships in predicted_coords.items():
             for ship_id, coord in ships.items():
@@ -424,7 +440,7 @@ class MyMatrix():
                                                                   self.myMap.height, \
                                                                   self.myMap.width, \
                                                                   MyCommon.Coordinates(pred_y,pred_x), \
-                                                                  attack_radius, \
+                                                                  MyCommon.Constants.ATTACK_RADIUS, \
                                                                   value, \
                                                                   cummulative=True)
                 except Exception as e:

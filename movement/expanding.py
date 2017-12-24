@@ -8,6 +8,7 @@ import sys
 import traceback
 
 
+
 def get_next_target_planet(MyMoves, ship_id):
     """
     GET NEXT PLANET TO CONQUER
@@ -20,18 +21,22 @@ def get_next_target_planet(MyMoves, ship_id):
         if from_planet_id:
             distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
             length = len(distances_to_other_planets)
+
+            ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+            least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
         else:
             ## from_planet_id IS NONE
             ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
             ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
-            ## 11!!!!!!!!!!!!!!!!!!!!!!
-            ## !!!!!!!!!!!!!!!!!!
-            ## !!!!!!!!!!!!!!!!!!!!1
-            ## NEED TO IMPLEMENT BOX FRAME TO FIGURE OUT WHERE THIS SHIP IS AND WHERE TO GO'
-            pass ## NEED TO IMPLEMENT LATER!!!!!!!!!!!!!!!!!111
+            ship_y = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['y']
+            ship_x = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['x']
+            ship_section = MyMoves.EXP.get_section((ship_y, ship_x))
+            distance_table = MyMoves.EXP.sections_planet_distance_table[ship_section]
+            length = len(distance_table)
 
-        ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
-        least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
+            ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+            least_distance_order = heapq.nsmallest(length, ((distance, id) for id, distance in distance_table.items()))
+
 
         for distance, planet_id in least_distance_order:
             ## NOT OWNED BY ANYBODY YET
@@ -41,8 +46,6 @@ def get_next_target_planet(MyMoves, ship_id):
             elif planet_id in MyMoves.myMap.planets_owned:
                 len_miners = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
                 max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
-
-                logging.debug("My planet!! len_miners: {} max_docks: {}".format(len_miners, max_docks))
 
                 if len_miners < max_docks:
                     return planet_id
@@ -80,15 +83,21 @@ def get_mining_spot(MyMoves, ship_id, target_planet_id):
     if MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key'] is None \
             or len(MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key']) == 3:
         ## FIRST 3 SHIPS OR READY TO MINE
-        MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+        if MyMoves.myMap.can_dock(ship_id, target_planet_id):
+            MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+        else:
+            ## CANT DOCK THIS PLANET ANYMORE/YET
+            ## NEED TO GO TO ANOTHER PLANET!!!!!!111
+            ## IMPLEMENT LATER!!!!!!!!!!!!!!!!!1
+            ## !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            #target_id = get_next_target_planet(MyMoves, ship_id)
+            pass
     else:
         ## REACHED LAUNCH ON COORD
         MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key'] = None  ## SO IT"LL DOCK NEXT TURN
 
-        start = MyCommon.Coordinates(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['y'], \
-                                     MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['x'])
-        target = MyCommon.Coordinates(MyMoves.myMap.data_planets[target_planet_id]['y'], \
-                                      MyMoves.myMap.data_planets[target_planet_id]['x'])
+        start = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+        target = MyMoves.myMap.data_planets[target_planet_id]['coords']
         angle = MyCommon.get_angle(start, target)
 
         values = [(angle, 3), \
@@ -157,8 +166,7 @@ def get_new_point_on_planet(MyMoves, old_target_point, old_angle, target_planet_
 
     NO LONGER USED!!!
     """
-    planet_center = MyCommon.Coordinates(MyMoves.myMap.data_planets[target_planet_id]['y'], \
-                                         MyMoves.myMap.data_planets[target_planet_id]['x'])
+    planet_center = MyMoves.myMap.data_planets[target_planet_id]['coords']
     planet_angle = MyCommon.get_reversed_angle(old_angle)
     opposite = 1.5
 

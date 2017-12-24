@@ -3,6 +3,11 @@ import datetime
 import numpy as np
 import math
 
+
+class Constants():
+    ATTACK_RADIUS = 5
+    DOCK_RADIUS = 4
+
 def disable_log(disable,log):
     """
     DISABLE LOGGING FOR THE GIVEN LOG
@@ -252,28 +257,3 @@ def get_coord_closest_value(matrix, starting_coord, looking_for_val, angle):
         return None
 
 
-## TESTING
-# start = Coordinates(37,60)
-# end = Coordinates(40,57)
-# print(calculate_distance(start,end))
-# print(get_angle(start,end))
-
-## TESTING DOCKING STATIONS
-# start = Coordinates(-4,0)
-# print(get_destination_coord(start,58,3))
-# print(get_destination_coord(start,60,2))
-# print(get_destination_coord(start,90,3))
-# print(get_destination_coord(start,120,2))
-# print(get_destination_coord(start,122,3))
-#
-# print(get_destination_coord(start,38,5))
-# print(get_destination_coord(start,148,5))
-
-
-# start = Coordinates(62,86)
-# target = Coordinates(61,85)
-# print(get_angle_thrust(start,target))
-#
-# start = Coordinates(61.5346,85.5386)
-# target = Coordinates(61,85)
-# print(get_angle_thrust(start,target))

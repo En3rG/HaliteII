@@ -116,9 +116,7 @@ class MyMoves():
             target_planet_id = self.EXP.best_planet_id
 
             for ship_id in self.myMap.ships_new:
-                ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
-                ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
-                ship_coord = MyCommon.Coordinates(ship_y, ship_x)
+                ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
 
                 # ## USE A* PATH FOUND EARLIER DURING EXPLORATION/INITIALIZATION
                 path_key = (-1, ship_id, target_planet_id)
@@ -138,9 +136,7 @@ class MyMoves():
                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
 
                 ## SET SHIP STATUSES
-                ship_y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
-                ship_x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
-                ship_coord = MyCommon.Coordinates(ship_y,ship_x)
+                ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                 self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord=None)
 
         else:
@@ -172,12 +168,9 @@ class MyMoves():
             #         self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord=None)
 
 
-            ## MOVE MINING SHIPS ALREADY FIRST
+            ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
-                y = self.myMap.data_ships[self.myMap.my_id][ship_id]['y']
-                x = self.myMap.data_ships[self.myMap.my_id][ship_id]['x']
-                ship_coord = MyCommon.Coordinates(y, x)
-                point = (int(round(ship_coord.y)), int(round(ship_coord.x)))
+                point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
 
                 self.myMap.taken_coords.add(point)
                 self.myMap.ships_moved_already.add(ship_id)
@@ -185,7 +178,7 @@ class MyMoves():
             ## MOVE OTHERS
             for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
                 if ship_id not in self.myMap.ships_moved_already:
-                    ship_coord = MyCommon.Coordinates(ship['y'], ship['x'])
+                    ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
 
                     try:
                         target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
@@ -200,9 +193,7 @@ class MyMoves():
                         ## NO MORE PLANETS TO CONQUER AT THIS TIME
                         break
                     else:
-                        planet_y = self.myMap.data_planets[target_planet_id]['y']
-                        planet_x = self.myMap.data_planets[target_planet_id]['x']
-                        planet_coord = MyCommon.Coordinates(planet_y, planet_x)
+                        planet_coord = self.myMap.data_planets[target_planet_id]['coords']
 
                         ## ADD MOVE TO COMMAND QUEUE AND SET STATUSES
                         self.set_moves(ship_coord, ship_id, planet_coord, target_planet_id)
@@ -268,7 +259,7 @@ class MyMoves():
                 ## USE A* TO GET TO LAUNCHPAD FLY OFF COORD
                 path_table = expanding.get_set_path_table_toward_launch(self, ship_id, ship_coord, from_planet_id, target_planet_id)
 
-                tentative_destination = path_table[(int(round(ship_coord.y)),int(round(ship_coord.x)))]
+                tentative_destination = path_table[self.myMap.data_ships[self.myMap.my_id][ship_id]['point']]
                 self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point'] = tentative_destination
                 angle, thrust = MyCommon.get_angle_thrust(ship_coord, MyCommon.Coordinates(tentative_destination[0], tentative_destination[1]))
 

@@ -51,10 +51,10 @@ class Exploration():
         self.sections_distance_table = self.get_distances_section()  ## DISTANCES FROM SECTION TO SECTION
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
 
-        for curr_section, data in self.sections_planet_distance_table.items():
-            logging.info("Curr_section: {}".format(curr_section))
-            for planet_id, distance in data.items():
-                logging.info("  planet_id: {} distance: {}".format(planet_id, distance))
+        # for curr_section, data in self.sections_planet_distance_table.items():
+        #     logging.info("Curr_section: {}".format(curr_section))
+        #     for planet_id, distance in data.items():
+        #         logging.info("  planet_id: {} distance: {}".format(planet_id, distance))
 
 
         self.planets_distance_matrix = self.get_distances()
@@ -411,3 +411,8 @@ class Exploration():
 
         return paths
 
+    def get_section(self, point):
+        """
+        TAKES A POINT (y,x) AND RETURN THE SECTION VALUE
+        """
+        return (point[0]//Exploration.NUM_SECTIONS, point[1]//Exploration.NUM_SECTIONS)

@@ -67,7 +67,7 @@ class MyMoves():
 
                 if closest_coord:
                     reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-                    target_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, 2)  ## MOVE BACK
+                    target_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
                 else:
                     ## DIDNT FIND. SHOULDNT HAPPEN FOR THE STARTING 3 SHIPS
                     logging.error("One of the starting ships didnt see the best planet, given the angle.")
@@ -111,6 +111,8 @@ class MyMoves():
 
                         ## GET THRUST AND ANGLE
                         thrust, angle = expanding2.get_Astar_thrust_angle(self, self.position_matrix, ship_id, target_coord)
+
+                        logging.debug("Test! ship_id: {} target_coord: {} thrust: {}".format(ship_id, target_coord, thrust))
 
                         if thrust == 0:
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))

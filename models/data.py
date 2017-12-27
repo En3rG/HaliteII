@@ -364,7 +364,7 @@ class MyMatrix():
             ## JUST USING myMap, NOT game_map
             matrix = MyCommon.fill_circle(matrix, \
                                           planet['coords'], \
-                                          planet['radius']+1, \
+                                          planet['radius']+MyCommon.Constants.FILL_PLANET_PAD, \
                                           value)
 
             ## FILL IN MATRIX_HP WITH HP OF PLANET (BOX)
@@ -375,7 +375,7 @@ class MyMatrix():
             ## JUST USING myMap, NOT game_map
             matrix_hp = MyCommon.fill_circle(matrix_hp, \
                                              planet['coords'], \
-                                             planet['radius']+1, \
+                                             planet['radius']+MyCommon.Constants.FILL_PLANET_PAD, \
                                              planet['health'] / Matrix_val.MAX_SHIP_HP.value)
 
         return matrix, matrix_hp

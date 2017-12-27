@@ -8,7 +8,9 @@ class Constants():
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
     SECTION_RADIUS = 10 ## TOTAL SIZE OF SECTION WILL BE 21x21
-    SECTION_CIRCLE_RADIUS = 7
+    SECTION_CIRCLE_RADIUS = 8
+    FILL_PLANET_PAD = 1
+    MOVE_BACK = 1
 
 def disable_log(disable,log):
     """
@@ -330,3 +332,10 @@ def get_circle_in_matrix(array, center_coord, circle_radius, square_radius):
 # #array = np.random.randint(5, size=(40,40))
 # print(get_circle_in_matrix(a, Coordinates(4,1), circle_radius, square_radius))
 
+
+# coord = Coordinates(95,35)
+# coord2 = Coordinates(96,36)
+# angle = 39
+# print(get_destination_coord(coord, angle, 1))
+#
+# print(calculate_distance(coord, coord2))

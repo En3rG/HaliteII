@@ -7,6 +7,8 @@ import math
 class Constants():
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
+    SECTION_RADIUS = 10 ## TOTAL SIZE OF SECTION WILL BE 21x21
+    SECTION_CIRCLE_RADIUS = 7
 
 def disable_log(disable,log):
     """
@@ -15,7 +17,7 @@ def disable_log(disable,log):
     LOGGER OBJECT HAS NO DISABLE? THUS ALWAYS PASSING logging
     """
     if disable:
-        log.disable(logging.INFO)
+        log.disable(logging.WARNING)
 
 def get_logger(name):
     """
@@ -49,12 +51,14 @@ class Coordinates():
 
 
 
-def fill_circle(array, height, width , center, radius, value, cummulative=False):
+def fill_circle(array, center, radius, value, cummulative=False):
     """
     MASK A CIRCLE ON THE ARRAY SPECIFIED WITH VALUE PROVIDED
 
     hieght AND width BASED ON ARRAY SIZE
     """
+    height = array.shape[0]
+    width = array.shape[1]
 
     ## y IS JUST AN ARRAY OF 1xY (ROWS)
     ## x IS JUST AN ARRAY OF 1xX (COLS)
@@ -158,13 +162,13 @@ def calculate_centroid(arr_points):
     return Coordinates(sum_y / length, sum_x / length)
 
 
-def within_circle(point,center,radius):
+def within_circle(point_coord, center_coord, radius):
     """
     RETURNS TRUE OR FALSE
     WHETHER point IS INSIDE THE CIRCLE, AT center WITH radius provided
     point AND center HAVE (y,x) FORMAT
     """
-    return ((point.y - center.y) ** 2 + (point.x - center.x) ** 2) < (radius ** 2)
+    return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2)
 
 
 def calculate_distance(coords1, coords2):
@@ -256,4 +260,73 @@ def get_coord_closest_value(matrix, starting_coord, looking_for_val, angle):
         ## DID NOT FIND WHAT WE WERE LOOKING FOR
         return None
 
+
+def add_padding(a, center_coord, square_radius):
+    """
+    RETURNS A MATRIX PADDED, WHEN ITS OUTSIDE THE BOUNDARIES OF THE ORIGINAL MATRIX
+    """
+    pad_values = -1
+
+    tp = max(0, -(center_coord.y - square_radius))
+    bp = max(0, -((a.shape[0]-center_coord.y-1) - square_radius))
+    lp = max(0, -(center_coord.x - square_radius))
+    rp = max(0, -((a.shape[1]-center_coord.x-1) - square_radius))
+
+    ## ADDS THE PADDING TO 'a'
+    a = np.pad(a, [[tp, bp], [lp, rp]], 'constant', constant_values=(pad_values))
+
+    ## RETURN THE SECTION THATS WITHIN THE BOUDARIES
+    ## BUT THIS WILL BE AUTOMATICALLY PADDED BECAUSE OF np.pad?
+    return a[center_coord.y - square_radius + tp:center_coord.y + square_radius + 1 + tp, \
+           center_coord.x - square_radius + lp:center_coord.x + square_radius + 1 + lp]
+
+
+
+def get_circle_in_matrix(array, center_coord, circle_radius, square_radius):
+    """
+    RETURNS A SQUARE MATRIX
+    GET VALUES FROM THE MATRIX PROVIDED, WITHIN THE CIRCLE SPECIFIED
+
+    """
+
+    center_y = int(round(center_coord.y))
+    center_x = int(round(center_coord.x))
+
+    height = array.shape[0]
+    width = array.shape[1]
+
+    ## VALUES OUTSIDE THE CIRCLE WILL BE ZEROES
+    temp_matrix = np.zeros((height, width), dtype=np.float16)
+
+    ## y IS JUST AN ARRAY OF 1xY (ROWS)
+    ## x IS JUST AN ARRAY OF 1xX (COLS)
+    y, x = np.ogrid[-center_y:height - center_y, -center_x:width - center_x]
+    ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
+    mask = x * x + y * y <= circle_radius * circle_radius
+
+    ## PLACE VALUES FROM THE CIRCLE ON THE TEMP MATRIX
+    temp_matrix[mask] = array[mask]
+
+    ## ADD PADDING, IF OUTSIDE THE MATRIX BOUNDARIES
+    section = add_padding(temp_matrix, Coordinates(center_y, center_x), square_radius)
+
+    return section
+
+
+
+
+# array = [
+#     [1, 2, 3, 4, 5, 6, 7, 8, 9],
+#     [2, 3, 4, 5, 6, 7, 8, 9, 1],
+#     [3, 4, 5, 0, 7, 8, 9, 1, 2],
+#     [4, 5, 6, 7, 8, 9, 1, 2, 3],
+#     [5, 0, 7, 8, 9, 4, 5, 6, 7],
+#     [6, 7, 8, 9, 1, 2, 3, 4, 5]
+# ]
+# a = np.asarray(array)
+# circle_radius = 2
+# square_radius = 2
+#
+# #array = np.random.randint(5, size=(40,40))
+# print(get_circle_in_matrix(a, Coordinates(4,1), circle_radius, square_radius))
 

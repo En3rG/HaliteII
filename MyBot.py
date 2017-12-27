@@ -9,6 +9,7 @@ from models.model import NeuralNet, make_keras_picklable
 from models.data import MyMap, MyMatrix
 from projection.projection import MyProjection
 from movement import moves
+from movement import moves2
 import MyCommon
 import time
 import copy
@@ -316,7 +317,8 @@ if __name__ == "__main__":
             ## CURRENTLY FROM STARTER BOT MOVES
             #moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
-            myMoves = moves.MyMoves(myMap, EXP)
+            #myMoves = moves.MyMoves(myMap, myMatrix, EXP)
+            myMoves = moves2.MyMoves(myMap, myMatrix, EXP)
             command_queue = myMoves.command_queue
             logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
 

@@ -3,9 +3,11 @@ import numpy
 from heapq import *
 import logging
 import MyCommon
+import datetime
+import time
 
 
-OBSTRUCTION = -100
+NON_OBSTRUCTION = 0
 
 
 def heuristic(a, b):
@@ -22,11 +24,11 @@ def isBadNeighbor(array,neighbor):
     if 0 <= neighbor[0] < array.shape[0]:
         if 0 <= neighbor[1] < array.shape[1]:
             ## NEIGHBOR COORDINATE IS WITHIN THE ARRAY
-            if array[neighbor[0]][neighbor[1]] == OBSTRUCTION:
+            if array[neighbor[0]][neighbor[1]] == NON_OBSTRUCTION:
+                return False ## VALID NEIGHBOR
+            else:
                 ## ITS AN OBSTRUCTION (BAD/SKIP)
                 return True
-            else:
-                return False ## VALID NEIGHBOR
         else:
             # OUTSIDE ARRAY Y WALLS (BAD/SKIP)
             return True
@@ -90,23 +92,23 @@ def a_star(array, start, goal):
     return []
 
 
-def simplify_paths(path_coords):
+def simplify_paths(path_points):
     """
     SIMPLIFY PATH.  COMBINE MOVEMENT WITH THE SAME SLOPES
     NEED TO MAXIMIZE THRUST OF 7 (MAX)
     """
     #logging.info("Original path: {}".format(path_coords))
 
-    if path_coords != []:
-        simplified_path = [path_coords[-1]]
-        prev_point = path_coords[-1]
+    if path_points != []:
+        simplified_path = [path_points[-1]]
+        prev_point = path_points[-1]
         prev_angle = None
         tempCoord = None
         prev_distance = 0
-        length = len(path_coords) - 1  ## MINUS THE PREVIOUS
+        length = len(path_points) - 1  ## MINUS THE PREVIOUS
 
         ## SINCE STARTING IS AT THE END, SKIP LAST ONE (PREV COORD)
-        for i, current_point in enumerate(path_coords[-2::-1], start=1):
+        for i, current_point in enumerate(path_points[-2::-1], start=1):
             ## GATHER PREVIOUS AND CURRENT COORD
             prevCoord = MyCommon.Coordinates(prev_point[0], prev_point[1])
             currentCoord = MyCommon.Coordinates(current_point[0], current_point[1])
@@ -196,7 +198,12 @@ def get_Astar_table(matrix, starting_point, target_point):
 #     [0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
 #
 # start = datetime.datetime.now()
-# path = a_star(nmap, (0,0), (10,13))
+#
+# for i in range(1):
+#     path = a_star(nmap, (0,0), (10,13))
+#
+#
+# end = datetime.datetime.now()
 # print("Length: {} Path: {}".format(len(path),path))
-
-# print(used)
+#
+# print(end-start)

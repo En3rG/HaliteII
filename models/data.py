@@ -124,14 +124,21 @@ class MyMap():
                                             'dock_status': ship.docking_status.value, \
                                             'enemy_in_turn':[], \
                                             'enemy_coords':[],\
+                                            ## ONLY POPULATED THE FIRST TURN THE SHIP CAME OUT
                                             'from_planet':None, \
+                                            ## TARGET IS THE FINAL DESTINATION
                                             'target_id':None, \
                                             'target_angle':None, \
-                                            'target_point':None, \
+                                            'target_coord':None, \
+                                            ## ITS IMMEDIATE TARGET/DESTINATION
                                             'tentative_coord':None, \
                                             'tentative_point':None, \
+                                            ## KEY IS USED TO GET THE ACTUAL A* PATH (PREDEFINED EARLIER)
                                             'Astar_path_key': None, \
+                                            ## A* TABLE GENERATED TO REACH ITS TARGET
                                             'Astar_path_table': None, \
+                                            ## WHERE IMMEDIATE DESTINATION IS
+                                            ## SINCE SOMETIMES WITH THE ROUNDING, IT MAY NOT HIT EXACTLY AT THAT POINT
                                             'Astar_dest_point': None, \
                                             'task':ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS
@@ -292,15 +299,16 @@ class MyMatrix():
                 #self.prediction_matrix = copy.deepcopy(EXP.all_planet_matrix)
                 curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
                 self.prediction_matrix = self.fill_planets_predictions(curr_matrix)
-                continue
+
 
             matrix_current = copy.deepcopy(matrix)
             matrix_hp_current = copy.deepcopy(matrix_hp)
             matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player_id)
 
-
-            ## FILL CURRENT PLAYER'S SHIPS
-            matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,ships)
+            if player_id != self.myMap.my_id:
+                ## NOT FILLING OUR SHIPS SINCE IT"LL BE ADDED ONCE ME MOVE EACH SHIPS
+                ## FILL CURRENT PLAYER'S SHIPS
+                matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,ships)
 
             #for player_enemy in self.game_map.all_players():
             for player_enemy_id, enemy_ships in self.myMap.data_ships.items():
@@ -312,6 +320,7 @@ class MyMatrix():
 
             final_matrix[player_id] = (matrix_current,matrix_hp_current) ## TUPLE OF 2 MATRIXES
 
+
         return final_matrix
 
 
@@ -322,8 +331,6 @@ class MyMatrix():
         for planet_id, planet in self.myMap.data_planets.items():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
-                                          self.myMap.height, \
-                                          self.myMap.width, \
                                           planet['coords'], \
                                           planet['radius'], \
                                           value, \
@@ -356,10 +363,8 @@ class MyMatrix():
             #matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
             ## JUST USING myMap, NOT game_map
             matrix = MyCommon.fill_circle(matrix, \
-                                          self.myMap.height, \
-                                          self.myMap.width, \
                                           planet['coords'], \
-                                          planet['radius'], \
+                                          planet['radius']+1, \
                                           value)
 
             ## FILL IN MATRIX_HP WITH HP OF PLANET (BOX)
@@ -369,10 +374,8 @@ class MyMatrix():
             #matrix_hp = self.fill_circle(matrix_hp, planet.y, planet.x, planet.radius, planet.health/Matrix_val.MAX_SHIP_HP.value)
             ## JUST USING myMap, NOT game_map
             matrix_hp = MyCommon.fill_circle(matrix_hp, \
-                                             self.myMap.height, \
-                                             self.myMap.width, \
                                              planet['coords'], \
-                                             planet['radius'], \
+                                             planet['radius']+1, \
                                              planet['health'] / Matrix_val.MAX_SHIP_HP.value)
 
         return matrix, matrix_hp
@@ -437,8 +440,6 @@ class MyMatrix():
                         value = Matrix_val.PREDICTION_ENEMY_SHIP_DOCKED.value
                     logging.debug("Predicted ship id: {} new coord: {} {}".format(ship_id, pred_y, pred_x))
                     self.prediction_matrix = MyCommon.fill_circle(self.prediction_matrix, \
-                                                                  self.myMap.height, \
-                                                                  self.myMap.width, \
                                                                   MyCommon.Coordinates(pred_y,pred_x), \
                                                                   MyCommon.Constants.ATTACK_RADIUS, \
                                                                   value, \

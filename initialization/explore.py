@@ -35,8 +35,8 @@ class Exploration():
     """
     LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
     LAUNCH_ON_DISTANCE = 4
-    MINING_AREA_BUFFER = 1  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
-    MOVE_BACK_DISTANCE = 1
+    MINING_AREA_BUFFER = 2  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
+    MOVE_BACK_DISTANCE = 2  ## MOVE BACK FROM MINING_AREA_BUFFER
 
     NUM_SECTIONS = 16
 
@@ -279,8 +279,6 @@ class Exploration():
         for planet in game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
-                                          game_map.height, \
-                                          game_map.width, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
                                           planet.radius + Exploration.MINING_AREA_BUFFER, \
                                           value, \
@@ -299,8 +297,6 @@ class Exploration():
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.int8)
         value = Matrix_val.PREDICTION_PLANET.value
         matrix = MyCommon.fill_circle(matrix, \
-                                      game_map.height, \
-                                      game_map.width, \
                                       MyCommon.Coordinates(planet.y, planet.x), \
                                       planet.radius + Exploration.MINING_AREA_BUFFER, \
                                       #planet.radius, \

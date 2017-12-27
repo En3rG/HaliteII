@@ -80,8 +80,8 @@ def get_mining_spot(MyMoves, ship_id, target_planet_id):
 
     ## CHECK PREVIOUS Astar path_key
 
-    if MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key'] is None \
-            or len(MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key']) == 3:
+    if MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key'] is None:
+            #or len(MyMoves.myMap.myMap_prev.data_ships[MyMoves.myMap.my_id][ship_id]['Astar_path_key']) == 3:
         ## FIRST 3 SHIPS OR READY TO MINE
         if MyMoves.myMap.can_dock(ship_id, target_planet_id):
             MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))

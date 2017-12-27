@@ -8,6 +8,7 @@ import MyCommon
 import heapq
 import initialization.astar as astar
 import movement.expanding as expanding
+import movement.expanding as expanding2
 
 
 
@@ -33,10 +34,11 @@ class MyMoves():
     'd 0 2'      ## DOCKING SHIP ID 0 TO PLANET 2
     't 1 3 353'  ## MOVE SHIP ID 1 WITH SPEED 3 AND ANGLE 353
     """
-    def __init__(self,myMap, EXP):
+    def __init__(self, myMap, myMatrix, EXP):
         self.command_queue = []
         self.EXP = EXP
         self.myMap = myMap
+        self.myMatrix = myMatrix
 
         self.get_my_moves()
 

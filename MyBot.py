@@ -84,8 +84,8 @@ def get_predictions_queue(Q):
             else:
                 break
         except Exception as e:
-            logging.warning("{}".format(e))
-            logging.warning("Q timed out")
+            logging.debug("Warning exception: {}".format(e))
+            logging.debug("Q timed out")
             break
 
     logging.debug("Length of Q: {}".format(len(q)))
@@ -120,9 +120,9 @@ def clean_predicting_args(MP):
                 else:
                     break
             except Exception as e:
-                logging.warning("{}".format(e))
+                logging.debug("Warning exception: {}".format(e))
                 garbage = None
-                logging.warning("Cleaned timed out {}".format(datetime.datetime.now()))
+                logging.debug("Cleaned timed out {}".format(datetime.datetime.now()))
                 break
 
         ## LETS TRY JUST SETTING IT TO NONE, THEN INITIALIZE QUEUE()
@@ -275,22 +275,26 @@ if __name__ == "__main__":
             ## TURN START
             ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
             game_map = game.update_map()
-            logging.info("hlt update_map time: {}".format(datetime.datetime.now()-main_start))
+            logging.info("hlt update_map time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start)))
+            start = datetime.datetime.now()
 
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
-            logging.info("myMap completed {}".format(datetime.datetime.now()))
+            logging.info("myMap completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
 
             ## GET PROJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(myMap)
-            logging.info("myProjection completed {}".format(datetime.datetime.now()))
+            logging.info("myProjection completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
 
 
 
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
             myProjection.check_for_enemy()
-            logging.info("myProjection.check_for_enemy completed {}".format(datetime.datetime.now()))
+            logging.info("myProjection.check_for_enemy completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
 
 
 
@@ -298,11 +302,13 @@ if __name__ == "__main__":
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
             myMatrix = MyMatrix(myMap,myMatrix_prev,input_matrix_y,input_matrix_x)
-            logging.info("myMatrix completed {}".format(datetime.datetime.now()))
+            logging.info("myMatrix completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
 
             ## FOR TRAINING/PREDICTING MODEL
             predictions, turn = model_handler(MP,turn, myMap, myMatrix)
-            logging.info("model_handler completed {}".format(datetime.datetime.now()))
+            logging.info("model_handler completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
             ## GETTING MEMORY USAGE IS QUITE SLOW (TIMES OUT)
             # mem_usage = memory_usage((model_handler, (MP,turn, myMap, myMatrix)))
             # logging.debug("mem_usage: {}".format(mem_usage))
@@ -310,7 +316,8 @@ if __name__ == "__main__":
             ## TRANSLATE PREDICTIONS
             predicted_moves = NeuralNet.translate_predictions(predictions)
             myMatrix.fill_prediction_matrix(predicted_moves)
-            logging.info("Predictions completed {}".format(datetime.datetime.now()))
+            logging.info("Predictions completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
 
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
@@ -320,7 +327,8 @@ if __name__ == "__main__":
             #myMoves = moves.MyMoves(myMap, myMatrix, EXP)
             myMoves = moves2.MyMoves(myMap, myMatrix, EXP)
             command_queue = myMoves.command_queue
-            logging.info("Completed algo at {}.  Copying files".format(datetime.datetime.now()))
+            logging.info("Completed all Algo at <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            start = datetime.datetime.now()
 
             ## SAVE OLD DATA FOR NEXT TURN
             ## WHEN USING DEEPCOPY SEEMS TO TIME OUT AFTER 7 TURNS
@@ -353,8 +361,19 @@ if __name__ == "__main__":
             ## CLEAN UP OBJECTS NO LONGER REQUIRED NEXT TURN
             ## NECESSARY?? NOPE
 
+            logging.info("Total Turn Elapse Time: <<< {} >>> at {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start), datetime.datetime.now()))
+
+
     ## DELETE THIS LATER (FOR DEBUGGING ONLY)
     except Exception as e:
+        """
+        ERROR: not enough values to unpack (expected at least 1, got 0)
+
+        CAUSES: - Invalid command queue (ie thrust 8)
+                - Took over 2 secs
+                - Printing out somewhere
+
+        """
         logging.error("Error found: ==> {}".format(e))
 
         for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):

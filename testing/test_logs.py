@@ -62,6 +62,7 @@ def log_myMap_ships(myMap):
     logging.debug("Ships (defending): {}".format(myMap.ships_defending))
     logging.debug("Ships (expanding): {}".format(myMap.ships_expanding))
     logging.debug("Ships (running): {}".format(myMap.ships_running))
+    logging.debug("Ships (battling): {}".format(myMap.ships_battling))
 
 def log_myMap_planets(myMap):
     logging.debug("------myMap Planets------")

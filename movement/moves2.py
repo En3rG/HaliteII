@@ -22,8 +22,6 @@ it will then have -2.  This can help us decide whether to move there or not. Or 
 
 """
 
-
-
 class Target():
     NOTHING = -1
     PLANET = 0
@@ -46,15 +44,17 @@ class MyMoves():
 
 
     def get_my_moves(self):
+        """
+        GET THE MOVES PER SHIP ID
+        """
         if self.myMap.myMap_prev is None:
             # FIRST TURN
 
             ## GET BEST PLANET
             target_planet_id = self.EXP.best_planet_id
-            target_planet = self.EXP.planets[target_planet_id]
 
             ## GET ANGLE OF CENTROID TO BEST PLANET
-            target_coord = MyCommon.Coordinates(target_planet['coords'].y, target_planet['coords'].x)
+            target_coord = self.myMap.data_planets[target_planet_id]['coords']
             angle = MyCommon.get_angle(self.EXP.myStartCoords, target_coord)
 
             ## GET MATRIX OF JUST THE TARGET PLANET
@@ -73,7 +73,7 @@ class MyMoves():
                     logging.error("One of the starting ships didnt see the best planet, given the angle.")
 
                 ## GET THRUST AND ANGLE
-                thrust, angle = expanding2.get_Astar_thrust_angle(self, self.position_matrix, ship_id, target_coord)
+                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, self.position_matrix, ship_id, target_coord)
 
                 ## ADD TO COMMAND QUEUE
                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
@@ -84,13 +84,11 @@ class MyMoves():
         else:
             ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
-                self.myMap.ships_moved_already.add(ship_id)
-                ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
+                self.set_ship_moved_and_fill_position(ship_id)
 
-                ## ADD TO POSITION MATRIX
-                expanding2.fill_position_matrix(self.position_matrix, ship_point)
 
-            ## MOVE OTHERS
+            ## MOVE OTHERS REMAINING
+            ## NOT USING HEAP (USING HEAP CAUSES TO TIME OUT)
             for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
                 if ship_id not in self.myMap.ships_moved_already:
                     ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
@@ -105,14 +103,18 @@ class MyMoves():
 
                     if target_planet_id is None:
                         ## NO MORE PLANETS TO CONQUER AT THIS TIME
+                        self.set_ship_moved_and_fill_position(ship_id)
                         break
                     else:
                         target_coord = expanding2.get_target_coord_towards_planet(self, target_planet_id, ship_id)
 
-                        ## GET THRUST AND ANGLE
-                        thrust, angle = expanding2.get_Astar_thrust_angle(self, self.position_matrix, ship_id, target_coord)
+                        if target_coord is None:
+                            ## NO AVAILABLE SPOT NEAR THE TARGET
+                            self.set_ship_moved_and_fill_position(ship_id)
+                            break
 
-                        logging.debug("Test! ship_id: {} target_coord: {} thrust: {}".format(ship_id, target_coord, thrust))
+                        ## GET THRUST AND ANGLE
+                        thrust, angle = expanding2.get_thrust_angle_from_Astar(self, self.position_matrix, ship_id, target_coord)
 
                         if thrust == 0:
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
@@ -124,8 +126,74 @@ class MyMoves():
                         self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, target_coord)
 
 
+            ## USING HEAPQ
+            ## USING HEAP IS VERY SLOW (TIMES OUT!!)
+            ## GET TARGET AND DISTANCES
+            ## SET distance_shipID_target
+            # self.get_target_and_distances()
+            #
+            # ## MOVE OTHERS REMAINING
+            # while self.myMap.distance_shipID_target:
+            #     ## GET VALUES FROM HEAPQ
+            #     distance, ship_id, target_planet_id, target_coord = heapq.heappop(self.myMap.distance_shipID_target)
+            #
+            #     ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+            #
+            #     ## GET THRUST AND ANGLE
+            #     thrust, angle = expanding2.get_thrust_angle_from_Astar(self, self.position_matrix, ship_id, target_coord)
+            #
+            #     logging.debug("Test! ship_id: {} target_coord: {} thrust: {}".format(ship_id, target_coord, thrust))
+            #
+            #     if thrust == 0:
+            #         self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+            #     else:
+            #         ## ADD TO COMMAND QUEUE
+            #         self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
+            #
+            #     ## SET SHIP STATUSES
+            #     self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, target_coord)
+
+    def get_target_and_distances(self):
+        """
+        GET SHIP'S TARGET AND DISTANCE TO THAT TARGET COORD
+
+        IF SHIP HAS NO TARGET, SET SHIP TO MOVED
+
+        USED WHEN USING HEAPQ, BUT KINDA SLOW
+        """
+        for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
+            if ship_id not in self.myMap.ships_moved_already:
+                ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+
+                try:
+                    target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
+                except:
+                    ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
+                    ## OR
+                    ## SHIP HAS NO TARGET SET
+                    target_planet_id = expanding.get_next_target_planet(self, ship_id)
+
+                if target_planet_id is None:
+                    ## NO MORE PLANETS TO CONQUER AT THIS TIME
+                    self.set_ship_moved_and_fill_position(ship_id)
+                    break
+                else:
+                    target_coord = expanding2.get_target_coord_towards_planet(self, target_planet_id, ship_id)
+
+                    ## ADD TO DISTANCE HEAP
+                    distance = MyCommon.calculate_distance(ship_coord, target_coord)
+                    heapq.heappush(self.myMap.distance_shipID_target, (distance, ship_id, target_planet_id, target_coord))
+
+                    if target_coord is None:
+                        ## NO AVAILABLE SPOT NEAR THE TARGET
+                        self.set_ship_moved_and_fill_position(ship_id)
+                        break
 
     def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, target_coord):
+        """
+        SET STATUSES OF THE SPECIFIC SHIP
+        """
+
         ## SET SHIP'S TARGET
         self.set_ship_target_id(ship_id, Target.PLANET, target_planet_id)
 
@@ -137,6 +205,23 @@ class MyMoves():
 
         ## GET DESTINATION COORDS (y,x)
         self.set_ship_destination(ship_id, ship_coord, angle, thrust, target_coord)
+
+        ## SET SHIP HAS MOVED AND FILL POSITION MATRIX
+        self.set_ship_moved_and_fill_position(ship_id)
+
+    def set_ship_moved_and_fill_position(self, ship_id):
+        """
+        ADD SHIP TO MOVED ALREADY
+
+        FILL POSITION MATRIX OF THIS SHIPS POSITION
+        """
+        logging.debug('Moved! ship_id: {}'.format(ship_id))
+
+        self.myMap.ships_moved_already.add(ship_id)
+        ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
+
+        ## ADD TO POSITION MATRIX
+        expanding2.fill_position_matrix(self.position_matrix, ship_point)
 
     def set_ship_destination(self, ship_id, coords, angle, thrust, target_coord):
         """
@@ -153,11 +238,10 @@ class MyMoves():
         ## FINAL TARGET
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_coord'] = target_coord
 
-        ## ADD THIS DESTINATION TO ALL TARGET COORDS
-        self.myMap.taken_coords.add(tentative_point)
-
         ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle
+
+        ##
 
     def set_ship_target_id(self, ship_id, target_type, target_id):
         """

@@ -47,6 +47,9 @@ def a_star(array, start, goal):
     start = (int(round(start[0])),int(round(start[1])))
     goal = (int(round(goal[0])),int(round(goal[1])))
 
+    logging.debug("a_star: start: {} goal: {}".format(start, goal))
+    logging.debug("array: {}".format(array))
+
     ## NEIGHBORS IN NORTH, EAST, SOUTH, WEST DIRECTIONS, PLUS DIAGONALS
     neighbors = [(-1,0),(0,1),(1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]
 
@@ -199,8 +202,8 @@ def get_Astar_table(matrix, starting_point, target_point):
 #
 # start = datetime.datetime.now()
 #
-# for i in range(1):
-#     path = a_star(nmap, (0,0), (10,13))
+#
+# path = a_star(nmap, (0,5), (0,4))
 #
 #
 # end = datetime.datetime.now()

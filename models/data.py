@@ -6,7 +6,7 @@ import MyCommon
 from movement import grouping
 import traceback
 import sys
-
+import heapq
 
 
 
@@ -64,6 +64,11 @@ class MyMap():
         self.ships_defending = set()  ## THESE ARE CURRENTLY NOT USED
         self.ships_expanding = set()  ## THESE ARE CURRENTLY NOT USED
         self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
+        self.ships_battling = {1:set(),\
+                               2:set(),\
+                               3:set(),\
+                               4:set(),\
+                               5:set()}
 
         self.ships_moved_already = set()  ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
         self.taken_coords = set()
@@ -81,6 +86,8 @@ class MyMap():
         self.set_from_planet()  ## ASSOCIATE NEW SHIPS TO A PLANET
 
         self.groups = grouping.Groups(self)
+
+        self.distance_shipID_target = []  ## WILL BE A HEAP, BASE ON DISTANCE TO TARGET ID
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -392,8 +399,10 @@ class MyMatrix():
             else:
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
-            matrix[round(ship['y'])][round(ship['x'])] = value
-            matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health']/Matrix_val.MAX_SHIP_HP.value
+            #matrix[round(ship['y'])][round(ship['x'])] = value
+            #matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health']/Matrix_val.MAX_SHIP_HP.value
+            matrix[ship['point'][0]][ship['point'][1]] = value
+            matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 
@@ -410,8 +419,10 @@ class MyMatrix():
             else:
                 value = Matrix_val.ENEMY_SHIP_DOCKED.value
 
-            matrix[round(ship['y'])][round(ship['x'])] = value
-            matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
+            #matrix[round(ship['y'])][round(ship['x'])] = value
+            #matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
+            matrix[ship['point'][0]][ship['point'][1]] = value
+            matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
 

@@ -85,15 +85,22 @@ class MyProjection():
                     current_matrix = self.turns[turn]
 
                     ## CHECK A CERTAIN SQUARE/PERIMETER IF ENEMY WILL BE THERE IN THAT TURN
-                    starting_y = round(ship_data['y']) - radius
-                    starting_x = round(ship_data['x']) - radius
-                    perimeter = current_matrix[starting_y:round(ship_data['y']) + radius, \
-                                               starting_x:round(ship_data['x']) + radius]
+                    # starting_y = round(ship_data['y']) - radius
+                    # starting_x = round(ship_data['x']) - radius
+                    # perimeter = current_matrix[starting_y:round(ship_data['y']) + radius, \
+                    #                            starting_x:round(ship_data['x']) + radius]
+                    starting_y = ship_data['point'][0] - radius
+                    starting_x = ship_data['point'][1] - radius
+                    perimeter = current_matrix[starting_y:ship_data['point'][0] + radius, \
+                                               starting_x:ship_data['point'][1] + radius]
 
                     if Matrix_val.ENEMY_SHIP.value in perimeter:
                         ## ENEMY DETECTED
                         self.myMap.data_ships[self.myMap.my_id][ship_id]['enemy_in_turn'].append(turn)
                         logging.debug("Enemy detected ship id: {}, turn: {}".format(ship_id, turn))
+
+                        ## ADD SHIPS TO ships_battling
+                        self.myMap.ships_battling[turn].add(ship_id)
 
                         ## GET LOCATION/COORDS OF PROJECTED ENEMY
                         list_coords = np.argwhere(perimeter == Matrix_val.ENEMY_SHIP.value)

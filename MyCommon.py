@@ -7,8 +7,8 @@ import math
 class Constants():
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
-    SECTION_RADIUS = 10 ## TOTAL SIZE OF SECTION WILL BE 21x21
-    SECTION_CIRCLE_RADIUS = 8
+    SECTION_SQUARE_RADIUS = 10 ## TOTAL SIZE OF SECTION WILL BE 21x21
+    SECTION_CIRCLE_RADIUS = 7
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
 
@@ -19,7 +19,7 @@ def disable_log(disable,log):
     LOGGER OBJECT HAS NO DISABLE? THUS ALWAYS PASSING logging
     """
     if disable:
-        log.disable(logging.WARNING)
+        log.disable(logging.DEBUG)
 
 def get_logger(name):
     """
@@ -177,11 +177,15 @@ def calculate_distance(coords1, coords2):
     """
     CALCULATE DISTANCE BETWEEN 2 POINTS
     """
-    y1 = int(round(coords1.y))
-    y2 = int(round(coords2.y))
-    x1 = int(round(coords1.x))
-    x2 = int(round(coords2.x))
-    return int(math.sqrt((y1 - y2) ** 2 + (x1 - x2) ** 2))
+    # y1 = int(round(coords1.y))
+    # y2 = int(round(coords2.y))
+    # x1 = int(round(coords1.x))
+    # x2 = int(round(coords2.x))
+    y1 = coords1.y
+    y2 = coords2.y
+    x1 = coords1.x
+    x2 = coords2.x
+    return int(round(math.sqrt((y1 - y2) ** 2 + (x1 - x2) ** 2)))
 
 def get_slope(prev_coord, current_coord):
     class Slope:
@@ -284,7 +288,7 @@ def add_padding(a, center_coord, square_radius):
 
 
 
-def get_circle_in_matrix(array, center_coord, circle_radius, square_radius):
+def get_circle_in_square(array, center_coord, circle_radius, square_radius):
     """
     RETURNS A SQUARE MATRIX
     GET VALUES FROM THE MATRIX PROVIDED, WITHIN THE CIRCLE SPECIFIED

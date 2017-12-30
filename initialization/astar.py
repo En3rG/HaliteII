@@ -48,7 +48,8 @@ def a_star(array, start, goal):
     goal = (int(round(goal[0])),int(round(goal[1])))
 
     logging.debug("a_star: start: {} goal: {}".format(start, goal))
-    logging.debug("array: {}".format(array))
+    #logging.debug("array: {}".format(array))
+
 
     ## NEIGHBORS IN NORTH, EAST, SOUTH, WEST DIRECTIONS, PLUS DIAGONALS
     neighbors = [(-1,0),(0,1),(1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]

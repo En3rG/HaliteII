@@ -7,7 +7,7 @@ import math
 class Constants():
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
-    SECTION_SQUARE_RADIUS = 10 ## TOTAL SIZE OF SECTION WILL BE 21x21
+    SECTION_SQUARE_RADIUS = 8 ## TOTAL SIZE OF SECTION WILL BE 21x21 IF 10, 17x17 IF 8
     SECTION_CIRCLE_RADIUS = 7
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
@@ -228,7 +228,7 @@ def convert_for_command_queue(*args):
         logging.ERROR("Command Error Length")
 
 
-def get_coord_closest_value(matrix, starting_coord, looking_for_val, angle):
+def get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle):
     """
     GIVEN THE ANGLE, FIND THE CLOSEST VALUE
     FOLLOWING THE PATH OF THE UNIT VECTOR

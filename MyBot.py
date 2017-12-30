@@ -141,21 +141,24 @@ def model_handler(MP, turn, myMap, myMatrix):
 
     RETURNS PREDICTIONS AS DICTIONARY, WITH KEY OF ENEMY IDs
     """
-    start = datetime.datetime.now()
 
-    for id in MP.enemyIDs:
-        logging.debug("Model handler for player: {}".format(id))
+    # start = datetime.datetime.now()
+    #
+    # for id in MP.enemyIDs:
+    #     logging.debug("Model handler for player: {}".format(id))
+    #
+    #     ## GET DATA FOR TRAINING
+    #     get_data_training(id, myMap, myMatrix, MP, turn)
+    #
+    #     ## GET DATA FOR PREDICTING
+    #     get_data_predicting(id, myMap, myMatrix, MP, turn)
+    #
+    # ## GATHER/CLEANUP QUEUES
+    # predictions = gather_clean_predictions(MP,start,turn)
+    #
+    # return predictions, turn + 1
 
-        ## GET DATA FOR TRAINING
-        get_data_training(id, myMap, myMatrix, MP, turn)
-
-        ## GET DATA FOR PREDICTING
-        get_data_predicting(id, myMap, myMatrix, MP, turn)
-
-    ## GATHER/CLEANUP QUEUES
-    predictions = gather_clean_predictions(MP,start,turn)
-
-    return predictions, turn + 1
+    return None, turn + 1
 
 def get_data_training(id, myMap, myMatrix, MP, turn):
     """
@@ -327,7 +330,7 @@ if __name__ == "__main__":
             #myMoves = moves.MyMoves(myMap, myMatrix, EXP)
             myMoves = moves2.MyMoves(myMap, myMatrix, EXP)
             command_queue = myMoves.command_queue
-            logging.info("Completed all Algo at <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            logging.info("myMoves completed in <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
 
             ## SAVE OLD DATA FOR NEXT TURN
@@ -336,7 +339,7 @@ if __name__ == "__main__":
             myMatrix_prev = myMatrix
 
             ## SET A DELAY PER TURN
-            set_delay(main_start)
+            #set_delay(main_start)
             logging.info("about to send commands {}".format(datetime.datetime.now()))
             logging.info("Command_queue: {}".format(command_queue))
 

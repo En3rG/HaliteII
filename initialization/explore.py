@@ -35,8 +35,7 @@ class Exploration():
     """
     LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
     LAUNCH_ON_DISTANCE = 4
-    MINING_AREA_BUFFER = 2  ## BUFFER PLACED FOR GENERATING A* PATH TO NOT CRASH WITH MINING SHIPS
-    MOVE_BACK_DISTANCE = 2  ## MOVE BACK FROM MINING_AREA_BUFFER
+
 
     NUM_SECTIONS = 16  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
 
@@ -280,7 +279,7 @@ class Exploration():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
-                                          planet.radius + Exploration.MINING_AREA_BUFFER, \
+                                          planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
                                           value, \
                                           cummulative=False)
 
@@ -298,7 +297,7 @@ class Exploration():
         value = Matrix_val.PREDICTION_PLANET.value
         matrix = MyCommon.fill_circle(matrix, \
                                       MyCommon.Coordinates(planet.y, planet.x), \
-                                      planet.radius + Exploration.MINING_AREA_BUFFER, \
+                                      planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
                                       #planet.radius, \
                                       value, \
                                       cummulative=False)
@@ -320,7 +319,7 @@ class Exploration():
         paths = self.get_planet_to_planet_paths(paths)
 
         ## GET A* FROM EACH OF THE STARTING SHIPS TO BEST PLANET
-        paths = self.get_starting_ships_paths(paths)
+        #paths = self.get_starting_ships_paths(paths)
 
         end = datetime.datetime.now()
         time_used = datetime.timedelta.total_seconds(end-start)
@@ -332,6 +331,8 @@ class Exploration():
     def get_planet_to_planet_paths(self, paths):
         """
         GET A* PATHS FROM FLY OFF TO LAND OFF LAUNCH COORDS
+
+        NO LONGER USED?
         """
         done = set()
 
@@ -361,6 +362,8 @@ class Exploration():
     def get_starting_ships_paths(self, paths):
         """
         GET A* PATHS FROM EACH OF THE STARTING SHIPS TO THE BEST PLANET
+
+        NO LONGER USED
         """
 
         ## USE A* TO GET PATH FROM STARTING CENTROID TO BEST PLANET
@@ -390,11 +393,11 @@ class Exploration():
                 for ship in player.all_ships():
                     starting_point = (ship.y, ship.x)
                     starting_coord = MyCommon.Coordinates(ship.y, ship.x)
-                    closest_coord = MyCommon.get_coord_closest_value(matrix, starting_coord, looking_for_val, angle)
+                    closest_coord = MyCommon.get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle)
 
                     if closest_coord:
                         reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-                        destination_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, Exploration.MOVE_BACK_DISTANCE)  ## MOVE BACK
+                        destination_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
                         closest_point = (destination_coord.y, destination_coord.x)
 
                         path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, starting_point, closest_point)

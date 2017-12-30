@@ -6,6 +6,8 @@ import logging
 import sys
 import traceback
 from models.data import Matrix_val
+import numpy as np
+import copy
 
 def fill_position_matrix(position_matrix, ship_point):
     """
@@ -33,7 +35,7 @@ def fill_position_matrix(position_matrix, ship_point):
     position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
 
 
-def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord):
+def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord, target_distance):
     """
     RETURN THRUST AND ANGLE BASED SHIP ID AND TARGET COORD ONLY
 
@@ -52,10 +54,9 @@ def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord)
     section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius)
 
     ## CHECK IF THE TARGET IS WITHIN THE SHIPS IMMEDIATE REACH
-    target_distance = MyCommon.calculate_distance(ship_coord, target_coord)
     if  target_distance <= 7:
         ## TARGET IS INSIDE CIRCLE RADIUS
-        temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, target_distance)
+        temp_target_coord = target_coord
     else:
         ## TARGET IS OUTSIDE CIRCLE RADIUS
         temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
@@ -86,7 +87,7 @@ def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord)
         ## JUST GETTING THE FIRST STRAIGHT (COULD COLLIDE WITH SOMETHING)
         #astar_destination_point = path_table_forward[mid_point]
 
-        logging.debug("At ship_id: {} section_target_point: {} temp_target_coord: {} target_coord: {} temp_target_point: {}".format(ship_id, section_target_point, temp_target_coord, target_coord, temp_target_point))
+        #logging.debug("At ship_id: {} section_target_point: {} temp_target_coord: {} target_coord: {} temp_target_point: {}".format(ship_id, section_target_point, temp_target_coord, target_coord, temp_target_point))
 
         if mid_point == section_target_point:
             ## REACHED ITS TARGET
@@ -97,22 +98,22 @@ def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord)
 
             if not (isPositionMatrix_free(MyMoves.position_matrix, ship_coord)):
                 logging.debug("Need to Move! (no longer available) NEED UPDATE!!!!")
-                astar_destination_coord = mid_coord
-                angle, thrust = 0, 0
             else:
-                astar_destination_coord = mid_coord
-                angle, thrust = 0, 0
                 logging.debug("Staying!")
+
+            astar_destination_coord = mid_coord
+            angle, thrust = 0, 0
+
         else:
             ## GET FURTHEST POINT WITHIN THE CIRCLE
             path_points = astar.a_star(section_matrix, mid_point, section_target_point)
-            logging.debug("path_points: {}".format(path_points))
+            #logging.debug("path_points: {}".format(path_points))
             for current_point in path_points[::-1]:
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
                 if MyCommon.within_circle(current_coord, mid_coord, circle_radius) \
                         and no_collision(mid_coord, current_coord, section_matrix):
                     astar_destination_point = current_point
-                    logging.debug("astar_destination_point: {}".format(astar_destination_point))
+                    #logging.debug("astar_destination_point: {}".format(astar_destination_point))
                 else:
                     break
 
@@ -143,13 +144,31 @@ def no_collision(start_coord, target_coord, section_matrix):
     """
     RETURNS TRUE IF NO COLLISION BETWEEN THE TWO COORDS
     """
+
+    # angle = MyCommon.get_angle(start_coord, target_coord)
+    # distance = MyCommon.calculate_distance(start_coord, target_coord)
+    #
+    # for thrust in range(int(round(distance))):
+    #     temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
+    #     round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
+    #     if section_matrix[round_coord.y][round_coord.x] != 0:
+    #         return False
+    #
+    # return True
+
+    ## NOT USING GET DESTINATION COORDS
+    ## SHOULD BE MORE OPTIMAL
     angle = MyCommon.get_angle(start_coord, target_coord)
     distance = MyCommon.calculate_distance(start_coord, target_coord)
+    unit_vector = -np.cos(np.radians(-angle - 90)), -np.sin(np.radians(-angle - 90))
+    start_point = [start_coord.y, start_coord.x]
 
-    for thrust in range(distance):
-        temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
-        round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
-        if section_matrix[round_coord.y][round_coord.x] != 0:
+    for multiplier in range(1,int(round(distance)) + 1):
+        new_coord = [start_point[0] + multiplier * unit_vector[0],
+                     start_point[1] + multiplier * unit_vector[1]]
+        round_new_coord = (int(round(new_coord[0])), int(round(new_coord[1])))
+
+        if section_matrix[round_new_coord[0]][round_new_coord[1]] != 0:
             return False
 
     return True
@@ -167,25 +186,37 @@ def get_target_coord_towards_planet(MyMoves, target_planet_id, ship_id):
     ## GET MATRIX OF JUST THE TARGET PLANET
     target_planet_matrix = MyMoves.EXP.planet_matrix[target_planet_id]
 
-    looking_for_val = Matrix_val.PREDICTION_PLANET.value
+    seek_value = Matrix_val.PREDICTION_PLANET.value
 
-    closest_coord = MyCommon.get_coord_closest_value(target_planet_matrix, ship_coord, looking_for_val, angle)
+    value_coord = MyCommon.get_coord_of_value_in_angle(target_planet_matrix, ship_coord, seek_value, angle)
 
-    if closest_coord:
+    if value_coord:
         reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-        new_target_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
+        new_target_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
     else:
         logging.error("Did not get closest target, given the angle.")
 
     if not(isPositionMatrix_free(MyMoves.position_matrix, new_target_coord)):
-        new_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
+        #new_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
 
-    return new_target_coord
+        new2_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
+        if new2_target_coord is None:  ## TRY GOING CLOCKWISE/COUNTERCLOCKWISE
+            new_target_coord = get_new_target_coord2(MyMoves, new_target_coord, reverse_angle, target_planet_id)
+        else:
+            new_target_coord = new2_target_coord
+
+    if new_target_coord is None:
+        distance = None
+    else:
+        distance = MyCommon.calculate_distance(ship_coord ,new_target_coord)
+
+    return new_target_coord, distance
 
 def get_new_target_coord(position_matrix, coord, reverse_angle):
     """
     GIVEN A COORD, GET A NEW COORD CLOSE TO IT
     """
+
     ## ONLY IF FILLED POSITION IS NORTH, EAST, SOUTH, WEST
     positions = [(reverse_angle + 90, 2), \
                  (reverse_angle - 90, 2), \
@@ -219,13 +250,54 @@ def get_new_target_coord(position_matrix, coord, reverse_angle):
     logging.debug("No new position found for coord: {}".format(coord))
     return None ## NO NEW COORDS AVAILABLE
 
+
+def get_new_target_coord2(MyMoves, old_target_coord, reverse_angle, target_planet_id):
+    """
+    USING CURVATURE OF PLANET
+
+    CLOCKWISE AND COUNTER CLOCKWISE DIRECTIONS
+    """
+    position_matrix = MyMoves.position_matrix
+    planet_center = MyMoves.myMap.data_planets[target_planet_id]['coords']
+    planet_angle = reverse_angle
+    planet_angle_left = reverse_angle
+    opposite = 1.5
+    spots = 0
+
+    while spots < 3:  ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
+        adjacent = MyCommon.calculate_distance(old_target_coord, planet_center)
+        angle = math.degrees(math.atan(opposite / adjacent))
+        hypotenuse = opposite / math.sin(math.radians(angle))
+        new_angle = planet_angle + angle
+        new_target_coord = MyCommon.get_destination_coord(planet_center, new_angle, hypotenuse)
+        round_coord = MyCommon.Coordinates(int(round(new_target_coord.y)), int(round(new_target_coord.x)))
+
+        if isPositionMatrix_free(position_matrix, round_coord):
+            return round_coord
+
+        ## GOING COUNTER CLOCKWISE
+        new_angle_left = planet_angle_left - angle
+        new_target_coord_left = MyCommon.get_destination_coord(planet_center, new_angle_left, hypotenuse)
+        round_coord = MyCommon.Coordinates(int(round(new_target_coord_left.y)), int(round(new_target_coord_left.x)))
+
+        if isPositionMatrix_free(position_matrix, round_coord):
+            return round_coord
+
+        ## UPDATE VALUES FOR NEXT ITERATION
+        old_target_coord = new_target_coord
+        planet_angle = new_angle
+        planet_angle_left = new_angle_left
+
+        spots += 1
+
+    logging.debug("No new position2 found for coord: {}".format(old_target_coord))
+    return None
+
 def isPositionMatrix_free(position_matrix, coord):
     """
     RETURNS TRUE IF POSITION MATRIX IS AVAILABLE
     """
     return position_matrix[int(round(coord.y))][int(round(coord.x))] == 0
-
-
 
 
 

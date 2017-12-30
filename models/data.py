@@ -53,6 +53,7 @@ class MyMap():
         self.planets_owned = set()  ## PLANETS I OWN
         self.planets_unowned = set()  ## PLANETS UNOWNED
         self.planets_enemy = set()  ## PLANETS OWNED BY ENEMY
+        self.planets_existing = set() ## ALL PLANETS EXISTING IN THE MAP CURRENTLY
 
         self.ships_enemy = set()
         self.ships_owned = set()  ## SHIPS I OWN
@@ -175,6 +176,9 @@ class MyMap():
         for planet in self.game_map.all_planets():
             ## FILL IN PLANETS DATA
             self.set_planet_data(planet)
+
+            ## ADD TO PLANET EXISTING CURRENTLY
+            self.planets_existing.add(planet.id)
 
             if not planet.is_owned():
                 ## PLANET NOT OWNED

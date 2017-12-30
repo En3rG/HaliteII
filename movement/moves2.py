@@ -39,7 +39,13 @@ class MyMoves():
         self.EXP = EXP
         self.myMap = myMap
         self.myMatrix = myMatrix
-        self.position_matrix = copy.deepcopy(myMatrix.matrix[myMap.my_id][0])  ## SECOND ONE IS HP MATRIX
+        self.position_matrix = {1: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+                                2: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+                                3: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+                                4: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+                                5: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+                                6: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+                                7: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),}  ## SECOND ONE IS HP MATRIX
 
         self.get_my_moves()
 
@@ -76,7 +82,7 @@ class MyMoves():
                 distance = MyCommon.calculate_distance(ship_coord, target_coord)
 
                 ## GET THRUST AND ANGLE
-                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, self.position_matrix, ship_id, target_coord, distance)
+                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance)
 
                 ## ADD TO COMMAND QUEUE
                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
@@ -89,7 +95,7 @@ class MyMoves():
 
             ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
-                self.set_ship_moved_and_fill_position(ship_id)
+                self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
 
             logging.info("Move mining ships time: {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - s)))
 
@@ -121,29 +127,26 @@ class MyMoves():
 
                     if target_planet_id is None:
                         ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                        self.set_ship_moved_and_fill_position(ship_id)
+                        self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                         continue
                     else:
-                        target_coord, distance = expanding2.get_target_coord_towards_planet(self, target_planet_id, ship_id)
+                        target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
 
                         if target_coord is None:
                             ## NO AVAILABLE SPOT NEAR THE TARGET
-                            self.set_ship_moved_and_fill_position(ship_id)
+                            self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                             continue
 
                         ## GET THRUST AND ANGLE
                         s = datetime.datetime.now()
 
-                        thrust, angle = expanding2.get_thrust_angle_from_Astar(self, self.position_matrix, ship_id, target_coord, distance)
+                        thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance)
 
                         astar_number += 1
 
                         time_astar += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
 
-                        logging.debug("Test! ship_id: {} target_coord: {} thrust: {} position_matrix size: {}".format(ship_id,
-                                                                                                            target_coord,
-                                                                                                            thrust,
-                                                                                                            self.position_matrix.shape))
+                        thrust = self.check_collisions(ship_id, angle, thrust)
 
                         if thrust == 0:
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
@@ -170,13 +173,13 @@ class MyMoves():
             # ## THIS GOES UP TO 0.5 SEC, WHILE ABOVE IS ABOUT 0.2-0.3 SEC ONLY (NOT USING HEAPPOP WILL NOT WORK!!)
             # ## STILL CANT DETERMINE WHY THIS IS MUCH SLOWER THAN ABOVE
             #
-            # s = datetime.datetime.now()
+            # #s = datetime.datetime.now()
             #
             # ## GET TARGET AND DISTANCES
             # ## SET distance_shipID_target
-            # self.get_target_and_distances()
+            # heap = self.get_target_and_distances()
             #
-            # logging.info("target and distance time: {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - s)))
+            # #logging.info("target and distance time: {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - s)))
             #
             # time_pop = 0
             # time_astar = 0
@@ -187,12 +190,12 @@ class MyMoves():
             # ## MOVE OTHERS REMAINING
             #
             # ## USING HEAPQ POP
-            # while self.myMap.distance_shipID_target:
+            # while heap:
             #     ## GET VALUES FROM HEAPQ
-            #     s = datetime.datetime.now()
-            #     distance, ship_id, target_planet_id, target_coord = heapq.heappop(self.myMap.distance_shipID_target)
-            #     time_pop += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
-            #     pop_number += 1
+            #     #s = datetime.datetime.now()
+            #     distance, ship_id, target_planet_id, target_coord = copy.deepcopy(heapq.heappop(heap))
+            #     #time_pop += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
+            #     #pop_number += 1
             #
             # ## INSTEAD OF POPPING, JUST LOOP THROUGH IT
             # ## NO NEED TO USE POP, SINCE WE ARE NO LONGER PLACING VALUES INTO THE HEAPQ
@@ -203,14 +206,13 @@ class MyMoves():
             #     ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
             #
             #     ## GET THRUST AND ANGLE
-            #     s = datetime.datetime.now()
+            #     #s = datetime.datetime.now()
             #
-            #     thrust, angle = expanding2.get_thrust_angle_from_Astar(self, self.position_matrix, ship_id, target_coord, distance)
+            #     thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance)
             #
-            #     time_astar += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
+            #     #time_astar += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
             #
             #
-            #     logging.debug("Test! ship_id: {} target_coord: {} thrust: {} position_matrix size: {}".format(ship_id, target_coord, thrust, self.position_matrix.shape))
             #
             #     if thrust == 0:
             #         self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
@@ -231,6 +233,37 @@ class MyMoves():
             # logging.info("Total time astar: {}".format(time_astar))
             # logging.info("Total time statuses: {}".format(time_statuses))
 
+    def check_collisions(self, ship_id, angle, thrust):
+        """
+        CHECK IF AN INTERMEDIATE COLLISION EXISTS
+        IF SO, RETURN THE THRUST THAT HAS NO COLLISION
+        """
+        ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+        dx = thrust / 7
+        prev_thrust = 0
+
+        for step_num in range(1, 7):
+            curr_thrust = int(round(dx * step_num))
+            intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
+            intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
+
+            no_collision = self.no_intermediate_collision(step_num, intermediate_point)
+            if no_collision:
+                prev_thrust = curr_thrust
+            else:
+                return prev_thrust  ## CURRENT THRUST HAS COLLISION
+
+        return thrust  ## RETURN ORIGINAL THRUST
+
+    def no_intermediate_collision(self, step_num, point):
+        """
+        CHECK IF THERE IS A COLLISION
+        PROVIDED THE STEP_NUM AND THE POINT (y,x)
+        """
+        return self.position_matrix[step_num][point[0]][point[1]] == 0
+
+
+
     def get_target_and_distances(self):
         """
         GET SHIP'S TARGET AND DISTANCE TO THAT TARGET COORD
@@ -239,6 +272,8 @@ class MyMoves():
 
         USED WHEN USING HEAPQ, BUT KINDA SLOW
         """
+        heap = []
+
         for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
             if ship_id not in self.myMap.ships_moved_already:
                 try:
@@ -255,20 +290,20 @@ class MyMoves():
 
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    self.set_ship_moved_and_fill_position(ship_id)
+                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                     continue
                 else:
-                    target_coord, distance = expanding2.get_target_coord_towards_planet(self, target_planet_id, ship_id)
+                    target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
 
                     if target_coord is None:
                         ## NO AVAILABLE SPOT NEAR THE TARGET
-                        self.set_ship_moved_and_fill_position(ship_id)
+                        self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                         continue
 
                     ## ADD TO DISTANCE HEAP
-                    heapq.heappush(self.myMap.distance_shipID_target, (distance, ship_id, target_planet_id, target_coord))
+                    heapq.heappush(heap, (distance, ship_id, target_planet_id, target_coord))
 
-
+        return heap
 
     def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, target_coord):
         """
@@ -288,9 +323,9 @@ class MyMoves():
         self.set_ship_destination(ship_id, ship_coord, angle, thrust, target_coord)
 
         ## SET SHIP HAS MOVED AND FILL POSITION MATRIX
-        self.set_ship_moved_and_fill_position(ship_id)
+        self.set_ship_moved_and_fill_position(ship_id, angle, thrust)
 
-    def set_ship_moved_and_fill_position(self, ship_id):
+    def set_ship_moved_and_fill_position(self, ship_id, angle, thrust):
         """
         ADD SHIP TO MOVED ALREADY
 
@@ -302,7 +337,10 @@ class MyMoves():
         ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
 
         ## ADD TO POSITION MATRIX
-        expanding2.fill_position_matrix(self.position_matrix, ship_point)
+        expanding2.fill_position_matrix(self.position_matrix[7], ship_point)
+
+        ## FILL IN INTERMEDIATE POSITION MATRIX
+        expanding2.fill_position_matrix2(self, ship_id, angle, thrust)
 
     def set_ship_destination(self, ship_id, coords, angle, thrust, target_coord):
         """

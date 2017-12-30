@@ -88,7 +88,6 @@ class MyMap():
 
         self.groups = grouping.Groups(self)
 
-        self.distance_shipID_target = []  ## WILL BE A HEAP, BASE ON DISTANCE TO TARGET ID
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
@@ -186,6 +185,7 @@ class MyMap():
             elif planet.owner is not None and planet.owner.id == self.game_map.my_id:
                 ## PLANET I OWN
                 self.planets_owned.add(planet.id)
+                self.data_planets[planet.id]['docked_ships'].update(planet._docked_ship_ids)
                 self.data_planets[planet.id]['my_miners'].update(planet._docked_ship_ids)
                 self.update_ship_task_mining(planet._docked_ship_ids)
             else:
@@ -214,6 +214,7 @@ class MyMap():
                                         'point': (int(round(planet.y)), int(round(planet.x))), \
                                        'radius': planet.radius, \
                                        'num_docks': planet.num_docking_spots, \
+                                        'docked_ships': set(), \
                                        'my_miners': set(), \
                                        'health': planet.health, \
                                        'owner': None if planet.owner is None else planet.owner.id}

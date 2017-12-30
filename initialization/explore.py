@@ -332,7 +332,6 @@ class Exploration():
         """
         GET A* PATHS FROM FLY OFF TO LAND OFF LAUNCH COORDS
 
-        NO LONGER USED?
         """
         done = set()
 

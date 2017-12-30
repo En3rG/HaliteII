@@ -13,7 +13,7 @@ def get_next_target_planet(MyMoves, ship_id):
     """
     GET NEXT PLANET TO CONQUER
 
-    GETS CALLED BY NEW SHIPS
+    GETS CALLED BY NEW SHIPS OR IF OLD PLANET TARGET OF A SHIP DIED RECENTLY
     """
     try:
         from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
@@ -44,10 +44,12 @@ def get_next_target_planet(MyMoves, ship_id):
                 return planet_id
             ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
             elif planet_id in MyMoves.myMap.planets_owned:
-                len_miners = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
+                len_miners_prev = len(MyMoves.myMap.myMap_prev.data_planets[planet_id]['my_miners'])
+                len_miners_now = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
                 max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
 
-                if len_miners < max_docks:
+                ## PREVIOUSLY AND CURRENTLY, HAVE LESS MINERS THAN NUMBER OF DOCKS
+                if len_miners_prev < max_docks and len_miners_now < max_docks:
                     return planet_id
 
     except Exception as e:

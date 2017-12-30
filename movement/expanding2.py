@@ -35,12 +35,27 @@ def fill_position_matrix(position_matrix, ship_point):
     position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
 
 
-def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord, target_distance):
+def fill_position_matrix2(MyMoves, ship_id, angle, thrust):
+    """
+    FILL IN INTERMEDIATE POSITION MATRIXES
+    """
+    ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+    dx = thrust/7
+
+    for x in range(1, 7):  ## 7 WILL BE FILLED BY ANOTHER FUNCTION
+        intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
+        intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
+        fill_position_matrix(MyMoves.position_matrix[x], intermediate_point)
+
+
+def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance):
     """
     RETURN THRUST AND ANGLE BASED SHIP ID AND TARGET COORD ONLY
 
     WE"LL USE LOCAL/SECTIONED A*
     """
+    position_matrix = MyMoves.position_matrix[7]
+
     square_radius = MyCommon.Constants.SECTION_SQUARE_RADIUS
     circle_radius = MyCommon.Constants.SECTION_CIRCLE_RADIUS
     fake_target_thrust = MyCommon.Constants.SECTION_SQUARE_RADIUS ## 10
@@ -96,7 +111,7 @@ def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord,
             ## CHECK IF STILL AVAILABLE IN POSITION MATRIX
             ## POSIBLE THAT ANOTHER SHIP NOW WENT TO THIS POSITION THAT MOVED BEFORE THIS SHIP
 
-            if not (isPositionMatrix_free(MyMoves.position_matrix, ship_coord)):
+            if not (isPositionMatrix_free(MyMoves.position_matrix[7], ship_coord)):
                 logging.debug("Need to Move! (no longer available) NEED UPDATE!!!!")
             else:
                 logging.debug("Staying!")
@@ -136,7 +151,7 @@ def get_thrust_angle_from_Astar(MyMoves, position_matrix, ship_id, target_coord,
     slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.SECTION_SQUARE_RADIUS, \
                             astar_destination_coord.x - MyCommon.Constants.SECTION_SQUARE_RADIUS)
     taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
-    fill_position_matrix(position_matrix, taken_point)
+    fill_position_matrix(MyMoves.position_matrix[7], taken_point)
 
     return thrust, angle
 
@@ -173,7 +188,7 @@ def no_collision(start_coord, target_coord, section_matrix):
 
     return True
 
-def get_target_coord_towards_planet(MyMoves, target_planet_id, ship_id):
+def get_docking_coord(MyMoves, target_planet_id, ship_id):
     """
     RETURN TARGET COORD TOWARDS A SPECIFIED PLANET
     """
@@ -192,27 +207,27 @@ def get_target_coord_towards_planet(MyMoves, target_planet_id, ship_id):
 
     if value_coord:
         reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-        new_target_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
+        docking_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
     else:
         logging.error("Did not get closest target, given the angle.")
 
-    if not(isPositionMatrix_free(MyMoves.position_matrix, new_target_coord)):
+    if not(isPositionMatrix_free(MyMoves.position_matrix[7], docking_coord)):
         #new_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
 
-        new2_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
-        if new2_target_coord is None:  ## TRY GOING CLOCKWISE/COUNTERCLOCKWISE
-            new_target_coord = get_new_target_coord2(MyMoves, new_target_coord, reverse_angle, target_planet_id)
+        new_docking_coord = get_new_docking_coord(MyMoves.position_matrix[7], docking_coord, reverse_angle)
+        if new_docking_coord is None:  ## TRY GOING CLOCKWISE/COUNTERCLOCKWISE
+            docking_coord = get_new_docking_coord2(MyMoves, docking_coord, reverse_angle, target_planet_id)
         else:
-            new_target_coord = new2_target_coord
+            docking_coord = new_docking_coord
 
-    if new_target_coord is None:
+    if docking_coord is None:
         distance = None
     else:
-        distance = MyCommon.calculate_distance(ship_coord ,new_target_coord)
+        distance = MyCommon.calculate_distance(ship_coord ,docking_coord)
 
-    return new_target_coord, distance
+    return docking_coord, distance
 
-def get_new_target_coord(position_matrix, coord, reverse_angle):
+def get_new_docking_coord(position_matrix, coord, reverse_angle):
     """
     GIVEN A COORD, GET A NEW COORD CLOSE TO IT
     """
@@ -251,13 +266,13 @@ def get_new_target_coord(position_matrix, coord, reverse_angle):
     return None ## NO NEW COORDS AVAILABLE
 
 
-def get_new_target_coord2(MyMoves, old_target_coord, reverse_angle, target_planet_id):
+def get_new_docking_coord2(MyMoves, old_target_coord, reverse_angle, target_planet_id):
     """
     USING CURVATURE OF PLANET
 
     CLOCKWISE AND COUNTER CLOCKWISE DIRECTIONS
     """
-    position_matrix = MyMoves.position_matrix
+    position_matrix = MyMoves.position_matrix[7]
     planet_center = MyMoves.myMap.data_planets[target_planet_id]['coords']
     planet_angle = reverse_angle
     planet_angle_left = reverse_angle
@@ -301,4 +316,51 @@ def isPositionMatrix_free(position_matrix, coord):
 
 
 
+
+# import random
+# import heapq
+# import datetime
+#
+# def someFunction(sum, val):
+#     sum += val
+#     return sum
+#
+# data_heap = []
+# data_list = []
+#
+# for x in range(1000):
+#     val1 = random.randint(1,10)
+#     val2 = random.randint(1, 10)
+#     heapq.heappush(data_heap, (val1,val2))
+#     data_list.append(val2)
+#
+#
+# ## METHOD 1
+# start = datetime.datetime.now()
+#
+# total = 0
+# total_somefunction = 0
+# for x in data_list:
+#     s = datetime.datetime.now()
+#     total = someFunction(total, x)
+#     total_somefunction += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
+#
+# print("all someFunction time in method #1", total_somefunction)
+# print("Total Method #1: ", datetime.timedelta.total_seconds(datetime.datetime.now() - start))
+#
+#
+#
+# ## METHOD 2
+# start = datetime.datetime.now()
+#
+# total = 0
+# total_somefunction = 0
+# while data_heap:
+#     _, x = heapq.heappop(data_heap)
+#     s = datetime.datetime.now()
+#     total = someFunction(total, x)
+#     total_somefunction += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
+#
+# print("all someFunction time in method #2", total_somefunction)
+# print("Total Method #2: ",datetime.timedelta.total_seconds(datetime.datetime.now() - start))
 

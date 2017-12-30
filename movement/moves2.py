@@ -146,16 +146,16 @@ class MyMoves():
 
                         time_astar += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
 
-                        thrust = self.check_collisions(ship_id, angle, thrust)
+                        safe_thrust = self.check_collisions(ship_id, angle, thrust)
 
                         if thrust == 0:
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
                         else:
                             ## ADD TO COMMAND QUEUE
-                            self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
+                            self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
 
                         ## SET SHIP STATUSES
-                        self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, target_coord)
+                        self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
 
             logging.info("Test! Turn")
             logging.info("Total astar number: {}".format(astar_number))
@@ -251,6 +251,7 @@ class MyMoves():
             if no_collision:
                 prev_thrust = curr_thrust
             else:
+                logging.debug("Collision detected! ship_id: {} intermediate_point: {} step_num: {} prev_thrust: {}".format(ship_id, intermediate_point, step_num, prev_thrust))
                 return prev_thrust  ## CURRENT THRUST HAS COLLISION
 
         return thrust  ## RETURN ORIGINAL THRUST
@@ -260,7 +261,7 @@ class MyMoves():
         CHECK IF THERE IS A COLLISION
         PROVIDED THE STEP_NUM AND THE POINT (y,x)
         """
-        return self.position_matrix[step_num][point[0]][point[1]] == 0
+        return self.position_matrix[step_num][point[0]][point[1]] != Matrix_val.ALLY_SHIP.value
 
 
 

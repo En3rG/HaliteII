@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02cba0c9-f6b0-4114-b540-93cb9b5b278a" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyCommon.py" afterPath="$PROJECT_DIR$/MyCommon.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/initialization/explore.py" afterPath="$PROJECT_DIR$/initialization/explore.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/expanding2.py" afterPath="$PROJECT_DIR$/movement/expanding2.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/moves2.py" afterPath="$PROJECT_DIR$/movement/moves2.py" />
     </list>
     <ignored path="MYBOT.iws" />
@@ -26,11 +30,11 @@
       <file leaf-file-name="expanding2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
-              <caret line="41" column="4" selection-start-line="41" selection-start-column="4" selection-end-line="47" selection-end-column="76" />
+            <state relative-caret-position="425">
+              <caret line="43" column="17" selection-start-line="43" selection-start-column="17" selection-end-line="43" selection-end-column="17" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
-                <marker date="1514625255848" expanded="true" signature="7794:8268" placeholder="..." />
+                <marker date="1514750878811" expanded="true" signature="7951:8562" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -39,8 +43,8 @@
       <file leaf-file-name="moves2.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/movement/moves2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="359">
-              <caret line="259" column="11" selection-start-line="259" selection-start-column="11" selection-end-line="259" selection-end-column="11" />
+            <state relative-caret-position="291">
+              <caret line="161" column="112" selection-start-line="161" selection-start-column="112" selection-end-line="161" selection-end-column="112" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -48,11 +52,31 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="MyBot.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MyBot.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="250" column="11" selection-start-line="250" selection-start-column="8" selection-end-line="250" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="projection.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/projection/projection.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-66">
+              <caret line="58" column="11" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MyCommon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="335">
-              <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+            <state relative-caret-position="230">
+              <caret line="181" column="32" selection-start-line="181" selection-start-column="32" selection-end-line="181" selection-end-column="32" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -63,8 +87,20 @@
       <file leaf-file-name="explore.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/initialization/explore.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="518">
-              <caret line="346" column="80" selection-start-line="346" selection-start-column="65" selection-end-line="346" selection-end-column="80" />
+            <state relative-caret-position="292">
+              <caret line="300" column="60" selection-start-line="300" selection-start-column="60" selection-end-line="300" selection-end-column="60" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="astar.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/initialization/astar.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="190">
+              <caret line="88" column="87" selection-start-line="88" selection-start-column="85" selection-end-line="88" selection-end-column="87" />
               <folding />
             </state>
           </provider>
@@ -73,21 +109,11 @@
       <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1938">
-              <caret line="114" column="32" selection-start-line="114" selection-start-column="30" selection-end-line="114" selection-end-column="32" />
+            <state relative-caret-position="224">
+              <caret line="19" column="22" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="projection.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/projection/projection.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="58" column="11" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -106,19 +132,19 @@
         <option value="$PROJECT_DIR$/projection/projection.py" />
         <option value="$PROJECT_DIR$/models/model.py" />
         <option value="$PROJECT_DIR$/initialization/astar.py" />
-        <option value="$PROJECT_DIR$/MyBot.py" />
-        <option value="$PROJECT_DIR$/MyCommon.py" />
         <option value="$PROJECT_DIR$/movement/expanding.py" />
-        <option value="$PROJECT_DIR$/initialization/explore.py" />
+        <option value="$PROJECT_DIR$/MyBot.py" />
         <option value="$PROJECT_DIR$/models/data.py" />
+        <option value="$PROJECT_DIR$/initialization/explore.py" />
+        <option value="$PROJECT_DIR$/MyCommon.py" />
         <option value="$PROJECT_DIR$/movement/expanding2.py" />
         <option value="$PROJECT_DIR$/movement/moves2.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="194" />
-    <option name="y" value="89" />
+    <option name="x" value="211" />
+    <option name="y" value="52" />
     <option name="width" value="1632" />
     <option name="height" value="939" />
   </component>
@@ -531,7 +557,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="194" y="89" width="1632" height="939" extended-state="0" />
+    <frame x="211" y="52" width="1632" height="939" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1144802" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -540,7 +566,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24457832" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24457832" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -584,7 +610,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-            <marker date="1514625255848" expanded="true" signature="7794:8268" placeholder="..." />
+            <marker date="1514750878811" expanded="true" signature="7951:8562" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -614,7 +640,7 @@
         <state relative-caret-position="272">
           <caret line="25" column="22" selection-start-line="25" selection-start-column="22" selection-end-line="25" selection-end-column="22" />
           <folding>
-            <element signature="e#0#14#0" expanded="false" />
+            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -690,7 +716,7 @@
         <state relative-caret-position="102">
           <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="44" />
           <folding>
-            <element signature="e#0#14#0" expanded="false" />
+            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -731,7 +757,7 @@
           <caret line="11" column="76" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="76" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-            <marker date="1514625255848" expanded="true" signature="7794:8268" placeholder="..." />
+            <marker date="1514750878811" expanded="true" signature="7951:8562" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -803,7 +829,7 @@
         <state relative-caret-position="442">
           <caret line="34" column="23" selection-start-line="34" selection-start-column="23" selection-end-line="34" selection-end-column="23" />
           <folding>
-            <element signature="e#0#14#0" expanded="false" />
+            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -904,26 +930,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MyBot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-714">
-          <caret line="160" column="25" selection-start-line="160" selection-start-column="25" selection-end-line="160" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/multiprocessor/processors.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="206">
           <caret line="271" column="26" selection-start-line="271" selection-start-column="24" selection-end-line="271" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/projection/projection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="58" column="11" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
           <folding />
         </state>
       </provider>
@@ -934,32 +944,6 @@
           <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
           <folding>
             <element signature="e#1#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/initialization/explore.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="518">
-          <caret line="346" column="80" selection-start-line="346" selection-start-column="65" selection-end-line="346" selection-end-column="80" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/initialization/astar.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="161" column="4" selection-start-line="161" selection-start-column="4" selection-end-line="161" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MyCommon.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -980,31 +964,75 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
+    <entry file="file://$PROJECT_DIR$/projection/projection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="41" column="4" selection-start-line="41" selection-start-column="4" selection-end-line="47" selection-end-column="76" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-            <marker date="1514625255848" expanded="true" signature="7794:8268" placeholder="..." />
-          </folding>
+        <state relative-caret-position="-66">
+          <caret line="58" column="11" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MyBot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="250" column="11" selection-start-line="250" selection-start-column="8" selection-end-line="250" selection-end-column="11" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/models/data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1938">
-          <caret line="114" column="32" selection-start-line="114" selection-start-column="30" selection-end-line="114" selection-end-column="32" />
+        <state relative-caret-position="224">
+          <caret line="19" column="22" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/initialization/explore.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="292">
+          <caret line="300" column="60" selection-start-line="300" selection-start-column="60" selection-end-line="300" selection-end-column="60" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MyCommon.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="181" column="32" selection-start-line="181" selection-start-column="32" selection-end-line="181" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/initialization/astar.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="88" column="87" selection-start-line="88" selection-start-column="85" selection-end-line="88" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="43" column="17" selection-start-line="43" selection-start-column="17" selection-end-line="43" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+            <marker date="1514750878811" expanded="true" signature="7951:8562" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/movement/moves2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="359">
-          <caret line="259" column="11" selection-start-line="259" selection-start-column="11" selection-end-line="259" selection-end-column="11" />
+        <state relative-caret-position="291">
+          <caret line="161" column="112" selection-start-line="161" selection-start-column="112" selection-end-line="161" selection-end-column="112" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

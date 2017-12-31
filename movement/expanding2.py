@@ -9,7 +9,7 @@ from models.data import Matrix_val
 import numpy as np
 import copy
 
-def fill_position_matrix(position_matrix, ship_point):
+def fill_position_matrix(position_matrix, ship_point, intermediate=False):
     """
     FILL POSITION MATRIX WITH 1 TO REPRESENT MY SHIP
     ALSO NEED TO TAKE INTO ACCOUNT ITS NEIGHBORING COORDS
@@ -28,11 +28,12 @@ def fill_position_matrix(position_matrix, ship_point):
     # position_matrix[ship_point[0] + 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
     # position_matrix[ship_point[0]][ship_point[1] - 2] = Matrix_val.ALLY_SHIP.value
 
-    ## ALSO DIAGONALS?
-    position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-    position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-    position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-    position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    if not(intermediate):  ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
+        ## ALSO DIAGONALS?
+        position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+        position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+        position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+        position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
 
 
 def fill_position_matrix2(MyMoves, ship_id, angle, thrust):
@@ -45,7 +46,7 @@ def fill_position_matrix2(MyMoves, ship_id, angle, thrust):
     for x in range(1, 7):  ## 7 WILL BE FILLED BY ANOTHER FUNCTION
         intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
         intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
-        fill_position_matrix(MyMoves.position_matrix[x], intermediate_point)
+        fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
 
 
 def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance):
@@ -128,7 +129,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance)
                 if MyCommon.within_circle(current_coord, mid_coord, circle_radius) \
                         and no_collision(mid_coord, current_coord, section_matrix):
                     astar_destination_point = current_point
-                    #logging.debug("astar_destination_point: {}".format(astar_destination_point))
+                    logging.debug("astar_destination_point: {}".format(astar_destination_point))
                 else:
                     break
 
@@ -160,33 +161,36 @@ def no_collision(start_coord, target_coord, section_matrix):
     RETURNS TRUE IF NO COLLISION BETWEEN THE TWO COORDS
     """
 
-    # angle = MyCommon.get_angle(start_coord, target_coord)
-    # distance = MyCommon.calculate_distance(start_coord, target_coord)
-    #
-    # for thrust in range(int(round(distance))):
-    #     temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
-    #     round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
-    #     if section_matrix[round_coord.y][round_coord.x] != 0:
-    #         return False
-    #
-    # return True
+    angle = MyCommon.get_angle(start_coord, target_coord)
+    distance = MyCommon.calculate_distance(start_coord, target_coord)
+
+    for thrust in range(int(round(distance))):
+        temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
+        round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
+        if section_matrix[round_coord.y][round_coord.x] != 0:
+            logging.debug("round_coord: {} is NOT free per A*".format(round_coord))
+            return False
+
+        logging.debug("round_coord: {} is free per A*".format(round_coord))
+
+    return True
 
     ## NOT USING GET DESTINATION COORDS
     ## SHOULD BE MORE OPTIMAL
-    angle = MyCommon.get_angle(start_coord, target_coord)
-    distance = MyCommon.calculate_distance(start_coord, target_coord)
-    unit_vector = -np.cos(np.radians(-angle - 90)), -np.sin(np.radians(-angle - 90))
-    start_point = [start_coord.y, start_coord.x]
-
-    for multiplier in range(1,int(round(distance)) + 1):
-        new_coord = [start_point[0] + multiplier * unit_vector[0],
-                     start_point[1] + multiplier * unit_vector[1]]
-        round_new_coord = (int(round(new_coord[0])), int(round(new_coord[1])))
-
-        if section_matrix[round_new_coord[0]][round_new_coord[1]] != 0:
-            return False
-
-    return True
+    # angle = MyCommon.get_angle(start_coord, target_coord)
+    # distance = MyCommon.calculate_distance(start_coord, target_coord)
+    # unit_vector = -np.cos(np.radians(-angle - 90)), -np.sin(np.radians(-angle - 90))
+    # start_point = [start_coord.y, start_coord.x]
+    #
+    # for multiplier in range(1,int(round(distance)) + 1):
+    #     new_coord = [start_point[0] + multiplier * unit_vector[0],
+    #                  start_point[1] + multiplier * unit_vector[1]]
+    #     round_new_coord = (int(round(new_coord[0])), int(round(new_coord[1])))
+    #
+    #     if section_matrix[round_new_coord[0]][round_new_coord[1]] != 0:
+    #         return False
+    #
+    # return True
 
 def get_docking_coord(MyMoves, target_planet_id, ship_id):
     """
@@ -315,6 +319,29 @@ def isPositionMatrix_free(position_matrix, coord):
     return position_matrix[int(round(coord.y))][int(round(coord.x))] == 0
 
 
+def ship_can_dock(MyMoves, ship_id):
+    """
+    CHECK IF A SHIP CAN DOCK ON ITS CURRENT COORDINATES
+    """
+    ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
+
+    logging.debug("dockable matrix value: {}".format(MyMoves.EXP.dockable_matrix[ship_point[0]][ship_point[1]]))
+
+    if MyMoves.EXP.dockable_matrix[ship_point[0]][ship_point[1]] == 1:
+        return True
+
+    return False
+
+
+
+
+## GET DISTANCES BETWEEN point and a set of points
+# to_points = np.array([(0,1),(1,0),(-1,0),(0,-1),(2,2)])
+# start = np.array([0,0])
+# distances = np.linalg.norm(to_points - start, ord=2, axis=1.)  # distances is a list
+#
+# print(type(distances))
+
 
 
 # import random
@@ -363,4 +390,5 @@ def isPositionMatrix_free(position_matrix, coord):
 #
 # print("all someFunction time in method #2", total_somefunction)
 # print("Total Method #2: ",datetime.timedelta.total_seconds(datetime.datetime.now() - start))
+
 

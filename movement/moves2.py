@@ -142,6 +142,8 @@ class MyMoves():
 
                         thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance)
 
+                        logging.debug("thrust: {} angle: {}".format(thrust, angle))
+
                         astar_number += 1
 
                         time_astar += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
@@ -150,6 +152,21 @@ class MyMoves():
 
                         if thrust == 0:
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+
+                            if not(expanding2.ship_can_dock(self, ship_id)):
+                                logging.debug("CAN NOT DOCK!!! ship_id: {} ship_coord: {}".format(ship_id, ship_coord))
+
+                            target_planet_coord = self.myMap.data_planets[target_planet_id]['coords']
+                            target_radius = self.myMap.data_planets[target_planet_id]['radius']
+                            d = MyCommon.calculate_distance(ship_coord, target_planet_coord, rounding=False)
+                            logging.debug("ship_id dock: {} radius: {} d: {}".format(ship_id, target_radius, d))
+
+                            # target_planet_coord = self.myMap.data_planets[target_planet_id]['coords']
+                            # target_radius = self.myMap.data_planets[target_planet_id]['radius']
+                            # d = MyCommon.calculate_distance(ship_coord, target_planet_coord)
+                            # if d > round(target_radius + 4):
+                            #     logging.debug("CAN NOT DOCK!!! MORE THAT DOCKABLE DISTANCE ship_id: {}".format(ship_id))
+
                         else:
                             ## ADD TO COMMAND QUEUE
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
@@ -238,14 +255,19 @@ class MyMoves():
         CHECK IF AN INTERMEDIATE COLLISION EXISTS
         IF SO, RETURN THE THRUST THAT HAS NO COLLISION
         """
+
         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+        logging.debug("ship_coord: {}".format(ship_coord))
         dx = thrust / 7
         prev_thrust = 0
 
         for step_num in range(1, 7):
             curr_thrust = int(round(dx * step_num))
+
             intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
             intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
+
+            logging.debug("intermediate_point: {}".format(intermediate_point))
 
             no_collision = self.no_intermediate_collision(step_num, intermediate_point)
             if no_collision:
@@ -261,7 +283,8 @@ class MyMoves():
         CHECK IF THERE IS A COLLISION
         PROVIDED THE STEP_NUM AND THE POINT (y,x)
         """
-        return self.position_matrix[step_num][point[0]][point[1]] != Matrix_val.ALLY_SHIP.value
+        #return self.position_matrix[step_num][point[0]][point[1]] != Matrix_val.ALLY_SHIP.value
+        return self.position_matrix[step_num][point[0]][point[1]] == 0
 
 
 

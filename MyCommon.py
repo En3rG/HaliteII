@@ -173,7 +173,7 @@ def within_circle(point_coord, center_coord, radius):
     return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2)
 
 
-def calculate_distance(coords1, coords2):
+def calculate_distance(coords1, coords2, rounding=True):
     """
     CALCULATE DISTANCE BETWEEN 2 POINTS
     """
@@ -185,7 +185,11 @@ def calculate_distance(coords1, coords2):
     y2 = coords2.y
     x1 = coords1.x
     x2 = coords2.x
-    return int(round(math.sqrt((y1 - y2) ** 2 + (x1 - x2) ** 2)))
+    if rounding:
+        return int(round(math.sqrt((y1 - y2) ** 2 + (x1 - x2) ** 2)))
+    else:
+        return math.sqrt((y1 - y2) ** 2 + (x1 - x2) ** 2)
+
 
 def get_slope(prev_coord, current_coord):
     class Slope:

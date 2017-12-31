@@ -63,8 +63,10 @@ class Exploration():
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
-        self.all_planet_matrix = self.fill_planets_for_paths(matrix, self.game_map)
+        self.all_planet_matrix = self.fill_planets_for_paths(matrix)
         self.get_launch_coords()
+
+        self.dockable_matrix = self.fill_dockable_matrix()
 
         self.A_paths = self.get_paths()
 
@@ -118,6 +120,18 @@ class Exploration():
                     matrix[id2][id] = matrix[id][id2]
 
         return matrix
+
+        ## COULD WE ALSO USE SCIPY??
+        # >> > from scipy.spatial import distance
+        # >> > coords = [(35.0456, -85.2672),
+        #                ...(35.1174, -89.9711),
+        #                ...(35.9728, -83.9422),
+        #                ...(36.1667, -86.7833)]
+        # >> > distance.cdist(coords, coords, 'euclidean')
+        # array([[0., 4.7044, 1.6172, 1.8856],
+        #        [4.7044, 0., 6.0893, 3.3561],
+        #        [1.6172, 6.0893, 0., 2.8477],
+        #        [1.8856, 3.3561, 2.8477, 0.]])
 
     def get_distances_section(self):
         """
@@ -269,13 +283,31 @@ class Exploration():
                 ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
                 self.planets[planet_id][target_planet.id] = LaunchPads(fly_off_coord,land_on_coord)
 
-    def fill_planets_for_paths(self, matrix, game_map):
+    def fill_dockable_matrix(self):
+        """
+        FILL MATRIX WITH DOCKABLE VALUE
+        WILL BE USED TO DETERMINE IF CURRENT POINT IS DOCKABLE
+        """
+
+        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.int8)
+
+        for planet in self.game_map.all_planets():
+            value = 1
+            matrix = MyCommon.fill_circle(matrix, \
+                                          MyCommon.Coordinates(planet.y, planet.x), \
+                                          ## -1 TO MAKE SURE ITS DOCKABLE, DUE TO POSSIBLE ROUNDING ISSUE
+                                          planet.radius + MyCommon.Constants.DOCK_RADIUS - 1, \
+                                          value, \
+                                          cummulative=False)
+        return matrix
+
+    def fill_planets_for_paths(self, matrix):
         """
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
 
         ADDING 4 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
         """
-        for planet in game_map.all_planets():
+        for planet in self.game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value
             matrix = MyCommon.fill_circle(matrix, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
@@ -284,12 +316,12 @@ class Exploration():
                                           cummulative=False)
 
             ## FILL THIS SPECIFIC PLANET
-            self.fill_one_planet(planet, game_map)
+            self.fill_one_planet(planet)
 
 
         return matrix
 
-    def fill_one_planet(self, planet, game_map):
+    def fill_one_planet(self, planet):
         """
         FILL ONE SPECIFIC PLANET
         """

@@ -82,7 +82,7 @@ class MyMoves():
                 distance = MyCommon.calculate_distance(ship_coord, target_coord)
 
                 ## GET THRUST AND ANGLE
-                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance)
+                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
 
                 ## ADD TO COMMAND QUEUE
                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
@@ -130,7 +130,9 @@ class MyMoves():
                         self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                         continue
                     else:
+                        logging.debug("Getting docking coord for ship_id: {}".format(ship_id))
                         target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
+                        logging.debug("Got docking coord of: {}".format(target_coord))
 
                         if target_coord is None:
                             ## NO AVAILABLE SPOT NEAR THE TARGET
@@ -140,9 +142,7 @@ class MyMoves():
                         ## GET THRUST AND ANGLE
                         s = datetime.datetime.now()
 
-                        thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance)
-
-                        logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                        thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
 
                         astar_number += 1
 
@@ -151,15 +151,8 @@ class MyMoves():
                         safe_thrust = self.check_collisions(ship_id, angle, thrust)
 
                         if thrust == 0:
+
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
-
-                            if not(expanding2.ship_can_dock(self, ship_id)):
-                                logging.debug("CAN NOT DOCK!!! ship_id: {} ship_coord: {}".format(ship_id, ship_coord))
-
-                            target_planet_coord = self.myMap.data_planets[target_planet_id]['coords']
-                            target_radius = self.myMap.data_planets[target_planet_id]['radius']
-                            d = MyCommon.calculate_distance(ship_coord, target_planet_coord, rounding=False)
-                            logging.debug("ship_id dock: {} radius: {} d: {}".format(ship_id, target_radius, d))
 
                             # target_planet_coord = self.myMap.data_planets[target_planet_id]['coords']
                             # target_radius = self.myMap.data_planets[target_planet_id]['radius']
@@ -257,7 +250,6 @@ class MyMoves():
         """
 
         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
-        logging.debug("ship_coord: {}".format(ship_coord))
         dx = thrust / 7
         prev_thrust = 0
 
@@ -266,8 +258,6 @@ class MyMoves():
 
             intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
             intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
-
-            logging.debug("intermediate_point: {}".format(intermediate_point))
 
             no_collision = self.no_intermediate_collision(step_num, intermediate_point)
             if no_collision:

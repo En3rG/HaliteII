@@ -175,17 +175,27 @@ class MyMoves():
                 ## ADDING THIS TO GET A NEW COORD, SINCE PATH/DESTINATION MIGHT NOT BE REACHABLE DUE TO OTHER SHIPS
                 target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
 
-                ## GET THRUST AND ANGLE
-                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
-
-                safe_thrust = self.check_collisions(ship_id, angle, thrust)
-
-                if thrust == 0:
+                if distance == 0:
+                    ## WE CAN DOCK ALREADY
+                    safe_thrust = 0
+                    angle = 0
+                    logging.debug("get_docking_coord distance 0 docking!!")
                     self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
 
                 else:
-                    ## ADD TO COMMAND QUEUE
-                    self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
+                    ## GET THRUST AND ANGLE
+                    thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
+                    logging.debug("get_thrust_angle_from_Astar thrust: {} angle: {}".format(thrust, angle))
+
+                    #safe_thrust = self.check_intermediate_collisions(ship_id, angle, thrust)
+                    safe_thrust = thrust  ## NOT LOOKING FOR INTERMEDIATE COLLLISIONS
+
+                    if thrust == 0:
+                        self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+
+                    else:
+                        ## ADD TO COMMAND QUEUE
+                        self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
 
                 ## SET SHIP STATUSES
                 self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
@@ -198,12 +208,9 @@ class MyMoves():
         """
         GET SHIP'S TARGET AND DISTANCE TO THAT TARGET COORD
 
-        IF SHIP HAS NO TARGET, SET SHIP TO MOVED
-
-        USED WHEN USING HEAPQ, BUT KINDA SLOW
+        IF SHIP HAS NO TARGET, SET SHIP TO MOVED FOR NOW
         """
         heap = []
-
 
         for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
             if ship_id not in self.myMap.ships_moved_already:
@@ -224,28 +231,28 @@ class MyMoves():
                     self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                     continue
                 else:
-                    ## IS THERE A REASON TO DO THIS??
+                    ## NO NEED TO DETERMINE DOCKING COORD
                     ## SINCE COORDINATE DETERMINED HERE MAY NO LONGER EXISTS DUE TO OTHER SHIPS GETTING HERE FIRST
                     #target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
-                    ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
-                    planet_coord = self.myMap.data_planets[target_planet_id]['coords']
-                    planet_radius = self.myMap.data_planets[target_planet_id]['radius']
-                    distance = MyCommon.calculate_distance(ship_coord, planet_coord, rounding=False) - planet_radius
 
                     # if target_coord is None:
                     #     ## NO AVAILABLE SPOT NEAR THE TARGET
                     #     self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                     #     continue
 
+                    ## JUST CALCULATE DISTANCE
+                    ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+                    planet_coord = self.myMap.data_planets[target_planet_id]['coords']
+                    planet_radius = self.myMap.data_planets[target_planet_id]['radius']
+                    distance = MyCommon.calculate_distance(ship_coord, planet_coord, rounding=False) - planet_radius
+
                     ## ADD TO DISTANCE HEAP
                     heapq.heappush(heap, (distance, ship_id, target_planet_id))
-
-
 
         return heap
         #return sorted(heap)
 
-    def check_collisions(self, ship_id, angle, thrust):
+    def check_intermediate_collisions(self, ship_id, angle, thrust):
         """
         CHECK IF AN INTERMEDIATE COLLISION EXISTS
         IF SO, RETURN THE THRUST THAT HAS NO COLLISION
@@ -316,7 +323,7 @@ class MyMoves():
         expanding2.fill_position_matrix(self.position_matrix[7], ship_point)
 
         ## FILL IN INTERMEDIATE POSITION MATRIX
-        expanding2.fill_position_matrix2(self, ship_id, angle, thrust)
+        expanding2.fill_position_matrix_intermediate_steps(self, ship_id, angle, thrust)
 
     def set_ship_destination(self, ship_id, coords, angle, thrust, target_coord):
         """

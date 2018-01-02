@@ -66,7 +66,7 @@ class Exploration():
         self.all_planet_matrix = self.fill_planets_for_paths(matrix)
         self.get_launch_coords()
 
-        self.dockable_matrix = self.fill_dockable_matrix()
+        self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
 
         self.A_paths = self.get_paths()
 

@@ -28,7 +28,9 @@ def fill_position_matrix(position_matrix, ship_point, intermediate=False):
     # position_matrix[ship_point[0] + 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
     # position_matrix[ship_point[0]][ship_point[1] - 2] = Matrix_val.ALLY_SHIP.value
 
-    if not(intermediate):  ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
+    if not(intermediate):
+        ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
+        ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
         ## ALSO DIAGONALS?
         position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
         position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
@@ -36,7 +38,7 @@ def fill_position_matrix(position_matrix, ship_point, intermediate=False):
         position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
 
 
-def fill_position_matrix2(MyMoves, ship_id, angle, thrust):
+def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust):
     """
     FILL IN INTERMEDIATE POSITION MATRIXES
     """
@@ -46,7 +48,13 @@ def fill_position_matrix2(MyMoves, ship_id, angle, thrust):
     for x in range(1, 7):  ## 7 WILL BE FILLED BY ANOTHER FUNCTION
         intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
         intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
-        fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
+
+        if thrust == 0:
+            ## IF THRUST IS 0, DOCKING
+            ## NEED TO FILL DIAGONALS
+            fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=False)
+        else:
+            fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
 
 
 def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id):
@@ -139,10 +147,12 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         if path_points:
             for current_point in path_points[::-1]:
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
+                # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
+                #         and no_collision(mid_coord, current_coord, section_matrix):
                 if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                        and no_collision(mid_coord, current_coord, section_matrix):
+                        and no_collision(MyMoves, ship_id, current_coord):
                     astar_destination_point = current_point
-                    #logging.debug("astar_destination_point: {}".format(astar_destination_point))
+                    logging.debug("astar_destination_point: {}".format(astar_destination_point))
                 else:
                     break
 
@@ -168,21 +178,34 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     return thrust, angle
 
-def no_collision(start_coord, target_coord, section_matrix):
+def no_collision(MyMoves, ship_id, current_coord):
+#def no_collision(start_coord, target_coord, section_matrix):
     """
     RETURNS TRUE IF NO COLLISION BETWEEN THE TWO COORDS
     """
+    ## DOING INTERMEDIATE COLLISION
+    mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
+    mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
 
-    angle = MyCommon.get_angle(start_coord, target_coord)
-    distance = MyCommon.calculate_distance(start_coord, target_coord)
+    ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+    target_coord = MyCommon.Coordinates(ship_coord.y + (current_coord.y - mid_coord.y), ship_coord.x + (current_coord.x - mid_coord.x))
+    angle = MyCommon.get_angle(ship_coord, target_coord)
+    thrust = MyCommon.calculate_distance(ship_coord, target_coord)
+    safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
 
-    for thrust in range(int(round(distance))):
-        temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
-        round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
-        if section_matrix[round_coord.y][round_coord.x] != 0:
-            return False
+    return thrust == safe_thrust
 
-    return True
+    ## NOT DOING INTERMEDIATE COLLISION
+    # angle = MyCommon.get_angle(start_coord, target_coord)
+    # distance = MyCommon.calculate_distance(start_coord, target_coord)
+    #
+    # for thrust in range(int(round(distance))):
+    #     temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
+    #     round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
+    #     if section_matrix[round_coord.y][round_coord.x] != 0:
+    #         return False
+    #
+    # return True
 
     ## NOT USING GET DESTINATION COORDS
     ## SHOULD BE MORE OPTIMAL
@@ -205,11 +228,17 @@ def get_docking_coord(MyMoves, target_planet_id, ship_id):
     """
     RETURN TARGET COORD TOWARDS A SPECIFIED PLANET
     """
-
     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     target_planet_coord = MyMoves.myMap.data_planets[target_planet_id]['coords']
 
     angle = MyCommon.get_angle(ship_coord, target_planet_coord)
+
+    if ship_can_dock(MyMoves, ship_coord, target_planet_id):
+        ## WE CAN DOCK ALREADY, SO JUST RETURN DISTANCE 0 SO WE CAN JUST DOCK
+        docking_coord = ship_coord
+        distance = 0
+        return docking_coord, distance
+
 
     ## GET MATRIX OF JUST THE TARGET PLANET
     target_planet_matrix = MyMoves.EXP.planet_matrix[target_planet_id]
@@ -220,11 +249,12 @@ def get_docking_coord(MyMoves, target_planet_id, ship_id):
 
     if value_coord:
         reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-        docking_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
+        docking_coord = MyCommon.get_destination_coord(value_coord, reverse_angle,
+                                                       MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
     else:
         logging.error("Did not get closest target, given the angle.")
 
-    if not(isPositionMatrix_free(MyMoves.position_matrix[7], docking_coord)) or not(ship_can_dock(MyMoves, docking_coord, target_planet_id)):
+    if not(isPositionMatrix_free(MyMoves.position_matrix[7], docking_coord)):
         #new_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
 
         new_docking_coord = get_new_docking_coord(MyMoves, ship_id, target_planet_id, MyMoves.position_matrix[7], docking_coord, reverse_angle)
@@ -246,11 +276,11 @@ def get_new_docking_coord(MyMoves, ship_id, target_planet_id, position_matrix, c
     """
 
     ## ONLY IF FILLED POSITION IS NORTH, EAST, SOUTH, WEST
-    positions = [(reverse_angle + 90, 2), \
+    positions = [(reverse_angle, 2), \
+                 (reverse_angle + 90, 2), \
                  (reverse_angle - 90, 2), \
-                 # (reverse_angle + 45, 2), \
-                 # (reverse_angle - 45, 2), \
-                 (reverse_angle, 2), \
+                 (reverse_angle + 45, 2), \
+                 (reverse_angle - 45, 2), \
                  (reverse_angle + 45, 3), \
                  (reverse_angle - 45, 3), \
                  ]
@@ -295,7 +325,7 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
     opposite = 1.5
     spots = 0
 
-    while spots < 5:  ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
+    while spots < 4:  ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
         adjacent = MyCommon.calculate_distance(old_target_coord, planet_center)
         angle = math.degrees(math.atan(opposite / adjacent))
         hypotenuse = opposite / math.sin(math.radians(angle))
@@ -353,12 +383,13 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
     d = MyCommon.calculate_distance(coord, target_planet_coord, rounding=False)
     dock_val = d - target_radius
 
-    if MyMoves.EXP.dockable_matrix[round_coord.y][round_coord.x] == 1:
-        # logging.debug("using dockable matrix")
-        # logging.debug("CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(coord, round_coord,
-        #                                                                                             target_planet_id, target_planet_coord, d,
-        #                                                                                             target_radius, dock_val))
-        return True
+    ## REMOVING THIS SINCE CAN RETURN TRUE EVEN THOUGH WE ARE NOT DOCKING ON THAT PLANET
+    # if MyMoves.EXP.dockable_matrix[round_coord.y][round_coord.x] == 1:
+    #     # logging.debug("using dockable matrix")
+    #     # logging.debug("CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(coord, round_coord,
+    #     #                                                                                             target_planet_id, target_planet_coord, d,
+    #     #                                                                                             target_radius, dock_val))
+    #     return True
 
     ## DIDNT FIND A 1 ABOVE, BUT DOUBLE CHECK DISTANCE
     #logging.debug("ship_id: {} target_planet_id: {} target_planet_coord: {} target_radius: {} d: {}".format(ship_id, target_planet_id, target_planet_coord, target_radius, d))
@@ -383,12 +414,10 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 
 
 
-# coord = MyCommon.Coordinates(20.8101, 44.4979)
-# #target = MyCommon.Coordinates(29.4644, 46.6996)
-# target = MyCommon.Coordinates(28.6257, 47.2443)
-# #target = MyCommon.Coordinates(29, 47)
+# coord = MyCommon.Coordinates(51.0186, 51.0945)
+# target = MyCommon.Coordinates(58.1583, 43.2568)
 # d = MyCommon.calculate_distance(coord, target, rounding=False)
-# print(d - 5.014, "d: ", d)
+# print(d-6.84)
 
 
 ## GET DISTANCES BETWEEN point and a set of points

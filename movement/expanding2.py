@@ -59,6 +59,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     square_radius = MyCommon.Constants.SECTION_SQUARE_RADIUS
     circle_radius = MyCommon.Constants.SECTION_CIRCLE_RADIUS
+    max_travel_distance = MyCommon.Constants.MAX_TRAVEL_DISTANCE
     fake_target_thrust = MyCommon.Constants.SECTION_SQUARE_RADIUS ## 10
     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
@@ -69,8 +70,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     ## GET SECTION
     section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius)
 
-    ## CHECK IF THE TARGET IS WITHIN THE SHIPS IMMEDIATE REACH
-    if  target_distance <= 7:
+    if  target_distance <= circle_radius:
         ## TARGET IS INSIDE CIRCLE RADIUS
         temp_target_coord = target_coord
     else:
@@ -99,35 +99,47 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     #path_table_forward, simplified_paths = astar.get_Astar_table(section_matrix, mid_point, section_target_point)
 
     ## RETURN ANGLE/THRUST
-    try:
-        ## JUST GETTING THE FIRST STRAIGHT (COULD COLLIDE WITH SOMETHING)
-        #astar_destination_point = path_table_forward[mid_point]
+    ## JUST GETTING THE FIRST STRAIGHT (COULD COLLIDE WITH SOMETHING)
+    #astar_destination_point = path_table_forward[mid_point]
 
-        #logging.debug("At ship_id: {} section_target_point: {} temp_target_coord: {} target_coord: {} temp_target_point: {}".format(ship_id, section_target_point, temp_target_coord, target_coord, temp_target_point))
+    #logging.debug("At ship_id: {} section_target_point: {} temp_target_coord: {} target_coord: {} temp_target_point: {}".format(ship_id, section_target_point, temp_target_coord, target_coord, temp_target_point))
 
-        if mid_point == section_target_point:
-            ## REACHED ITS TARGET
-            logging.debug("target reached!")
+    if mid_point == section_target_point:
+        ## REACHED ITS TARGET
+        logging.debug("target reached!")
 
-            ## CHECK IF STILL AVAILABLE IN POSITION MATRIX
-            ## POSIBLE THAT ANOTHER SHIP NOW WENT TO THIS POSITION THAT MOVED BEFORE THIS SHIP
+        ## CHECK IF STILL AVAILABLE IN POSITION MATRIX
+        ## POSSIBLE THAT ANOTHER SHIP NOW WENT TO THIS POSITION THAT MOVED BEFORE THIS SHIP
+        if not (isPositionMatrix_free(MyMoves.position_matrix[7], ship_coord)):
+            logging.debug("CANNOT MOVE DUE TO ANOTHER SHIP GOING HERE FIRST??? ship_id: {}".format(ship_id))
 
-            if not (isPositionMatrix_free(MyMoves.position_matrix[7], ship_coord)) or not(ship_can_dock(MyMoves, ship_coord, target_planet_id)):
-                logging.debug("Need to Move! (no longer available) NEED UPDATE!!!! or CAN NOT DOCK yet due to rounding")
-                logging.debug("NEED TO HANDLE THIS LATER!!!!!!")
-            else:
-                logging.debug("Staying!")
+            ## NEED TO UPDATE THIS LATER!!
+            astar_destination_coord = mid_coord
+            angle, thrust = 0, 0
+
+        ## POSSIBLE THAT DUE TO ROUNDING, IT STIL CANNOT DOCK
+        elif not(ship_can_dock(MyMoves, ship_coord, target_planet_id)):
+            logging.debug("CANNOT DOCK DUE TO ROUNDING!!!!!! ship_id: {}".format(ship_id))
+
+            ## FOR NOW JUST MOVE 1 TOWARDS TARGET
+            angle, thrust = angle_towards_target, 1
+            astar_destination_coord = MyCommon.get_destination_coord(mid_coord, angle, thrust, rounding=True)
+
+        else:
+            logging.debug("Staying!")
 
             astar_destination_coord = mid_coord
             angle, thrust = 0, 0
 
-        else:
-            ## GET FURTHEST POINT WITHIN THE CIRCLE
-            path_points = astar.a_star(section_matrix, mid_point, section_target_point)
-            #logging.debug("path_points: {}".format(path_points))
+    else:
+        ## GET FURTHEST POINT WITHIN THE CIRCLE
+        path_points = astar.a_star(section_matrix, mid_point, section_target_point)
+        #logging.debug("path_points: {}".format(path_points))
+
+        if path_points:
             for current_point in path_points[::-1]:
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
-                if MyCommon.within_circle(current_coord, mid_coord, circle_radius) \
+                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
                         and no_collision(mid_coord, current_coord, section_matrix):
                     astar_destination_point = current_point
                     #logging.debug("astar_destination_point: {}".format(astar_destination_point))
@@ -136,17 +148,16 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
-    except:
-        ## NO A* PATH FOUND
-        ## TARGET POINT MAY NOT BE REACHABLE (DUE TO OTHER SHIPS IN ITS IN POSITION MATRIX)
-        ## ACTUAL TARGET POINT IS AVAILABLE SINCE IT WAS DETERMINED BY get_target_coord_towards_planet ?
-        ## WHICH LOOKS FOR OTHER TARGET COORDS IF ITS ALREADY TAKEN
 
-        astar_destination_coord = mid_coord ## NEED TO UPDATE THIS LATER, GET A NEW TARGET!!
-        angle, thrust = 0, 0
-        logging.debug("ship_coord: {}".format(ship_coord))
-        logging.debug("No A* PATH FOUND!!!!!!!!!!!!!!!!!!!!!!!")
-        logging.debug("except!")
+        else:
+            ## NO A* PATH FOUND
+            ## TARGET POINT MAY NOT BE REACHABLE (DUE TO OTHER SHIPS IN ITS IN POSITION MATRIX)
+            ## ACTUAL TARGET POINT IS AVAILABLE SINCE IT WAS DETERMINED BY get_target_coord_towards_planet ?
+            ## WHICH LOOKS FOR OTHER TARGET COORDS IF ITS ALREADY TAKEN
+
+            astar_destination_coord = mid_coord  ## NEED TO UPDATE THIS LATER, GET A NEW TARGET!!
+            angle, thrust = 0, 0
+            logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
 
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
@@ -267,7 +278,7 @@ def get_new_docking_coord(MyMoves, ship_id, target_planet_id, position_matrix, c
             #return new_coord
             return round_coord ## THIS IS BETTER? LESS COLLISION?
 
-    logging.debug("No new position found for coord: {}".format(coord))
+    logging.debug("No new position found for ship_id: {} target_planet_id: {} coord: {}".format(ship_id, target_planet_id,coord))
     return None ## NO NEW COORDS AVAILABLE
 
 
@@ -284,7 +295,7 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
     opposite = 1.5
     spots = 0
 
-    while spots < 3:  ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
+    while spots < 5:  ## MOVE 1.5 FROM OLD TARGET TO NEW TARGET
         adjacent = MyCommon.calculate_distance(old_target_coord, planet_center)
         angle = math.degrees(math.atan(opposite / adjacent))
         hypotenuse = opposite / math.sin(math.radians(angle))
@@ -316,7 +327,7 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
 
         spots += 1
 
-    logging.debug("No new position2 found for coord: {}".format(old_target_coord))
+    logging.debug("No new position2 found for ship_id: {} target_planet_id: {} coord: {}".format(ship_id, target_planet_id, old_target_coord))
     return None
 
 def isPositionMatrix_free(position_matrix, coord):
@@ -343,10 +354,10 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
     dock_val = d - target_radius
 
     if MyMoves.EXP.dockable_matrix[round_coord.y][round_coord.x] == 1:
-        logging.debug("using dockable matrix")
-        logging.debug("CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(coord, round_coord,
-                                                                                                    target_planet_id, target_planet_coord, d,
-                                                                                                    target_radius, dock_val))
+        # logging.debug("using dockable matrix")
+        # logging.debug("CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(coord, round_coord,
+        #                                                                                             target_planet_id, target_planet_coord, d,
+        #                                                                                             target_radius, dock_val))
         return True
 
     ## DIDNT FIND A 1 ABOVE, BUT DOUBLE CHECK DISTANCE
@@ -355,27 +366,28 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
     ## DOCKING RADIUS NOT REALLY 4??? SUTRACT XXX
     if d <= target_radius + MyCommon.Constants.DOCK_RADIUS - 0.22:
         #logging.debug("DOCKING!!!! even though first dock test failed. ship_id: {}".format(ship_id))
-        logging.debug(
-            "CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(
-                coord, round_coord,
-                target_planet_id, target_planet_coord, d,
-                target_radius, dock_val))
+        # logging.debug(
+        #     "CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(
+        #         coord, round_coord,
+        #         target_planet_id, target_planet_coord, d,
+        #         target_radius, dock_val))
         return True
 
     ## TOO FAR
-    logging.debug(
-        "CAN NOT DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(
-            coord, round_coord,
-            target_planet_id, target_planet_coord, d,
-            target_radius, dock_val))
+    # logging.debug(
+    #     "CAN NOT DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(
+    #         coord, round_coord,
+    #         target_planet_id, target_planet_coord, d,
+    #         target_radius, dock_val))
     return False
 
 
-#
+
 # coord = MyCommon.Coordinates(20.8101, 44.4979)
-# target = MyCommon.Coordinates(29.4644, 46.6996)
+# #target = MyCommon.Coordinates(29.4644, 46.6996)
+# target = MyCommon.Coordinates(28.6257, 47.2443)
 # #target = MyCommon.Coordinates(29, 47)
-# d = MyCommon.calculate_distance(coord, target, False)
+# d = MyCommon.calculate_distance(coord, target, rounding=False)
 # print(d - 5.014, "d: ", d)
 
 
@@ -434,5 +446,4 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 #
 # print("all someFunction time in method #2", total_somefunction)
 # print("Total Method #2: ",datetime.timedelta.total_seconds(datetime.datetime.now() - start))
-
 

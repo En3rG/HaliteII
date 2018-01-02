@@ -5,10 +5,11 @@ import math
 
 
 class Constants():
+    MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
-    SECTION_SQUARE_RADIUS = 8 ## TOTAL SIZE OF SECTION WILL BE 21x21 IF 10, 17x17 IF 8
-    SECTION_CIRCLE_RADIUS = 7
+    SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
+    SECTION_CIRCLE_RADIUS = 7 ## 7
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
 
@@ -85,24 +86,24 @@ def get_angle(coords, target_coords):
     return int(round(angle))
 
 
-def get_destination_coord(start_coord, angle, thrust):
+def get_destination_coord(start_coord, angle, thrust, rounding=False):
     """
     GIVEN ANGLE AND THRUST, GET DESTINATION COORDS
 
     start_coord HAVE (y,x) FORMAT
     """
     if angle == 0:
-        return Coordinates(start_coord.y, start_coord.x + thrust)
+        new_y, new_x = start_coord.y, start_coord.x + thrust
 
     elif angle < 90:
         angle_radian = math.radians(angle)
         rise = thrust * math.sin(angle_radian)
         run = thrust * math.cos(angle_radian)
-        return Coordinates(start_coord.y + rise, start_coord.x + run)
+        new_y, new_x = start_coord.y + rise, start_coord.x + run
 
     elif angle == 90:
         #return Coordinates(start_coord.y - thrust, start_coord.x)
-        return Coordinates(start_coord.y + thrust, start_coord.x)
+        new_y, new_x = start_coord.y + thrust, start_coord.x
 
     elif angle < 180:
         angle = 180 - angle
@@ -110,10 +111,10 @@ def get_destination_coord(start_coord, angle, thrust):
 
         rise = thrust * math.sin(angle_radian)
         run = thrust * math.cos(angle_radian)
-        return Coordinates(start_coord.y + rise, start_coord.x - run)
+        new_y, new_x = start_coord.y + rise, start_coord.x - run
 
     elif angle == 180:
-        return Coordinates(start_coord.y, start_coord.x - thrust)
+        new_y, new_x = start_coord.y, start_coord.x - thrust
 
     elif angle < 270:
         angle = angle - 180
@@ -121,11 +122,11 @@ def get_destination_coord(start_coord, angle, thrust):
 
         rise = thrust * math.sin(angle_radian)
         run = thrust * math.cos(angle_radian)
-        return Coordinates(start_coord.y - rise, start_coord.x - run)
+        new_y, new_x = start_coord.y - rise, start_coord.x - run
 
     elif angle == 270:
         #return Coordinates(start_coord.y + thrust, start_coord.x)
-        return Coordinates(start_coord.y - thrust, start_coord.x)
+        new_y, new_x = start_coord.y - thrust, start_coord.x
 
     else:
         angle = 360 - angle
@@ -133,8 +134,12 @@ def get_destination_coord(start_coord, angle, thrust):
 
         rise = thrust * math.sin(angle_radian)
         run = thrust * math.cos(angle_radian)
-        return Coordinates(start_coord.y - rise, start_coord.x + run)
+        new_y, new_x = start_coord.y - rise, start_coord.x + run
 
+    if rounding:
+        return Coordinates(int(round(new_y)), int(round(new_x)))
+    else:
+        return Coordinates(new_y, new_x)
 
 def get_variance(arr):
     """

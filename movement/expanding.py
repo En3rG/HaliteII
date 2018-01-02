@@ -41,15 +41,12 @@ def get_next_target_planet(MyMoves, ship_id):
         for distance, planet_id in least_distance_order:
             ## NOT OWNED BY ANYBODY YET
             if planet_id in MyMoves.myMap.planets_unowned:
-                return planet_id
+                if has_room_to_dock(MyMoves, planet_id):
+                    return planet_id
+
             ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
             elif planet_id in MyMoves.myMap.planets_owned:
-                len_miners_prev = len(MyMoves.myMap.myMap_prev.data_planets[planet_id]['my_miners'])
-                len_miners_now = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
-                max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
-
-                ## PREVIOUSLY AND CURRENTLY, HAVE LESS MINERS THAN NUMBER OF DOCKS
-                if len_miners_prev < max_docks and len_miners_now < max_docks:
+                if has_room_to_dock(MyMoves, planet_id):
                     return planet_id
 
     except Exception as e:
@@ -60,6 +57,33 @@ def get_next_target_planet(MyMoves, ship_id):
             logging.error("Error in {} on line {}".format(fname, lineno))
 
         return None  ## NO MORE PLANETS
+
+
+def has_room_to_dock(MyMoves, planet_id):
+    """
+    RETURNS TRUE IF THERE IS STILL A DOCKING SPACE AVAILABLE
+    """
+
+    ## WHEN NOT USING HEAPQ
+    # len_miners_prev = len(MyMoves.myMap.myMap_prev.data_planets[planet_id]['my_miners'])
+    # len_miners_now = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
+    # max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
+    #
+    # ## PREVIOUSLY AND CURRENTLY, HAVE LESS MINERS THAN NUMBER OF DOCKS
+    # if len_miners_prev < max_docks and len_miners_now < max_docks:
+    #     return True
+    #
+    # return False
+
+    ## WHEN USING HEAPQ, OR MOVING CLOSER SHIPS FIRST
+    len_miners_now = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
+    max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
+
+    ## CURRENTLY ONLY, HAVE LESS MINERS THAN NUMBER OF DOCKS
+    if len_miners_now < max_docks:
+        return True
+
+    return False
 
 
 def get_mining_spot(MyMoves, ship_id, target_planet_id):

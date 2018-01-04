@@ -63,8 +63,10 @@ class MyProjection():
         new_y = round(curr_coord.y + (slope.rise * multiplier))
         new_x = round(curr_coord.x + (slope.run * multiplier))
 
-
-        matrix[new_y][new_x] = Matrix_val.ENEMY_SHIP.value
+        try:
+            matrix[new_y][new_x] = Matrix_val.ENEMY_SHIP.value
+        except:
+            logging.warning("set_turn_projection went out of bounds y: {} x: {}".format(new_y, new_x))
 
 
 

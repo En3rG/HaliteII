@@ -9,7 +9,6 @@ import sys
 import heapq
 
 
-
 class Matrix_val(Enum):
     """
     VALUES PLACED ON THE MATRIX
@@ -46,7 +45,7 @@ class MyMap():
     CONVERT GAME_MAP TO DICTIONARY
     ACCESS WITH PLAYER IDs AND SHIP IDs
     """
-    MAX_NODES = 2
+    MAX_NODES = 2 ## USED FOR LIMITING NUMBER OF NODES IN MEMORY
     NUM_NODES = 0
 
     def __init__(self,game_map, myMap_prev):
@@ -71,7 +70,8 @@ class MyMap():
                                4:set(),\
                                5:set()}
 
-
+        self.section_in_battle = set() ## WILL CONTAIN SECTIONS IN WAR
+        self.section_with_enemy = set() ## WILL CONTAIN SECTIONS WITH ENEMY
 
         self.ships_moved_already = set()  ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
         self.taken_coords = set()
@@ -83,7 +83,7 @@ class MyMap():
         self.myMap_prev = myMap_prev
         self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
 
-        self.section_summary = np.zeros((self.height//MyCommon.Constants.NUM_SECTIONS, self.width//MyCommon.Constants.NUM_SECTIONS), dtype=np.float16)
+        self.section_summary = np.zeros((self.height//MyCommon.Constants.NUM_SECTIONS + 1, self.width//MyCommon.Constants.NUM_SECTIONS + 1), dtype=np.float16)
 
         self.data_ships = self.get_ship_data()
         self.data_planets = {}
@@ -175,8 +175,11 @@ class MyMap():
         """
         SET SHIP INTO SECTION SUMMARY
         """
-        section_point = MyCommon.get_section(coord)
+        section_point = MyCommon.get_section_num(coord)
         self.section_summary[section_point[0]][section_point[1]] += 1
+
+        ## ADD THIS SECTION TO SECTION WITH ENEMY
+        self.section_with_enemy.add(section_point)
 
 
     def set_planet_status(self):
@@ -274,6 +277,8 @@ class MyMap():
     def can_dock(self, ship_id, planet_id):
         """
         RETURNS TRUE IF CAN DOCK PLANET ID
+
+        NOT USED?
         """
         ship_coord = self.data_ships[self.my_id][ship_id]['coords']
         planet_coord = self.data_planets[planet_id]['coords']
@@ -344,8 +349,6 @@ class MyMatrix():
                     matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, enemy_ships)
 
             final_matrix[player_id] = (matrix_current,matrix_hp_current) ## TUPLE OF 2 MATRIXES
-
-
 
         return final_matrix
 

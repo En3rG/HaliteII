@@ -59,7 +59,6 @@ class Coordinates():
         return "y: {} x: {}".format(self.y,self.x)
 
 
-
 def fill_circle(array, center, radius, value, cummulative=False):
     """
     MASK A CIRCLE ON THE ARRAY SPECIFIED WITH VALUE PROVIDED
@@ -307,7 +306,6 @@ def get_circle_in_square(array, center_coord, circle_radius, square_radius):
     """
     RETURNS A SQUARE MATRIX
     GET VALUES FROM THE MATRIX PROVIDED, WITHIN THE CIRCLE SPECIFIED
-
     """
 
     center_y = int(round(center_coord.y))
@@ -346,25 +344,36 @@ def get_coord_closest_most_enemies_from_section(values, distances):
     # Extract corresponding values off d
     di = distances[r, c]
 
-    min_di = di.min()
+    if len(di) >= 1:
+        min_di = di.min()
 
-    # Get indices (indexable into r,c) corresponding to lowest distance
-    ld_indx = np.flatnonzero(di == min_di)
+        # Get indices (indexable into r,c) corresponding to lowest distance
+        ld_indx = np.flatnonzero(di == min_di)
 
-    # Get max index (based off v) out of the selected indices
-    max_idx = values[r[ld_indx], c[ld_indx]].argmax()
+        # Get max index (based off v) out of the selected indices
+        max_idx = values[r[ld_indx], c[ld_indx]].argmax()
 
-    # Index into r,c with the lowest dist indices and
-    # from those select maxed one based off v
-    return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di
+        # Index into r,c with the lowest dist indices and
+        # from those select maxed one based off v
+        return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di
+
+    else:
+        ## NO ENEMIES FOUND
+        return None, None
 
 
-def get_section(coord):
+def get_section_num(coord):
     """
     TAKES A COORD AND RETURN THE SECTION VALUE
     """
     return (int(coord.y // Constants.NUM_SECTIONS), int(coord.x // Constants.NUM_SECTIONS))
 
+def get_coord_from_section(section):
+    """
+    GET COORD FROM SECTION PROVIDED
+    """
+    ## SUBTRACT HALF OF NUM SECTIONS TO GET THE MIDDLE FO THAT SECTION
+    return Coordinates(section[0] * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2), section[1] * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2) )
 
 # array = [
 #     [1, 2, 3, 4, 5, 6, 7, 8, 9],

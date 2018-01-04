@@ -381,6 +381,10 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
     # ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     # ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
 
+    ## NO TARGET PLANET
+    if target_planet_id is None:
+        return False
+
     round_coord = MyCommon.Coordinates(int(round(coord.y)), int(round(coord.x)))
 
     target_planet_coord = MyMoves.myMap.data_planets[target_planet_id]['coords']

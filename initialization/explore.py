@@ -14,6 +14,8 @@ class LaunchPads():
     """
     WILL CONTAIN THE COORDINATE OF START PLANET (FLY OFF COORD)
     AND TARGET PLANET (LAND ON COORD)
+
+    NO LONGER USED.
     """
     def __init__(self,fly_off_coord,land_on_coord):
         self.fly_off = fly_off_coord ## COORDINATE OBJECT
@@ -33,22 +35,14 @@ class Exploration():
     GATHERS BEST PLANET TO CONQUER FIRST
     GATHERS PATHS, EACH PLANET TO EACH PLANET
     """
-    LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
+    LAUNCH_OFF_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
     LAUNCH_ON_DISTANCE = 4
 
-
-
     def __init__(self,game):
-        ## FOR TESTING ONLY
-        #log_dimensions(game.map)
-        #log_planets(game.map)
-        #log_players(game.map)
-
         self.game_map = game.map
         self.planets = self.get_planets()
         self.sections_distance_table = self.get_distances_section()                  ## DISTANCES FROM SECTION TO SECTION
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
-
 
         self.planets_distance_matrix = self.get_distances()
         self.myStartCoords = self.get_start_coords()
@@ -60,14 +54,9 @@ class Exploration():
         self.all_planet_matrix = self.fill_planets_for_paths(matrix)
         self.get_launch_coords()
 
-        self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
+        #self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
 
-        #self.A_paths = self.get_paths()
-
-
-        # for k,v in self.A_paths.items():
-        #     logging.debug("k: {} v: {}".format(k,v))
-
+        #self.A_paths = self.get_paths() ## NO LONGER USED??
 
     def get_planets(self):
         """
@@ -138,8 +127,8 @@ class Exploration():
         row_length = self.game_map.height//MyCommon.Constants.NUM_SECTIONS
         col_length = self.game_map.width//MyCommon.Constants.NUM_SECTIONS
 
-        for r in range(row_length):
-            for c in range(col_length):
+        for r in range(row_length + 1):
+            for c in range(col_length + 1):
                 curr_section = (r,c)
                 table[curr_section] = self.calculate_distance_sections(curr_section, row_length, col_length)
 
@@ -149,7 +138,6 @@ class Exploration():
         """
         GENERATES A TABLE WITH ACTUAL DISTANCES BETWEEN SECTIONS
         """
-        ## INITIALIZE MATRIX
 
         ## USING DICTIONARY
         # dict = {}
@@ -189,15 +177,14 @@ class Exploration():
         GET TABLE OF EACH SECTION'S DISTANCE TO EACH PLANETS
 
         table[curr_section][planet_id] = distance
-
         """
         table = {}
 
         row_length = self.game_map.height // MyCommon.Constants.NUM_SECTIONS
         col_length = self.game_map.width // MyCommon.Constants.NUM_SECTIONS
 
-        for r in range(row_length):
-            for c in range(col_length):
+        for r in range(row_length + 1):
+            for c in range(col_length + 1):
                 curr_section = (r, c)
                 table[curr_section] = self.calculate_distance_to_planets(curr_section)
 
@@ -211,7 +198,7 @@ class Exploration():
 
         for planet_id, planet in self.planets.items():
             planet_coords = planet['coords']
-            planet_section = MyCommon.get_section(planet_coords)
+            planet_section = MyCommon.get_section_num(planet_coords)
 
             distance = self.sections_distance_table[curr_section][planet_section[0]][planet_section[1]]
             dict[planet_id] = distance
@@ -243,6 +230,7 @@ class Exploration():
 
         return distances
 
+
     def get_planets_score(self):
         """
         GET SCORE OF TARGET PLANET
@@ -267,6 +255,7 @@ class Exploration():
 
         return self.get_highest_score(scores)
 
+
     def get_highest_score(self,scores):
         """
         RETURN PLANET ID (KEY) WITH HIGHEST SCORE
@@ -275,16 +264,19 @@ class Exploration():
         k = list(scores.keys())
         return k[v.index(max(v))]
 
+
     def get_launch_coords(self):
         """
         DETERMINE LAUNCH COORDS PER START (PLANET) TO TARGET (PLANET)
+
+        NO LONGER USED?
         """
 
         for planet_id, start_planet in self.planets.items():
             for target_planet in self.game_map.all_planets():
                 ## GET FLY OFF COORD
                 angle = MyCommon.get_angle(start_planet['coords'],MyCommon.Coordinates(target_planet.y,target_planet.x))
-                distance = start_planet['radius'] + Exploration.LAUNCH_DISTANCE
+                distance = start_planet['radius'] + Exploration.LAUNCH_OFF_DISTANCE
                 fly_off_coord = MyCommon.get_destination_coord(start_planet['coords'], angle, distance)
 
                 ## GET LAND ON COORD
@@ -299,6 +291,8 @@ class Exploration():
         """
         FILL MATRIX WITH DOCKABLE VALUE
         WILL BE USED TO DETERMINE IF CURRENT POINT IS DOCKABLE
+
+        NO LONGER USED
         """
 
         matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.int8)
@@ -318,6 +312,8 @@ class Exploration():
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
 
         ADDING 4 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
+
+        STILL USED, EVEN WHEN USING JUST SECTIONED A*
         """
         for planet in self.game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value
@@ -329,7 +325,6 @@ class Exploration():
 
             ## FILL THIS SPECIFIC PLANET
             self.fill_one_planet(planet)
-
 
         return matrix
 
@@ -354,16 +349,16 @@ class Exploration():
         GET A* PATHS FROM PLANET (START LAUNCHPAD) TO PLANET (TARGET LAUNCHPAD)
 
         GET A* PATH FROM STARTING LOCATION (3 SHIPS) TO BEST PLANET
+
+        NO LONGER USED
         """
         paths = {}
-
 
         ## GET A* PATHS FROM A PLANET TO EACH PLANET
         paths = self.get_planet_to_planet_paths(paths)
 
         ## GET A* FROM EACH OF THE STARTING SHIPS TO BEST PLANET
         #paths = self.get_starting_ships_paths(paths)
-
 
         return paths
 
@@ -372,6 +367,7 @@ class Exploration():
         """
         GET A* PATHS FROM FLY OFF TO LAND OFF LAUNCH COORDS
 
+        NO LONGER USED
         """
         done = set()
 
@@ -389,8 +385,6 @@ class Exploration():
 
                     paths[(planet_id, target_planet.id)] = path_table_forward
                     paths[(target_planet.id, planet_id)] = path_table_reverse
-
-                    # logging.debug("Get Paths Testing. On: {} fly_off_point: {} land_on_point: {} path_table_forward: {}".format((planet_id,target_planet.id),fly_off_point,land_on_point,path_table_forward))
 
                     ## ADD TO DONE ALREADY
                     done.add((planet_id, target_planet.id))
@@ -414,7 +408,7 @@ class Exploration():
 
         ## FOR CENTROID TARGET ONLY
         # fly_off_point = (self.myStartCoords.y, self.myStartCoords.x)
-        # distance = target_planet['radius'] + Exploration.LAUNCH_DISTANCE
+        # distance = target_planet['radius'] + Exploration.LAUNCH_OFF_DISTANCE
         # land_on_coord = MyCommon.get_destination_coord(target_coord, angle, distance)
         # land_on_point = (land_on_coord.y, land_on_coord.x)
         #
@@ -446,7 +440,5 @@ class Exploration():
                         ## DIDNT FIND. SHOULDNT HAPPEN FOR THE STARTING 3 SHIPS
                         logging.error("One of the starting ships didnt see the best planet, given the angle.")
 
-
         return paths
-
 

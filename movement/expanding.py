@@ -15,46 +15,40 @@ def get_next_target_planet(MyMoves, ship_id):
 
     GETS CALLED BY NEW SHIPS OR IF OLD PLANET TARGET OF A SHIP DIED RECENTLY
     """
-    try:
-        from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
+    from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
 
-        if from_planet_id:
-            distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
-            length = len(distances_to_other_planets)
+    if from_planet_id:
+        distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
+        length = len(distances_to_other_planets)
 
-            ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
-            least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
-        else:
-            ## from_planet_id IS NONE
-            ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
-            ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
-            ship_section = MyCommon.get_section(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords'])
-            distance_table = MyMoves.EXP.sections_planet_distance_table[ship_section]
-            length = len(distance_table)
+        ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+        least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
+    else:
+        ## from_planet_id IS NONE
+        ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
+        ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
+        ship_section = MyCommon.get_section_num(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords'])
+        distance_table = MyMoves.EXP.sections_planet_distance_table[ship_section]
+        length = len(distance_table)
 
-            ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
-            least_distance_order = heapq.nsmallest(length, ((distance, id) for id, distance in distance_table.items()))
+        ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+        least_distance_order = heapq.nsmallest(length, ((distance, id) for id, distance in distance_table.items()))
 
 
-        for distance, planet_id in least_distance_order:
-            ## NOT OWNED BY ANYBODY YET
-            if planet_id in MyMoves.myMap.planets_unowned:
-                if has_room_to_dock(MyMoves, planet_id):
-                    return planet_id
+    for distance, planet_id in least_distance_order:
+        ## NOT OWNED BY ANYBODY YET
+        if planet_id in MyMoves.myMap.planets_unowned:
+            if has_room_to_dock(MyMoves, planet_id):
+                return planet_id
 
-            ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
-            elif planet_id in MyMoves.myMap.planets_owned:
-                if has_room_to_dock(MyMoves, planet_id):
-                    return planet_id
+        ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
+        elif planet_id in MyMoves.myMap.planets_owned:
+            if has_room_to_dock(MyMoves, planet_id):
+                return planet_id
 
-    except Exception as e:
-        logging.error("Error found: ==> {}".format(e))
+    return None ## NO MORE PLANETS
 
-        for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
-            fname, lineno, fn, text = frame
-            logging.error("Error in {} on line {}".format(fname, lineno))
 
-        return None  ## NO MORE PLANETS
 
 
 def has_room_to_dock(MyMoves, planet_id):

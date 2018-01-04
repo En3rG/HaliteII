@@ -101,56 +101,6 @@ class MyMoves():
             attacking.get_battling_ships(self)
 
 
-            # # MOVE OTHERS REMAINING
-            # # NOT USING HEAP (USING HEAP CAUSES TO TIME OUT)
-            # for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
-            #     if ship_id not in self.myMap.ships_moved_already:
-            #         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
-            #
-            #         try:
-            #             target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
-            #
-            #             ## IF PLANET NO LONGER EXISTS, GET A NEW PLANET
-            #             if target_planet_id not in self.myMap.planets_existing:
-            #                 target_planet_id = expanding.get_next_target_planet(self, ship_id)
-            #
-            #         except:
-            #             ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
-            #             ## OR
-            #             ## SHIP HAS NO TARGET SET
-            #             target_planet_id = expanding.get_next_target_planet(self, ship_id)
-            #
-            #         if target_planet_id is None:
-            #             ## NO MORE PLANETS TO CONQUER AT THIS TIME
-            #             self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
-            #             continue
-            #         else:
-            #             target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
-            #
-            #             if target_coord is None:
-            #                 ## NO AVAILABLE SPOT NEAR THE TARGET
-            #                 self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
-            #                 continue
-            #
-            #             ## GET THRUST AND ANGLE
-            #             thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
-            #
-            #             safe_thrust = self.check_collisions(ship_id, angle, thrust)
-            #
-            #             if thrust == 0:
-            #                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
-            #
-            #             else:
-            #                 ## ADD TO COMMAND QUEUE
-            #                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
-            #
-            #             ## SET SHIP STATUSES
-            #             self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
-
-
-
-
-
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW
             ## TURNS OUT A* IS RUNNING LONGER SINCE PATH IS UNREACHABLE, DUE TO ANOTHER SHIP BLOCKING ITS DESTINATION
@@ -172,8 +122,7 @@ class MyMoves():
                     target_planet_id = expanding.get_next_target_planet(self, ship_id)
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    logging.debug("No more planet to conquer ship_id: {}".format(ship_id))
-                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
+                    attacking.closest_section_in_war(self, ship_id)
                     continue
 
                 ## ADDING THIS TO GET A NEW COORD, SINCE PATH/DESTINATION MIGHT NOT BE REACHABLE DUE TO OTHER SHIPS
@@ -230,7 +179,8 @@ class MyMoves():
 
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
+                    #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
+                    attacking.closest_section_in_war(self, ship_id)
                     continue
                 else:
                     ## NO NEED TO DETERMINE DOCKING COORD

@@ -158,6 +158,7 @@ def model_handler(MP, turn, myMap, myMatrix):
     #
     # return predictions, turn + 1
 
+    ## IF MULTIPROCESSING IS OFF
     return None, turn + 1
 
 def get_data_training(id, myMap, myMatrix, MP, turn):

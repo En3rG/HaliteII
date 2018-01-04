@@ -19,8 +19,8 @@ import keras
 import datetime
 import os
 import signal
-from memory_profiler import profile       ## USING @profile PER FUNCTIONS, RUN WITH -m memory_profile FLAG
-from memory_profiler import memory_usage
+#from memory_profiler import profile       ## USING @profile PER FUNCTIONS, RUN WITH -m memory_profile FLAG
+#from memory_profiler import memory_usage
 import traceback
 
 
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     freeze_support()
 
     ## UPDATABLE PARAMETERS
-    disable_log = False
+    disable_log = True
     MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
     WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
     GET_TIMEOUT = 0.005 ## TIMEOUT SET FOR .GET()

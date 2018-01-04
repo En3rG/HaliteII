@@ -135,6 +135,12 @@ class MyMoves():
                     logging.debug("get_docking_coord distance 0 docking!!")
                     self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
 
+                elif target_coord is None:
+                    ## DOCKING COORD NOT FOUND?
+                    logging.warning("Why is there no docking coord for ship_id: {} target_planet_id: {}".format(ship_id,target_planet_id ))
+                    angle = 0
+                    safe_thrust = 0
+
                 else:
                     ## GET THRUST AND ANGLE
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)

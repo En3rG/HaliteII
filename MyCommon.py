@@ -68,6 +68,9 @@ def fill_circle(array, center, radius, value, cummulative=False):
     height = array.shape[0]
     width = array.shape[1]
 
+    ## ROUND RADIUS?
+    radius = int(round(radius))
+
     ## y IS JUST AN ARRAY OF 1xY (ROWS)
     ## x IS JUST AN ARRAY OF 1xX (COLS)
     y, x = np.ogrid[-center.y:height - center.y, -center.x:width - center.x]

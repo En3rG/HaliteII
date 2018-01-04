@@ -423,8 +423,8 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 
 
 
-# coord = MyCommon.Coordinates(8 ,8)
-# target = MyCommon.Coordinates(4,13)
+# coord = MyCommon.Coordinates(26.4012 , 91.7516)
+# target = MyCommon.Coordinates(35.5327, 87.3649)
 # d = MyCommon.calculate_distance(coord, target, rounding=False)
 # print(d)
 

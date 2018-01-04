@@ -222,7 +222,7 @@ if __name__ == "__main__":
     freeze_support()
 
     ## UPDATABLE PARAMETERS
-    disable_log = True
+    disable_log = False
     MAX_DELAY = 1.825 ## TO MAXIMIZE TIME PER TURN
     WAIT_TIME = 1.100 ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
     GET_TIMEOUT = 0.005 ## TIMEOUT SET FOR .GET()
@@ -393,3 +393,7 @@ if __name__ == "__main__":
         MP.exit = True
         #os.killpg(0, signal.SIGKILL) ## MP.exit SEEMS ENOUGH (NEED TO CLOSE WINDOW THOUGH)
         ## GAME END
+
+
+## OLD MAP USED
+## .\halite -d "240 160" -s "326461518" "python MyBot.py" "python StarterBot.py" "python MyBot.py" "python StarterBot.py"

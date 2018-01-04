@@ -7,6 +7,7 @@ from models.data import ShipTasks
 import MyCommon
 import heapq
 import initialization.astar as astar
+import movement.attacking as attacking
 import movement.expanding as expanding
 import movement.expanding2 as expanding2
 import copy
@@ -93,9 +94,11 @@ class MyMoves():
         else:
             ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
-                self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
+                self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
 
 
+            ## LOOK FOR SHIPS ABOUT TO BATTLE
+            attacking.get_battling_ships(self)
 
 
             # # MOVE OTHERS REMAINING
@@ -169,7 +172,8 @@ class MyMoves():
                     target_planet_id = expanding.get_next_target_planet(self, ship_id)
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
+                    logging.debug("No more planet to conquer ship_id: {}".format(ship_id))
+                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
                     continue
 
                 ## ADDING THIS TO GET A NEW COORD, SINCE PATH/DESTINATION MIGHT NOT BE REACHABLE DUE TO OTHER SHIPS
@@ -202,8 +206,6 @@ class MyMoves():
 
 
 
-
-
     def get_target_and_distances(self):
         """
         GET SHIP'S TARGET AND DISTANCE TO THAT TARGET COORD
@@ -228,7 +230,7 @@ class MyMoves():
 
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
+                    self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
                     continue
                 else:
                     ## NO NEED TO DETERMINE DOCKING COORD
@@ -308,7 +310,7 @@ class MyMoves():
         ## SET SHIP HAS MOVED AND FILL POSITION MATRIX
         self.set_ship_moved_and_fill_position(ship_id, angle, thrust)
 
-    def set_ship_moved_and_fill_position(self, ship_id, angle, thrust):
+    def set_ship_moved_and_fill_position(self, ship_id, angle, thrust, mining=False):
         """
         ADD SHIP TO MOVED ALREADY
 
@@ -320,10 +322,10 @@ class MyMoves():
         ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
 
         ## ADD TO POSITION MATRIX
-        expanding2.fill_position_matrix(self.position_matrix[7], ship_point)
+        expanding2.fill_position_matrix(self.position_matrix[7], ship_point, mining)
 
         ## FILL IN INTERMEDIATE POSITION MATRIX
-        expanding2.fill_position_matrix_intermediate_steps(self, ship_id, angle, thrust)
+        expanding2.fill_position_matrix_intermediate_steps(self, ship_id, angle, thrust, mining)
 
     def set_ship_destination(self, ship_id, coords, angle, thrust, target_coord):
         """

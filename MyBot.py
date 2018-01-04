@@ -247,9 +247,12 @@ if __name__ == "__main__":
         ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
         MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
 
+        start = datetime.datetime.now()
+
         ## PERFORM INITIALIZATION PREP
         EXP = Exploration(game)
 
+        logging.info("EXP time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
 
     except Exception as e:
         logging.error("Error found: ==> {}".format(e))
@@ -341,7 +344,7 @@ if __name__ == "__main__":
             ## SET A DELAY PER TURN
             #set_delay(main_start)
             logging.info("about to send commands {}".format(datetime.datetime.now()))
-            logging.info("Command_queue: {}".format(command_queue))
+            logging.info("at turn: {} Command_queue: {}".format(turn-1, command_queue))
 
             ## SEND OUR COMMANDS TO HALITE ENGINE THIS TURN
             game.send_command_queue(command_queue)

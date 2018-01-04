@@ -130,7 +130,7 @@ class MyMap():
                                             'health': ship.health, \
                                             'dock_status': ship.docking_status.value, \
                                             'enemy_in_turn':[], \
-                                            'enemy_coords':[],\
+                                            'enemy_coords':{},\
                                             ## ONLY POPULATED THE FIRST TURN THE SHIP CAME OUT
                                             'from_planet':None, \
                                             ## TARGET IS THE FINAL DESTINATION

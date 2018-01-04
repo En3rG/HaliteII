@@ -36,8 +36,7 @@ class Exploration():
     LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
     LAUNCH_ON_DISTANCE = 4
 
-
-    NUM_SECTIONS = 16  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
+    NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
 
     def __init__(self,game):
         ## FOR TESTING ONLY
@@ -47,13 +46,13 @@ class Exploration():
 
         self.game_map = game.map
         self.planets = self.get_planets()
-        self.sections_distance_table = self.get_distances_section()  ## DISTANCES FROM SECTION TO SECTION
+        self.sections_distance_table = self.get_distances_section()                  ## DISTANCES FROM SECTION TO SECTION
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
 
-        # for curr_section, data in self.sections_planet_distance_table.items():
+        # for curr_section, data in self.sections_distance_table.items():
         #     logging.info("Curr_section: {}".format(curr_section))
         #     for planet_id, distance in data.items():
-        #         logging.info("  planet_id: {} distance: {}".format(planet_id, distance))
+        #         logging.info("  id: {} distance: {}".format(planet_id, distance))
 
 
         self.planets_distance_matrix = self.get_distances()
@@ -68,7 +67,7 @@ class Exploration():
 
         self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
 
-        self.A_paths = self.get_paths()
+        #self.A_paths = self.get_paths()
 
 
         # for k,v in self.A_paths.items():
@@ -345,7 +344,6 @@ class Exploration():
         """
         paths = {}
 
-        start = datetime.datetime.now()
 
         ## GET A* PATHS FROM A PLANET TO EACH PLANET
         paths = self.get_planet_to_planet_paths(paths)
@@ -353,9 +351,6 @@ class Exploration():
         ## GET A* FROM EACH OF THE STARTING SHIPS TO BEST PLANET
         #paths = self.get_starting_ships_paths(paths)
 
-        end = datetime.datetime.now()
-        time_used = datetime.timedelta.total_seconds(end-start)
-        logging.info("A* algo took: {}".format(time_used))
 
         return paths
 

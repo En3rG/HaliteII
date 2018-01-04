@@ -8,8 +8,8 @@ class Constants():
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
-    SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
-    SECTION_CIRCLE_RADIUS = 7 ## 7
+    SECTION_SQUARE_RADIUS = 20 ## 8.  WILL BE 17x17
+    SECTION_CIRCLE_RADIUS = 19 ## 7
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
 
@@ -326,6 +326,31 @@ def get_circle_in_square(array, center_coord, circle_radius, square_radius):
     section = add_padding(temp_matrix, Coordinates(center_y, center_x), square_radius)
 
     return section
+
+
+def get_coord_closest_most_enemies_from_section(values, distances):
+    """
+    GET CLOSESTS AND MOST ENEMIES FROM THE SECTION PROVIDED
+
+    RETURNS COORD BASED ON VALUES/DISTANCES PASSED
+    """
+    indexes = np.argwhere(values >= 1)
+
+    # Get row, col indices for the condition
+    r, c = np.where(values >= 1)
+
+    # Extract corresponding values off d
+    di = distances[r, c]
+
+    # Get indices (indexable into r,c) corresponding to lowest distance
+    ld_indx = np.flatnonzero(di == di.min())
+
+    # Get max index (based off v) out of the selected indices
+    max_idx = values[r[ld_indx], c[ld_indx]].argmax()
+
+    # Index into r,c with the lowest dist indices and
+    # from those select maxed one based off v
+    return (r[ld_indx][max_idx], c[ld_indx][max_idx])
 
 
 

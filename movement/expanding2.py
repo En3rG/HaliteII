@@ -9,7 +9,7 @@ from models.data import Matrix_val
 import numpy as np
 import copy
 
-def fill_position_matrix(position_matrix, ship_point, intermediate=False):
+def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False):
     """
     FILL POSITION MATRIX WITH 1 TO REPRESENT MY SHIP
     ALSO NEED TO TAKE INTO ACCOUNT ITS NEIGHBORING COORDS
@@ -28,7 +28,7 @@ def fill_position_matrix(position_matrix, ship_point, intermediate=False):
     # position_matrix[ship_point[0] + 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
     # position_matrix[ship_point[0]][ship_point[1] - 2] = Matrix_val.ALLY_SHIP.value
 
-    if not(intermediate):
+    if not(intermediate) or mining:
         ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
         ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
         ## ALSO DIAGONALS?
@@ -38,7 +38,7 @@ def fill_position_matrix(position_matrix, ship_point, intermediate=False):
         position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
 
 
-def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust):
+def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, mining):
     """
     FILL IN INTERMEDIATE POSITION MATRIXES
     """
@@ -49,12 +49,13 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust):
         intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
         intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
 
-        if thrust == 0:
-            ## IF THRUST IS 0, DOCKING
-            ## NEED TO FILL DIAGONALS
-            fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=False)
-        else:
-            fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
+        fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=True)
+        # if thrust == 0:
+        #     ## IF THRUST IS 0, DOCKING
+        #     ## NEED TO FILL DIAGONALS
+        #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=False)
+        # else:
+        #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
 
 
 def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id):
@@ -145,16 +146,20 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #logging.debug("path_points: {}".format(path_points))
 
         if path_points:
-            for current_point in path_points[::-1]:
+            astar_destination_point = path_points[-2]
+            for current_point in reversed(path_points[:-1]):
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
                 # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
                 #         and no_collision(mid_coord, current_coord, section_matrix):
+
                 if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
                         and no_collision(MyMoves, ship_id, current_coord):
                     astar_destination_point = current_point
-                    logging.debug("astar_destination_point: {}".format(astar_destination_point))
+                    logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                 else:
+                    ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
                     break
+
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
@@ -174,7 +179,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.SECTION_SQUARE_RADIUS, \
                             astar_destination_coord.x - MyCommon.Constants.SECTION_SQUARE_RADIUS)
     taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
-    fill_position_matrix(MyMoves.position_matrix[7], taken_point)
+    fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
 
     return thrust, angle
 
@@ -414,10 +419,10 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 
 
 
-# coord = MyCommon.Coordinates(51.0186, 51.0945)
-# target = MyCommon.Coordinates(58.1583, 43.2568)
+# coord = MyCommon.Coordinates(8 ,8)
+# target = MyCommon.Coordinates(4,13)
 # d = MyCommon.calculate_distance(coord, target, rounding=False)
-# print(d-6.84)
+# print(d)
 
 
 ## GET DISTANCES BETWEEN point and a set of points
@@ -475,4 +480,5 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 #
 # print("all someFunction time in method #2", total_somefunction)
 # print("Total Method #2: ",datetime.timedelta.total_seconds(datetime.datetime.now() - start))
+
 

@@ -63,7 +63,10 @@ class MyProjection():
         new_y = round(curr_coord.y + (slope.rise * multiplier))
         new_x = round(curr_coord.x + (slope.run * multiplier))
 
+
         matrix[new_y][new_x] = Matrix_val.ENEMY_SHIP.value
+
+
 
     def check_for_enemy(self):
         """
@@ -108,7 +111,7 @@ class MyProjection():
                         list_coords[:,0] += starting_y
                         list_coords[:,1] += starting_x
 
-                        self.myMap.data_ships[self.myMap.my_id][ship_id]['enemy_coords'].append(list_coords)
+                        self.myMap.data_ships[self.myMap.my_id][ship_id]['enemy_coords'][turn] = list_coords
                         logging.debug("Enemy detected in coords: {}".format(list_coords))
 
 #

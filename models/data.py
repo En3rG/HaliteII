@@ -71,6 +71,8 @@ class MyMap():
                                4:set(),\
                                5:set()}
 
+
+
         self.ships_moved_already = set()  ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
         self.taken_coords = set()
 
@@ -80,6 +82,9 @@ class MyMap():
         self.width = game_map.width
         self.myMap_prev = myMap_prev
         self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
+
+        self.section_summary = np.zeros((self.height//MyCommon.Constants.NUM_SECTIONS, self.width//MyCommon.Constants.NUM_SECTIONS), dtype=np.float16)
+
         self.data_ships = self.get_ship_data()
         self.data_planets = {}
         self.set_planet_status()
@@ -88,10 +93,8 @@ class MyMap():
 
         self.groups = grouping.Groups(self)
 
-
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
-
 
     def check_limit(self):
         """
@@ -164,7 +167,17 @@ class MyMap():
                     if docked:
                         self.ships_mining_enemy.add(ship_id)
 
+                    self.set_section_summary(data[player_id][ship_id]['coords'])
+
         return data
+
+    def set_section_summary(self, coord):
+        """
+        SET SHIP INTO SECTION SUMMARY
+        """
+        section_point = MyCommon.get_section(coord)
+        self.section_summary[section_point[0]][section_point[1]] += 1
+
 
     def set_planet_status(self):
         """

@@ -36,7 +36,7 @@ class Exploration():
     LAUNCH_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
     LAUNCH_ON_DISTANCE = 4
 
-    NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
+
 
     def __init__(self,game):
         ## FOR TESTING ONLY
@@ -48,11 +48,6 @@ class Exploration():
         self.planets = self.get_planets()
         self.sections_distance_table = self.get_distances_section()                  ## DISTANCES FROM SECTION TO SECTION
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
-
-        # for curr_section, data in self.sections_distance_table.items():
-        #     logging.info("Curr_section: {}".format(curr_section))
-        #     for planet_id, distance in data.items():
-        #         logging.info("  id: {} distance: {}".format(planet_id, distance))
 
 
         self.planets_distance_matrix = self.get_distances()
@@ -140,8 +135,8 @@ class Exploration():
         """
         table = {}
 
-        row_length = self.game_map.height//Exploration.NUM_SECTIONS
-        col_length = self.game_map.width//Exploration.NUM_SECTIONS
+        row_length = self.game_map.height//MyCommon.Constants.NUM_SECTIONS
+        col_length = self.game_map.width//MyCommon.Constants.NUM_SECTIONS
 
         for r in range(row_length):
             for c in range(col_length):
@@ -156,32 +151,50 @@ class Exploration():
         """
         ## INITIALIZE MATRIX
 
-        dict = {}
-        dict[curr_section] = 0 ## DISTANCE TO ITSELF IS 0
+        ## USING DICTIONARY
+        # dict = {}
+        # dict[curr_section] = 0 ## DISTANCE TO ITSELF IS 0
+        #
+        # for r in range(row_length):
+        #     for c in range(col_length):
+        #         if dict.get((r, c)):
+        #             ## ALREADY EXISTS
+        #             ## CALCULATED ALREADY
+        #             pass
+        #         else:
+        #             coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
+        #             coord2 = MyCommon.Coordinates(r, c)
+        #             dict[(r, c)] = MyCommon.calculate_distance(coord1, coord2)
+        #
+        # return dict
+
+        ## USING NUMPY
+        matrix = np.zeros((row_length, col_length), dtype=np.float16)
 
         for r in range(row_length):
             for c in range(col_length):
-                if dict.get((r, c)):
+                if matrix[r][c] != 0:
                     ## ALREADY EXISTS
                     ## CALCULATED ALREADY
                     pass
                 else:
                     coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
                     coord2 = MyCommon.Coordinates(r, c)
-                    dict[(r, c)] = MyCommon.calculate_distance(coord1, coord2)
+                    matrix[r][c] = MyCommon.calculate_distance(coord1, coord2)
 
-        return dict
+        return matrix
 
     def get_distances_section_to_planet(self):
         """
         GET TABLE OF EACH SECTION'S DISTANCE TO EACH PLANETS
 
         table[curr_section][planet_id] = distance
+
         """
         table = {}
 
-        row_length = self.game_map.height // Exploration.NUM_SECTIONS
-        col_length = self.game_map.width // Exploration.NUM_SECTIONS
+        row_length = self.game_map.height // MyCommon.Constants.NUM_SECTIONS
+        col_length = self.game_map.width // MyCommon.Constants.NUM_SECTIONS
 
         for r in range(row_length):
             for c in range(col_length):
@@ -198,9 +211,9 @@ class Exploration():
 
         for planet_id, planet in self.planets.items():
             planet_coords = planet['coords']
-            planet_section = (planet_coords.y//Exploration.NUM_SECTIONS, planet_coords.x//Exploration.NUM_SECTIONS)
+            planet_section = MyCommon.get_section(planet_coords)
 
-            distance = self.sections_distance_table[curr_section][planet_section]
+            distance = self.sections_distance_table[curr_section][planet_section[0]][planet_section[1]]
             dict[planet_id] = distance
 
         return dict
@@ -436,8 +449,4 @@ class Exploration():
 
         return paths
 
-    def get_section(self, point):
-        """
-        TAKES A POINT (y,x) AND RETURN THE SECTION VALUE
-        """
-        return (point[0]//Exploration.NUM_SECTIONS, point[1]//Exploration.NUM_SECTIONS)
+

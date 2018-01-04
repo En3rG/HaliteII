@@ -8,10 +8,12 @@ class Constants():
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
-    SECTION_SQUARE_RADIUS = 20 ## 8.  WILL BE 17x17
-    SECTION_CIRCLE_RADIUS = 19 ## 7
+    SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
+    SECTION_CIRCLE_RADIUS = 7 ## 7
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
+
+    NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
 
 def disable_log(disable,log):
     """
@@ -353,6 +355,11 @@ def get_coord_closest_most_enemies_from_section(values, distances):
     return (r[ld_indx][max_idx], c[ld_indx][max_idx])
 
 
+def get_section(coord):
+    """
+    TAKES A COORD AND RETURN THE SECTION VALUE
+    """
+    return (int(coord.y // Constants.NUM_SECTIONS), int(coord.x // Constants.NUM_SECTIONS))
 
 
 # array = [

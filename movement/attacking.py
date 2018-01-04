@@ -53,7 +53,10 @@ def get_battling_ships(MyMoves):
 
                 angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS,MyCommon.Constants.SIZE_SECTIONS_RADIUS),
                                            MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
-                thrust = 7
+
+                over_thrust = 10
+                target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
+                thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
 
                 set_commands_status(MyMoves, ship_id, thrust, angle)
             else:

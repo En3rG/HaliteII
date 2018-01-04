@@ -4,7 +4,6 @@ stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
 
 
-
 import hlt
 import logging
 from initialization.explore import Exploration
@@ -12,7 +11,7 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
                               log_myMap_planets, log_all_planets
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
-from models.model import NeuralNet, make_keras_picklable
+#from models.model import NeuralNet, make_keras_picklable
 from models.data import MyMap, MyMatrix
 from projection.projection import MyProjection
 from movement import moves
@@ -21,7 +20,6 @@ import MyCommon
 import time
 import copy
 import numpy as np
-import keras
 import datetime
 import os
 import signal
@@ -252,7 +250,7 @@ if __name__ == "__main__":
 
         ## INITIALIZE PROCESSES
         ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
-        MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
+        #MP = MyProcesses(game,disable_log, WAIT_TIME, input_matrix_y, input_matrix_x, input_matrix_z, num_epoch, batch_size)
 
         start = datetime.datetime.now()
 
@@ -268,11 +266,12 @@ if __name__ == "__main__":
             fname, lineno, fn, text = frame
             logging.error("Error in {} on line {}".format(fname, lineno))
 
-    ## REENABLE STDOUT
-    sys.stderr = stderr
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
     time.sleep(1)
+
+    ## REENABLE STDOUT
+    sys.stderr = stderr
 
     predictions = {}
     turn = 0
@@ -321,8 +320,8 @@ if __name__ == "__main__":
             start = datetime.datetime.now()
 
             ## FOR TRAINING/PREDICTING MODEL
-            predictions, turn = model_handler(MP,turn, myMap, myMatrix)
-            #turn += 1
+            #predictions, turn = model_handler(MP,turn, myMap, myMatrix)
+            turn += 1
             logging.info("model_handler completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
             ## GETTING MEMORY USAGE IS QUITE SLOW (TIMES OUT)
@@ -330,8 +329,8 @@ if __name__ == "__main__":
             # logging.debug("mem_usage: {}".format(mem_usage))
 
             ## TRANSLATE PREDICTIONS
-            predicted_moves = NeuralNet.translate_predictions(predictions)
-            myMatrix.fill_prediction_matrix(predicted_moves)
+            #predicted_moves = NeuralNet.translate_predictions(predictions)
+            #myMatrix.fill_prediction_matrix(predicted_moves)
             logging.info("Predictions completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
 
@@ -352,7 +351,7 @@ if __name__ == "__main__":
             myMatrix_prev = myMatrix
 
             ## SET A DELAY PER TURN
-            set_delay(main_start)
+            #set_delay(main_start)
             logging.info("about to send commands {}".format(datetime.datetime.now()))
             logging.info("at turn: {} Command_queue: {}".format(turn-1, command_queue))
 

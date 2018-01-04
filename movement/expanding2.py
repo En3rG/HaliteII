@@ -486,3 +486,5 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # print("Total Method #2: ",datetime.timedelta.total_seconds(datetime.datetime.now() - start))
 
 
+# import tensorflow as tf; print(tf.__version__)
+# import keras as k; print(k.__version__)

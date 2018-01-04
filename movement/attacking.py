@@ -61,8 +61,8 @@ def get_battling_ships(MyMoves):
                 set_commands_status(MyMoves, ship_id, thrust, angle)
             else:
                 ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
-                thrust, angle = closest_section_with_enemy(MyMoves, ship_id)
-                set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle)
+                closest_section_with_enemy(MyMoves, ship_id)
+
 
 def set_section_in_battle(MyMoves, ship_section, enemy_section_point):
     """
@@ -100,8 +100,8 @@ def closest_section_in_war(MyMoves, ship_id):
         set_commands_status(MyMoves, ship_id, thrust, angle)
     else:
         ## NO SECTION IN BATTLE
-        thrust, angle = closest_section_with_enemy(MyMoves, ship_id)
-        set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle)
+        closest_section_with_enemy(MyMoves, ship_id)
+
 
 
 def closest_section_with_enemy(MyMoves, ship_id):
@@ -127,4 +127,4 @@ def closest_section_with_enemy(MyMoves, ship_id):
 
     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, final_distance, target_planet_id=None)
 
-    return thrust, angle
+    set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle)

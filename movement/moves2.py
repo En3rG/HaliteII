@@ -122,7 +122,8 @@ class MyMoves():
                     target_planet_id = expanding.get_next_target_planet(self, ship_id)
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    attacking.closest_section_in_war(self, ship_id)
+                    #attacking.closest_section_in_war(self, ship_id)
+                    attacking.closest_section_with_enemy(self, ship_id)
                     continue
 
                 ## ADDING THIS TO GET A NEW COORD, SINCE PATH/DESTINATION MIGHT NOT BE REACHABLE DUE TO OTHER SHIPS
@@ -186,7 +187,8 @@ class MyMoves():
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
                     #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
-                    attacking.closest_section_in_war(self, ship_id)
+                    #attacking.closest_section_in_war(self, ship_id)
+                    attacking.closest_section_with_enemy(self, ship_id)
                     continue
                 else:
                     ## NO NEED TO DETERMINE DOCKING COORD

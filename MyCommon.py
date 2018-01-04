@@ -8,12 +8,16 @@ class Constants():
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
+
+    ## FOR A* SECTIONED
     SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
     SECTION_CIRCLE_RADIUS = 7 ## 7
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
 
+    ## FOR DIVIDING WHOLE MAP INTO SECTIONS
     NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
+    SIZE_SECTIONS_RADIUS = 5
 
 def disable_log(disable,log):
     """
@@ -336,23 +340,23 @@ def get_coord_closest_most_enemies_from_section(values, distances):
 
     RETURNS COORD BASED ON VALUES/DISTANCES PASSED
     """
-    indexes = np.argwhere(values >= 1)
-
     # Get row, col indices for the condition
     r, c = np.where(values >= 1)
 
     # Extract corresponding values off d
     di = distances[r, c]
 
+    min_di = di.min()
+
     # Get indices (indexable into r,c) corresponding to lowest distance
-    ld_indx = np.flatnonzero(di == di.min())
+    ld_indx = np.flatnonzero(di == min_di)
 
     # Get max index (based off v) out of the selected indices
     max_idx = values[r[ld_indx], c[ld_indx]].argmax()
 
     # Index into r,c with the lowest dist indices and
     # from those select maxed one based off v
-    return (r[ld_indx][max_idx], c[ld_indx][max_idx])
+    return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di
 
 
 def get_section(coord):

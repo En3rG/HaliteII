@@ -28,9 +28,7 @@ def get_next_target_planet(MyMoves, ship_id):
             ## from_planet_id IS NONE
             ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
             ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
-            ship_y = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['y']
-            ship_x = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['x']
-            ship_section = MyMoves.EXP.get_section((ship_y, ship_x))
+            ship_section = MyCommon.get_section(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords'])
             distance_table = MyMoves.EXP.sections_planet_distance_table[ship_section]
             length = len(distance_table)
 

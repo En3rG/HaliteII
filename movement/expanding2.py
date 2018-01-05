@@ -162,32 +162,23 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             astar_destination_point = path_points[-2]
             for current_point in reversed(path_points[:-1]):
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
-                # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                #         and no_collision(mid_coord, current_coord, section_matrix):
 
+                ## NOT DOING INTERMEDIATE COLLISION
                 if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                        and no_collision(MyMoves, ship_id, current_coord):
+                        and no_collision(mid_coord, current_coord, section_matrix):
+
+                ## DOING INTERMEDIATE COLLISION
+                # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
+                #         and no_collision(MyMoves, ship_id, current_coord):
+
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                 else:
                     ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
                     break
 
-            ## SWITCH IT UP, GO FOR FURTHEST TO START
-            # within_circle = False
-            # astar_destination_point = None
-            # for current_point in path_points:
-            #     current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
-            #     ## WILL GO UNTIL WITHIN THE CIRCLE
-            #     if within_circle == False and MyCommon.within_circle(current_coord, mid_coord, max_travel_distance):
-            #         within_circle = True
-            #
-            #     if within_circle and no_collision(MyMoves, ship_id, current_coord):
-            #         astar_destination_point = current_point
-            #         break
-            #
-            # if astar_destination_point is None:
-            #     astar_destination_point = path_points[-1] ## JUST POINT TO ITSELF
+            ## THEN DO INTERMEDIATE COLLISION HERE? ONCE FOUND MAXIMUM SPEED FOR A*?
+
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
@@ -213,34 +204,34 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     return thrust, angle
 
-def no_collision(MyMoves, ship_id, current_coord):
-#def no_collision(start_coord, target_coord, section_matrix):
+#def no_collision(MyMoves, ship_id, current_coord):
+def no_collision(start_coord, target_coord, section_matrix):
     """
     RETURNS TRUE IF NO COLLISION BETWEEN THE TWO COORDS
     """
     ## DOING INTERMEDIATE COLLISION
-    mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
-    mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
-
-    ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-    target_coord = MyCommon.Coordinates(ship_coord.y + (current_coord.y - mid_coord.y), ship_coord.x + (current_coord.x - mid_coord.x))
-    angle = MyCommon.get_angle(ship_coord, target_coord)
-    thrust = MyCommon.calculate_distance(ship_coord, target_coord)
-    safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
-
-    return thrust == safe_thrust
+    # mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
+    # mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
+    #
+    # ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+    # target_coord = MyCommon.Coordinates(ship_coord.y + (current_coord.y - mid_coord.y), ship_coord.x + (current_coord.x - mid_coord.x))
+    # angle = MyCommon.get_angle(ship_coord, target_coord)
+    # thrust = MyCommon.calculate_distance(ship_coord, target_coord)
+    # safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
+    #
+    # return thrust == safe_thrust
 
     ## NOT DOING INTERMEDIATE COLLISION
-    # angle = MyCommon.get_angle(start_coord, target_coord)
-    # distance = MyCommon.calculate_distance(start_coord, target_coord)
-    #
-    # for thrust in range(int(round(distance))):
-    #     temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
-    #     round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
-    #     if section_matrix[round_coord.y][round_coord.x] != 0:
-    #         return False
-    #
-    # return True
+    angle = MyCommon.get_angle(start_coord, target_coord)
+    distance = MyCommon.calculate_distance(start_coord, target_coord)
+
+    for thrust in range(int(round(distance))):
+        temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
+        round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
+        if section_matrix[round_coord.y][round_coord.x] != 0:
+            return False
+
+    return True
 
     ## NOT USING GET DESTINATION COORDS
     ## SHOULD BE MORE OPTIMAL
@@ -460,8 +451,8 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # print(temp_target_coord)
 
 
-# coord = MyCommon.Coordinates(8 , 8)
-# target = MyCommon.Coordinates(10, 11)
+# coord = MyCommon.Coordinates(98.8920 , 115.2048)
+# target = MyCommon.Coordinates(168.1835, 56.3206)
 # d = MyCommon.calculate_distance(coord, target, rounding=False)
 # print(d)
 
@@ -541,3 +532,6 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # #t = MyCommon.add_padding(a, center_coord, square_radius, 0)
 #
 # print(t)
+
+# coord = MyCommon.Coordinates(79.7208, 165.3800)
+# print(MyCommon.get_section_num(coord))

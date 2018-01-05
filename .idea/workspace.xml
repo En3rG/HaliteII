@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02cba0c9-f6b0-4114-b540-93cb9b5b278a" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/training/test.txt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyCommon.py" afterPath="$PROJECT_DIR$/MyCommon.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyBot.py" afterPath="$PROJECT_DIR$/MyBot.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/initialization/explore.py" afterPath="$PROJECT_DIR$/initialization/explore.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/expanding2.py" afterPath="$PROJECT_DIR$/movement/expanding2.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/moves2.py" afterPath="$PROJECT_DIR$/movement/moves2.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run_game.bat" afterPath="$PROJECT_DIR$/run_game.bat" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/training/train.py" afterPath="$PROJECT_DIR$/training/train.py" />
     </list>
@@ -30,12 +31,12 @@
       <file leaf-file-name="expanding2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1753">
-              <caret line="525" column="48" selection-start-line="525" selection-start-column="48" selection-end-line="525" selection-end-column="48" />
+            <state relative-caret-position="342">
+              <caret line="463" column="1" selection-start-line="463" selection-start-column="1" selection-end-line="463" selection-end-column="1" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
-                <marker date="1515180457970" expanded="true" signature="11589:12063" placeholder="..." />
-                <marker date="1515180457970" expanded="true" signature="21935:22086" placeholder="..." />
+                <marker date="1515193081761" expanded="true" signature="10974:11424" placeholder="..." />
+                <marker date="1515193081761" expanded="true" signature="21296:21471" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -44,18 +45,18 @@
       <file leaf-file-name="MyBot.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MyBot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="206" column="32" selection-start-line="206" selection-start-column="32" selection-end-line="206" selection-end-column="32" />
+            <state relative-caret-position="864">
+              <caret line="224" column="147" selection-start-line="224" selection-start-column="147" selection-end-line="224" selection-end-column="147" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="moves2.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="moves2.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/movement/moves2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3772">
-              <caret line="110" column="34" selection-start-line="110" selection-start-column="34" selection-end-line="110" selection-end-column="34" />
+            <state relative-caret-position="359">
+              <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -66,8 +67,8 @@
       <file leaf-file-name="attacking.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/attacking.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2924">
-              <caret line="172" column="52" selection-start-line="172" selection-start-column="52" selection-end-line="172" selection-end-column="52" />
+            <state relative-caret-position="180">
+              <caret line="17" column="28" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -75,11 +76,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="processors.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/multiprocessor/processors.py">
+      <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="331">
-              <caret line="741" column="55" selection-start-line="741" selection-start-column="55" selection-end-line="741" selection-end-column="55" />
+            <state relative-caret-position="-1734">
+              <caret line="59" column="51" selection-start-line="59" selection-start-column="51" selection-end-line="59" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -93,46 +94,6 @@
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/training/train.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="67" column="42" selection-start-line="67" selection-start-column="42" selection-end-line="67" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="explore.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/initialization/explore.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="270" column="42" selection-start-line="270" selection-start-column="42" selection-end-line="270" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="moves.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/movement/moves.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="422" column="48" selection-start-line="422" selection-start-column="40" selection-end-line="422" selection-end-column="48" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_logs.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/testing/test_logs.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2">
-              <caret line="69" column="66" selection-start-line="69" selection-start-column="47" selection-end-line="69" selection-end-column="66" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -154,19 +115,19 @@
         <option value="$PROJECT_DIR$/movement/expanding.py" />
         <option value="$PROJECT_DIR$/models/data.py" />
         <option value="$PROJECT_DIR$/multiprocessor/processors.py" />
-        <option value="$PROJECT_DIR$/MyBot.py" />
-        <option value="$PROJECT_DIR$/movement/moves2.py" />
         <option value="$PROJECT_DIR$/movement/attacking.py" />
-        <option value="$PROJECT_DIR$/movement/expanding2.py" />
         <option value="$PROJECT_DIR$/MyCommon.py" />
         <option value="$PROJECT_DIR$/training/train.py" />
+        <option value="$PROJECT_DIR$/MyBot.py" />
         <option value="$PROJECT_DIR$/initialization/explore.py" />
+        <option value="$PROJECT_DIR$/movement/expanding2.py" />
+        <option value="$PROJECT_DIR$/movement/moves2.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="287" />
-    <option name="y" value="54" />
+    <option name="x" value="373" />
+    <option name="y" value="49" />
     <option name="width" value="1479" />
     <option name="height" value="885" />
   </component>
@@ -325,7 +286,7 @@
       <recent name="C:\Users\Gio\Desktop\Gio's Folder\Python\HALITE\HALITE II\MYBOT\movement" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.expanding2">
     <configuration default="false" name="MyCommon" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -554,8 +515,8 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.train" />
-        <item index="1" class="java.lang.String" itemvalue="Python.expanding2" />
+        <item index="0" class="java.lang.String" itemvalue="Python.expanding2" />
+        <item index="1" class="java.lang.String" itemvalue="Python.train" />
         <item index="2" class="java.lang.String" itemvalue="Python.explore" />
         <item index="3" class="java.lang.String" itemvalue="Python.MyCommon" />
         <item index="4" class="java.lang.String" itemvalue="Python.astar" />
@@ -579,7 +540,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="287" y="54" width="1479" height="885" extended-state="0" />
+    <frame x="373" y="49" width="1479" height="885" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12645249" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -588,7 +549,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273196" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26675257" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12886597" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -626,8 +587,8 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-            <marker date="1515180457970" expanded="true" signature="11589:12063" placeholder="..." />
-            <marker date="1515180457970" expanded="true" signature="21935:22086" placeholder="..." />
+            <marker date="1515193081761" expanded="true" signature="10974:11424" placeholder="..." />
+            <marker date="1515193081761" expanded="true" signature="21296:21471" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -774,8 +735,8 @@
           <caret line="11" column="76" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="76" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-            <marker date="1515180457970" expanded="true" signature="11589:12063" placeholder="..." />
-            <marker date="1515180457970" expanded="true" signature="21935:22086" placeholder="..." />
+            <marker date="1515193081761" expanded="true" signature="10974:11424" placeholder="..." />
+            <marker date="1515193081761" expanded="true" signature="21296:21471" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -950,16 +911,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82">
-          <caret line="157" column="37" selection-start-line="157" selection-start-column="37" selection-end-line="157" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#21#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/initialization/astar.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="63">
@@ -972,54 +923,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="401">
           <caret line="106" column="54" selection-start-line="106" selection-start-column="54" selection-end-line="106" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MyBot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="206" column="32" selection-start-line="206" selection-start-column="32" selection-end-line="206" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1753">
-          <caret line="525" column="48" selection-start-line="525" selection-start-column="48" selection-end-line="525" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-            <marker date="1515180457970" expanded="true" signature="11589:12063" placeholder="..." />
-            <marker date="1515180457970" expanded="true" signature="21935:22086" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/movement/moves2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3772">
-          <caret line="110" column="34" selection-start-line="110" selection-start-column="34" selection-end-line="110" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/movement/attacking.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2924">
-          <caret line="172" column="52" selection-start-line="172" selection-start-column="52" selection-end-line="172" selection-end-column="52" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multiprocessor/processors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="331">
-          <caret line="741" column="55" selection-start-line="741" selection-start-column="55" selection-end-line="741" selection-end-column="55" />
           <folding />
         </state>
       </provider>
@@ -1052,17 +955,73 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/training/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="67" column="42" selection-start-line="67" selection-start-column="42" selection-end-line="67" selection-end-column="42" />
+        <state relative-caret-position="374">
+          <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/initialization/explore.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="270" column="42" selection-start-line="270" selection-start-column="42" selection-end-line="270" selection-end-column="42" />
+        <state relative-caret-position="119">
+          <caret line="259" column="55" selection-start-line="259" selection-start-column="55" selection-end-line="259" selection-end-column="55" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multiprocessor/processors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="741" column="55" selection-start-line="741" selection-start-column="55" selection-end-line="741" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1734">
+          <caret line="59" column="51" selection-start-line="59" selection-start-column="51" selection-end-line="59" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/attacking.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="17" column="28" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="463" column="1" selection-start-line="463" selection-start-column="1" selection-end-line="463" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+            <marker date="1515193081761" expanded="true" signature="10974:11424" placeholder="..." />
+            <marker date="1515193081761" expanded="true" signature="21296:21471" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MyBot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="864">
+          <caret line="224" column="147" selection-start-line="224" selection-start-column="147" selection-end-line="224" selection-end-column="147" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/moves2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="359">
+          <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

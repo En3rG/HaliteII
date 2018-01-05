@@ -350,7 +350,7 @@ def get_section_with_padding(a, center_coord, square_radius, pad_values):
     """
     ## MAKE SURE ITS ROUNDED
     center_coord = Coordinates(int(round(center_coord.y)), int(round(center_coord.x)))
-    
+
     return add_padding(a, center_coord, square_radius, 0)
 
 

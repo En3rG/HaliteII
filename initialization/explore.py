@@ -268,7 +268,8 @@ class Exploration():
             for d,i in list_dist:
                 docks += self.planets[i]['docks']
                 distances += d
-            scores[id] = docks/distances
+            #scores[id] = docks/distances 
+            scores[id] = docks - (3*distances)  ## DISTANCE IS 3 TIMES LESS TO POINTS
 
         return self.get_highest_score(scores)
 

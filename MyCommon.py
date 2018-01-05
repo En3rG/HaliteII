@@ -295,12 +295,10 @@ def get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle):
         return None
 
 
-def add_padding(a, center_coord, square_radius):
+def add_padding(a, center_coord, square_radius, pad_values):
     """
     RETURNS A MATRIX PADDED, WHEN ITS OUTSIDE THE BOUNDARIES OF THE ORIGINAL MATRIX
     """
-    pad_values = -1
-
     tp = max(0, -(center_coord.y - square_radius))
     bp = max(0, -((a.shape[0]-center_coord.y-1) - square_radius))
     lp = max(0, -(center_coord.x - square_radius))
@@ -316,7 +314,7 @@ def add_padding(a, center_coord, square_radius):
 
 
 
-def get_circle_in_square(array, center_coord, circle_radius, square_radius):
+def get_circle_in_square(array, center_coord, circle_radius, square_radius, pad_values):
     """
     RETURNS A SQUARE MATRIX
     GET VALUES FROM THE MATRIX PROVIDED, WITHIN THE CIRCLE SPECIFIED
@@ -341,19 +339,32 @@ def get_circle_in_square(array, center_coord, circle_radius, square_radius):
     temp_matrix[mask] = array[mask]
 
     ## ADD PADDING, IF OUTSIDE THE MATRIX BOUNDARIES
-    section = add_padding(temp_matrix, Coordinates(center_y, center_x), square_radius)
+    section = add_padding(temp_matrix, Coordinates(center_y, center_x), square_radius, pad_values)
 
     return section
 
 
-def get_coord_closest_most_enemies_from_section(values, distances):
+def get_section_with_padding(a, center_coord, square_radius, pad_values):
+    """
+    GET A SECTION FROM AN ARRAY, CONSIDER ADDING PADDING IF OVER THE BOUNDARY
+    """
+    ## MAKE SURE ITS ROUNDED
+    center_coord = Coordinates(int(round(center_coord.y)), int(round(center_coord.x)))
+    
+    return add_padding(a, center_coord, square_radius, 0)
+
+
+def get_coord_closest_most_enemies_from_section(seek_val, values, distances):
     """
     GET CLOSESTS AND MOST ENEMIES FROM THE SECTION PROVIDED
 
     RETURNS COORD BASED ON VALUES/DISTANCES PASSED
     """
     # Get row, col indices for the condition
-    r, c = np.where(values >= 1)
+    if seek_val == 1:
+        r, c = np.where(values >= seek_val)
+    else: ## FOR -1s
+        r, c = np.where(values <= seek_val)
 
     # Extract corresponding values off d
     di = distances[r, c]

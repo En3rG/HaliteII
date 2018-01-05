@@ -73,6 +73,7 @@ class MyMoves():
 
             heap = []
 
+            ## PLACE SHIPS IN HEAP BASE ON DISTANCE
             for ship_id in self.myMap.ships_new:
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                 value_coord = MyCommon.get_coord_of_value_in_angle(planet_matrix, ship_coord, seek_value, angle)
@@ -106,6 +107,7 @@ class MyMoves():
                 self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
+            ## MOVE THOSE SHIPS
             attacking.get_battling_ships(self)
 
             ## USING HEAPQ

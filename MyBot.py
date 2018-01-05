@@ -203,9 +203,10 @@ if __name__ == "__main__":
 
     finally:
         ## TERMINATE MULTIPROCESSES
-        MP.exit = True
+        #MP.exit = True
         #os.killpg(0, signal.SIGKILL) ## MP.exit SEEMS ENOUGH (NEED TO CLOSE WINDOW THOUGH)
         ## GAME END
+        pass
 
 
 ## KERAS/TENSORFLOW ERROR ON SERVER. COMMENT OUT THE FOLLOWING
@@ -214,6 +215,7 @@ if __name__ == "__main__":
 ## - MODEL_HANDLER
 ## - PREDICTION
 ## - SET_DELAY
+## - MP.exit = True
 
 
 

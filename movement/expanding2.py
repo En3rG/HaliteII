@@ -78,16 +78,23 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     ## GET ANGLE TO TARGET
     angle_towards_target = MyCommon.get_angle(ship_coord, target_coord)
 
+
     ## GET SECTION
-    section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius)
+    pad_values = -1
+    section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius, pad_values)
+
+    logging.debug("get_thrust_angle_from_Astar:: angle_towards_target {}".format(angle_towards_target))
 
     if  target_distance <= circle_radius:
         ## TARGET IS INSIDE CIRCLE RADIUS
         temp_target_coord = target_coord
+        logging.debug("get_thrust_angle_from_Astar:: target_distance {}".format(target_distance))
     else:
         ## TARGET IS OUTSIDE CIRCLE RADIUS
         temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
 
+
+    logging.debug("get_thrust_angle_from_Astar:: temp_target_coord {}".format(temp_target_coord))
 
     ## GET TARGET POINT ON THE SECTION MATRIX
     ## ROUNDING temp_target_point CAUSES COLLISIONS OR NOT DOCKING SHIPS
@@ -100,10 +107,13 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     section_target_point = (int(MyCommon.Constants.SECTION_SQUARE_RADIUS + temp_target_point[0]), \
                             int(MyCommon.Constants.SECTION_SQUARE_RADIUS + temp_target_point[1]))
 
+    logging.debug("get_thrust_angle_from_Astar:: section_target_point {}".format(section_target_point))
 
     ## MID POINT OF THE SECTION MATRIX IS THE STARTING POINT (SHIP COORD IN SECTION MATRIX IS JUST THE MIDDLE)
     mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
     mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
+
+
 
     ## PERFORM A* TOWARDS TARGET
     ## WE DONT REALLY NEED TABLE OR SIMPLIFIED PATHS HERE
@@ -181,6 +191,8 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
+
+            logging.debug("angle {} thrust {}".format(angle, thrust))
 
         else:
             ## NO A* PATH FOUND
@@ -441,8 +453,15 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 
 
 
-# coord = MyCommon.Coordinates(26.4012 , 91.7516)
-# target = MyCommon.Coordinates(35.5327, 87.3649)
+# ship_coord = MyCommon.Coordinates(34.2850, 57.5704)
+# angle_towards_target = 277
+# fake_target_thrust = 10
+# temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
+# print(temp_target_coord)
+
+
+# coord = MyCommon.Coordinates(8 , 8)
+# target = MyCommon.Coordinates(10, 11)
 # d = MyCommon.calculate_distance(coord, target, rounding=False)
 # print(d)
 
@@ -507,3 +526,18 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # import tensorflow as tf; print(tf.__version__)
 # import keras as k; print(k.__version__)
 
+
+# def get_section_with_padding(a, center_coord, square_radius, pad_values):
+#     return MyCommon.add_padding(a, center_coord, square_radius, 0)
+#
+# a = np.array([[1,2,3],[4,5,6],[7,8,9]])
+# [print(a)]
+# center_coord = MyCommon.Coordinates(0,0)
+# circle_radius = 2
+# square_radius = 2
+#
+# t = get_section_with_padding(a, center_coord, square_radius, 0)
+#
+# #t = MyCommon.add_padding(a, center_coord, square_radius, 0)
+#
+# print(t)

@@ -54,9 +54,26 @@ class Exploration():
         self.all_planet_matrix = self.fill_planets_for_paths(matrix)
         self.get_launch_coords()
 
+        self.sample_distance_matrix = self.get_sample_distance_matrix()
+
         #self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
 
         #self.A_paths = self.get_paths() ## NO LONGER USED??
+
+    def get_sample_distance_matrix(self):
+        """
+        DISTANCE MATRIX FOR 15x15 MATRIX
+        ASSUMING START IS AT THE CENTER
+        """
+        matrix = np.zeros((15, 15), dtype=np.float16)
+        start = MyCommon.Coordinates(7, 7)
+
+        for r in range(15):
+            for c in range(15):
+                matrix[r][c] = MyCommon.calculate_distance(start, MyCommon.Coordinates(r,c))
+
+        return matrix
+
 
     def get_planets(self):
         """

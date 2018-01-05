@@ -5,14 +5,28 @@ import math
 
 
 class Constants():
+
+    DISABLE_LOG = False
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
 
+    ## NEURAL NETWORK MODEL
+    INPUT_MATRIX_Y = 27
+    INPUT_MATRIX_X = 27
+    INPUT_MATRIX_Z = 4
+    NUM_EPOCH = 2
+    BATCH_SIZE = 300
+
+    ## FOR MULTIPROCESSING
+    MAX_DELAY = 1.825  ## TO MAXIMIZE TIME PER TURN
+    WAIT_TIME = 1.100  ## WAIT TIME FOR PREDICTIONS TO GET INTO QUEUE
+    GET_TIMEOUT = 0.005  ## TIMEOUT SET FOR .GET()
+
     ## FOR A* SECTIONED
     SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
     SECTION_CIRCLE_RADIUS = 7 ## 7
-    FILL_PLANET_PAD = 1
+    FILL_PLANET_PAD = 2
     MOVE_BACK = 1
 
     ## FOR DIVIDING WHOLE MAP INTO SECTIONS
@@ -67,9 +81,6 @@ def fill_circle(array, center, radius, value, cummulative=False):
     """
     height = array.shape[0]
     width = array.shape[1]
-
-    ## ROUND RADIUS?
-    radius = int(round(radius))
 
     ## y IS JUST AN ARRAY OF 1xY (ROWS)
     ## x IS JUST AN ARRAY OF 1xX (COLS)

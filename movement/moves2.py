@@ -10,6 +10,7 @@ import initialization.astar as astar
 import movement.attacking as attacking
 import movement.expanding as expanding
 import movement.expanding2 as expanding2
+import movement.attacking as attacking
 import copy
 from models.data import Matrix_val
 import numpy as np
@@ -69,6 +70,9 @@ class MyMoves():
             planet_matrix = self.EXP.planet_matrix[target_planet_id]
 
             seek_value = Matrix_val.PREDICTION_PLANET.value
+
+            heap = []
+
             for ship_id in self.myMap.ships_new:
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                 value_coord = MyCommon.get_coord_of_value_in_angle(planet_matrix, ship_coord, seek_value, angle)
@@ -80,7 +84,12 @@ class MyMoves():
                     ## DIDNT FIND. SHOULDNT HAPPEN FOR THE STARTING 3 SHIPS
                     logging.error("One of the starting ships didnt see the best planet, given the angle.")
 
-                distance = MyCommon.calculate_distance(ship_coord, target_coord)
+                distance = MyCommon.calculate_distance(ship_coord, target_coord, rounding=False)
+
+                heapq.heappush(heap, (distance, ship_id, target_planet_id, ship_coord, target_coord))
+
+            while heap:
+                distance, ship_id, target_planet_id, ship_coord, target_coord = heapq.heappop(heap)
 
                 ## GET THRUST AND ANGLE
                 thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
@@ -96,10 +105,8 @@ class MyMoves():
             for ship_id in self.myMap.ships_mining_ally:
                 self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
 
-
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             attacking.get_battling_ships(self)
-
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW
@@ -112,53 +119,60 @@ class MyMoves():
             ## MOVE OTHERS REMAINING
             # USING HEAPQ POP
             while heap:
-                distance, ship_id, target_planet_id = heapq.heappop(heap)
+                planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord = heapq.heappop(heap)
+                logging.debug("at heap ship_id: {}".format(ship_id))
 
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
 
-                ## DOUBLE CHECK IF PLANET IS STILL AVAILABLE
-                if not(expanding.has_room_to_dock(self, target_planet_id)):
-                    ## GET A NEW PLANET ID
-                    target_planet_id = expanding.get_next_target_planet(self, ship_id)
-                if target_planet_id is None:
-                    ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    #attacking.closest_section_in_war(self, ship_id)
-                    attacking.closest_section_with_enemy(self, ship_id)
+                ## HAS ENEMY TARGET COORD
+                if enemy_target_coord is not None:
+                    thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, enemy_target_coord, enemy_distance, target_planet_id=None)
+                    attacking.set_commands_status(self, ship_id, thrust=thrust, angle=angle)
                     continue
-
-                ## ADDING THIS TO GET A NEW COORD, SINCE PATH/DESTINATION MIGHT NOT BE REACHABLE DUE TO OTHER SHIPS
-                target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
-
-                if distance == 0:
-                    ## WE CAN DOCK ALREADY
-                    safe_thrust = 0
-                    angle = 0
-                    logging.debug("get_docking_coord distance 0 docking!!")
-                    self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
-
-                elif target_coord is None:
-                    ## DOCKING COORD NOT FOUND?
-                    logging.warning("Why is there no docking coord for ship_id: {} target_planet_id: {}".format(ship_id,target_planet_id ))
-                    angle = 0
-                    safe_thrust = 0
-
                 else:
-                    ## GET THRUST AND ANGLE
-                    thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
-                    logging.debug("get_thrust_angle_from_Astar thrust: {} angle: {}".format(thrust, angle))
+                    ## DOUBLE CHECK IF PLANET IS STILL AVAILABLE
+                    if not(expanding.has_room_to_dock(self, target_planet_id)):
+                        ## GET A NEW PLANET ID
+                        target_planet_id = expanding.get_next_target_planet(self, ship_id)
+                    if target_planet_id is None:
+                        ## NO MORE PLANETS TO CONQUER AT THIS TIME
+                        #attacking.closest_section_in_war(self, ship_id)
+                        attacking.closest_section_with_enemy(self, ship_id, move_now=True)
+                        continue
 
-                    #safe_thrust = self.check_intermediate_collisions(ship_id, angle, thrust)
-                    safe_thrust = thrust  ## NOT LOOKING FOR INTERMEDIATE COLLLISIONS
+                    ## ADDING THIS TO GET A NEW COORD, SINCE PATH/DESTINATION MIGHT NOT BE REACHABLE DUE TO OTHER SHIPS
+                    target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
 
-                    if thrust == 0:
+                    if distance == 0:
+                        ## WE CAN DOCK ALREADY
+                        safe_thrust = 0
+                        angle = 0
+                        logging.debug("get_docking_coord distance 0 docking!!")
                         self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
 
-                    else:
-                        ## ADD TO COMMAND QUEUE
-                        self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
+                    elif target_coord is None:
+                        ## DOCKING COORD NOT FOUND?
+                        logging.warning("Why is there no docking coord for ship_id: {} target_planet_id: {}".format(ship_id,target_planet_id ))
+                        angle = 0
+                        safe_thrust = 0
 
-                ## SET SHIP STATUSES
-                self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
+                    else:
+                        ## GET THRUST AND ANGLE
+                        thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
+                        logging.debug("get_thrust_angle_from_Astar thrust: {} angle: {}".format(thrust, angle))
+
+                        #safe_thrust = self.check_intermediate_collisions(ship_id, angle, thrust)
+                        safe_thrust = thrust  ## NOT LOOKING FOR INTERMEDIATE COLLLISIONS
+
+                        if thrust == 0:
+                            self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+
+                        else:
+                            ## ADD TO COMMAND QUEUE
+                            self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
+
+                    ## SET SHIP STATUSES
+                    self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
 
 
 
@@ -171,7 +185,9 @@ class MyMoves():
         heap = []
 
         for ship_id, ship in self.myMap.data_ships[self.myMap.my_id].items():
+            logging.debug("ship_id: {}".format(ship_id))
             if ship_id not in self.myMap.ships_moved_already:
+                logging.debug("not moved yet")
                 try:
                     target_planet_id = self.myMap.myMap_prev.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
 
@@ -188,7 +204,10 @@ class MyMoves():
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
                     #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
                     #attacking.closest_section_in_war(self, ship_id)
-                    attacking.closest_section_with_enemy(self, ship_id)
+                    planet_distance = 9999
+                    enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
+                    heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
+
                     continue
                 else:
                     ## NO NEED TO DETERMINE DOCKING COORD
@@ -204,10 +223,12 @@ class MyMoves():
                     ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                     planet_coord = self.myMap.data_planets[target_planet_id]['coords']
                     planet_radius = self.myMap.data_planets[target_planet_id]['radius']
-                    distance = MyCommon.calculate_distance(ship_coord, planet_coord, rounding=False) - planet_radius
+                    planet_distance = MyCommon.calculate_distance(ship_coord, planet_coord, rounding=False) - planet_radius
+                    enemy_distance = 0
+                    enemy_target_coord = None
 
                     ## ADD TO DISTANCE HEAP
-                    heapq.heappush(heap, (distance, ship_id, target_planet_id))
+                    heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
         return heap
         #return sorted(heap)

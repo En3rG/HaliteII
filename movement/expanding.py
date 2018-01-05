@@ -72,7 +72,7 @@ def has_room_to_dock(MyMoves, planet_id):
     max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
 
     ## CURRENTLY ONLY, HAVE LESS MINERS THAN NUMBER OF DOCKS
-    if len_miners_now < max_docks:
+    if planet_id not in MyMoves.myMap.planets_enemy and len_miners_now < max_docks:
         return True
 
     return False

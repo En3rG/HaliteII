@@ -83,7 +83,7 @@ class MyMap():
         self.myMap_prev = myMap_prev
         self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
 
-        self.section_summary = np.zeros((self.height//MyCommon.Constants.NUM_SECTIONS + 1, self.width//MyCommon.Constants.NUM_SECTIONS + 1), dtype=np.float16)
+        self.section_summary = np.zeros(((self.height//MyCommon.Constants.NUM_SECTIONS) + 1, (self.width//MyCommon.Constants.NUM_SECTIONS) + 1), dtype=np.float16)
 
         self.data_ships = self.get_ship_data()
         self.data_planets = {}

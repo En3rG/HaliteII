@@ -157,10 +157,10 @@ class Exploration():
         # return dict
 
         ## USING NUMPY
-        matrix = np.zeros((row_length, col_length), dtype=np.float16)
+        matrix = np.zeros((row_length + 1, col_length + 1), dtype=np.float16)
 
-        for r in range(row_length):
-            for c in range(col_length):
+        for r in range(row_length + 1):
+            for c in range(col_length + 1):
                 if matrix[r][c] != 0:
                     ## ALREADY EXISTS
                     ## CALCULATED ALREADY

@@ -38,6 +38,8 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
         position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
 
 
+
+
 def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, mining):
     """
     FILL IN INTERMEDIATE POSITION MATRIXES
@@ -146,6 +148,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #logging.debug("path_points: {}".format(path_points))
 
         if path_points:
+            ## GOING FROM START POINT TO END POINT
             astar_destination_point = path_points[-2]
             for current_point in reversed(path_points[:-1]):
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
@@ -160,6 +163,21 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                     ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
                     break
 
+            ## SWITCH IT UP, GO FOR FURTHEST TO START
+            # within_circle = False
+            # astar_destination_point = None
+            # for current_point in path_points:
+            #     current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
+            #     ## WILL GO UNTIL WITHIN THE CIRCLE
+            #     if within_circle == False and MyCommon.within_circle(current_coord, mid_coord, max_travel_distance):
+            #         within_circle = True
+            #
+            #     if within_circle and no_collision(MyMoves, ship_id, current_coord):
+            #         astar_destination_point = current_point
+            #         break
+            #
+            # if astar_destination_point is None:
+            #     astar_destination_point = path_points[-1] ## JUST POINT TO ITSELF
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
@@ -488,3 +506,4 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 
 # import tensorflow as tf; print(tf.__version__)
 # import keras as k; print(k.__version__)
+

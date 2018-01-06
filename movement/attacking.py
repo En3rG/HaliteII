@@ -56,8 +56,8 @@ def get_battling_ships(MyMoves):
             if enemy_section_point: ## AN ENEMY WAS FOUND
                 ## HERE ENEMY_SECTION_POINT IS ONLY IN REFERENCE WITH JUST THE SECTION MATRIX
                 ## NEED TO TAKE INTO ACCOUNT THE SHIPS SECTION
-                enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
-                                       ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
+                # enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+                #                        ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
 
 
                 ## PLACE THIS SECTION TO BATTLING
@@ -95,9 +95,9 @@ def get_battling_ships(MyMoves):
                                                MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
 
                     over_thrust = 10
-                    #target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
 
-                    target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH
+                    target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
+                    #target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH
 
                     logging.debug("section_coord {} target_coord {}".format(section_coord, target_coord))
 
@@ -138,12 +138,12 @@ def set_section_in_battle(MyMoves, ship_section, enemy_section_point):
     """
     SET SECTIONS IN WAR
     """
-    # slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS, enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
-    # section = (ship_section[0] + slope[0], ship_section[1] + slope[1])
-    # MyMoves.myMap.section_in_battle.add(section)
+    slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS, enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
+    section = (ship_section[0] + slope[0], ship_section[1] + slope[1])
+    MyMoves.myMap.section_in_battle.add(section)
 
     ## NO NEED TO FIND SLOPE, ALREADY TAKEN INTO ACCOUNT BEFORE CALLING THIS
-    MyMoves.myMap.section_in_battle.add(enemy_section_point)
+    # MyMoves.myMap.section_in_battle.add(enemy_section_point)
 
 def closest_section_in_battle(MyMoves, ship_id):
     """

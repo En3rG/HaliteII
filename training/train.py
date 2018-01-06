@@ -69,7 +69,7 @@ def save_json(filename,data):
 
 
 
-filename = "6880939.hlt"
+filename = "replay-20180106-001223-0500--2529531316-336-224-240573.hlt"
 data = load_hlt(filename)
 
 save_json("test.txt",data)

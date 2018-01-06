@@ -40,6 +40,9 @@ class Exploration():
 
     def __init__(self,game):
         self.game_map = game.map
+        self.height = self.game_map.height + 1
+        self.width = self.game_map.width + 1
+
         self.planets = self.get_planets()
         self.sections_distance_table = self.get_distances_section()                  ## DISTANCES FROM SECTION TO SECTION
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
@@ -49,7 +52,7 @@ class Exploration():
         self.distances_from_start = self.get_start_distances()
         self.best_planet_id = self.get_planets_score()
 
-        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.float16)
+        matrix = np.zeros((self.height , self.width), dtype=np.float16)
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix = self.fill_planets_for_paths(matrix)
         self.get_launch_coords()
@@ -141,8 +144,8 @@ class Exploration():
         """
         table = {}
 
-        row_length = self.game_map.height//MyCommon.Constants.NUM_SECTIONS
-        col_length = self.game_map.width//MyCommon.Constants.NUM_SECTIONS
+        row_length = self.height //MyCommon.Constants.NUM_SECTIONS
+        col_length = self.width //MyCommon.Constants.NUM_SECTIONS
 
         for r in range(row_length + 1):
             for c in range(col_length + 1):
@@ -197,8 +200,8 @@ class Exploration():
         """
         table = {}
 
-        row_length = self.game_map.height // MyCommon.Constants.NUM_SECTIONS
-        col_length = self.game_map.width // MyCommon.Constants.NUM_SECTIONS
+        row_length = self.height// MyCommon.Constants.NUM_SECTIONS
+        col_length = self.width// MyCommon.Constants.NUM_SECTIONS
 
         for r in range(row_length + 1):
             for c in range(col_length + 1):
@@ -255,7 +258,7 @@ class Exploration():
         TOTAL DOCKS / TOTAL DISTANCES
         """
         scores = {}
-        include_planets = 2
+        include_planets = 1
 
         for id, dist in self.distances_from_start.items():
             ## GET 2 SMALLEST DISTANCE
@@ -269,7 +272,7 @@ class Exploration():
                 docks += self.planets[i]['docks']
                 distances += d
             #scores[id] = docks/distances
-            scores[id] = 10*docks - (7*distances)  ## DISTANCE IS 3 TIMES LESS TO POINTS
+            scores[id] = docks - (distances)  ## DISTANCE IS 3 TIMES LESS TO POINTS
 
         return self.get_highest_score(scores)
 
@@ -313,7 +316,7 @@ class Exploration():
         NO LONGER USED
         """
 
-        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.int8)
+        matrix = np.zeros((self.height , self.width), dtype=np.int8)
 
         for planet in self.game_map.all_planets():
             value = 1
@@ -350,7 +353,7 @@ class Exploration():
         """
         FILL ONE SPECIFIC PLANET
         """
-        matrix = np.zeros((self.game_map.height, self.game_map.width), dtype=np.int8)
+        matrix = np.zeros((self.height, self.width), dtype=np.int8)
         value = Matrix_val.PREDICTION_PLANET.value
         matrix = MyCommon.fill_circle(matrix, \
                                       MyCommon.Coordinates(planet.y, planet.x), \

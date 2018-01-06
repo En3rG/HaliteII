@@ -34,8 +34,7 @@ def get_battling_ships(MyMoves):
             distances = MyMoves.EXP.sections_distance_table[ship_section]
             values = MyMoves.myMap.section_summary
 
-            logging.debug("ship_section: {}".format(ship_section))
-            logging.debug("values: {}".format(values.shape))
+            logging.debug("ship_id:: {} ship_coords: {} ship_section: {}".format(ship_id,ship_coords,ship_section))
 
             ## GET SECTIONED MATRIX
             # d_sectioned = distances[ship_section[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS:ship_section[0] + MyCommon.Constants.SIZE_SECTIONS_RADIUS + 1,
@@ -53,18 +52,17 @@ def get_battling_ships(MyMoves):
             seek_val = 1
             enemy_section_point, section_distance = MyCommon.get_coord_closest_most_enemies_from_section(seek_val, v_sectioned, d_sectioned)
 
-            logging.debug("enemy_section_point {} min_distance {}".format(enemy_section_point, section_distance))
-
 
             if enemy_section_point: ## AN ENEMY WAS FOUND
+                ## HERE ENEMY_SECTION_POINT IS ONLY IN REFERENCE WITH JUST THE SECTION MATRIX
+                ## NEED TO TAKE INTO ACCOUNT THE SHIPS SECTION
+                enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+                                       ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
+
+
                 ## PLACE THIS SECTION TO BATTLING
                 set_section_in_battle(MyMoves, ship_section, enemy_section_point)
 
-                angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS,MyCommon.Constants.SIZE_SECTIONS_RADIUS),
-                                           MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
-
-                over_thrust = 10
-                target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
 
                 if section_distance == 0:
                     ## ENEMY WITHIN THE SAME SECTION
@@ -79,6 +77,7 @@ def get_battling_ships(MyMoves):
                     ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
                     seek_val = -0.75
                     enemy_point, enemy_distance = MyCommon.get_coord_closest_most_enemies_from_section(seek_val, v_section, d_section)
+                    ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
 
                     angle = MyCommon.get_angle(MyCommon.Coordinates(7, 7), MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
 
@@ -91,6 +90,16 @@ def get_battling_ships(MyMoves):
                     ## GET ACTUAL ENEMY DISTANCE
                     section_coord = MyCommon.get_coord_from_section(enemy_section_point)
                     enemy_distance = MyCommon.calculate_distance(ship_coords, section_coord)
+
+                    angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS, MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+                                               MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
+
+                    over_thrust = 10
+                    #target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
+
+                    target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH
+
+                    logging.debug("section_coord {} target_coord {}".format(section_coord, target_coord))
 
                     heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust))
 
@@ -115,6 +124,7 @@ def get_battling_ships(MyMoves):
             else:
                 ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION
                 logging.debug("ship_id: {} from handled_ships in different section".format(ship_id))
+                logging.debug("section_distance: {} enemy_distance {} target_coord {}".format(section_distance, enemy_distance,target_coord , over_thrust))
                 thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
                 logging.debug("thrust: {} angle: {}".format(thrust, angle))
                 set_commands_status(MyMoves, ship_id, thrust, angle)
@@ -128,10 +138,12 @@ def set_section_in_battle(MyMoves, ship_section, enemy_section_point):
     """
     SET SECTIONS IN WAR
     """
-    slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS, enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
-    section = (ship_section[0] + slope[0], ship_section[1] + slope[1])
+    # slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS, enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
+    # section = (ship_section[0] + slope[0], ship_section[1] + slope[1])
+    # MyMoves.myMap.section_in_battle.add(section)
 
-    MyMoves.myMap.section_in_battle.add(section)
+    ## NO NEED TO FIND SLOPE, ALREADY TAKEN INTO ACCOUNT BEFORE CALLING THIS
+    MyMoves.myMap.section_in_battle.add(enemy_section_point)
 
 def closest_section_in_battle(MyMoves, ship_id):
     """

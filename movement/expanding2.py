@@ -13,14 +13,20 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
     """
     FILL POSITION MATRIX WITH 1 TO REPRESENT MY SHIP
     ALSO NEED TO TAKE INTO ACCOUNT ITS NEIGHBORING COORDS
+
+    ADDING TRY/EXCEPT TO HANDLE OUT OF BOUNDS
     """
     position_matrix[ship_point[0]][ship_point[1]] = Matrix_val.ALLY_SHIP.value
 
     ## ALSO ITS NORTH, EAST, SOUTH AND WEST
-    position_matrix[ship_point[0] - 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
-    position_matrix[ship_point[0]][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-    position_matrix[ship_point[0] + 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
-    position_matrix[ship_point[0]][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    try: position_matrix[ship_point[0] - 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
+    except: pass
+    try: position_matrix[ship_point[0]][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    except: pass
+    try: position_matrix[ship_point[0] + 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
+    except: pass
+    try: position_matrix[ship_point[0]][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    except: pass
 
     ## A BIT FURTHER NORTH, EAST, SOUTH AND WEST
     # position_matrix[ship_point[0] - 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
@@ -32,11 +38,14 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
         ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
         ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
         ## ALSO DIAGONALS?
-        position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-        position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-        position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-        position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-
+        try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+        except: pass
+        try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+        except: pass
+        try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+        except: pass
+        try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+        except: pass
 
 
 
@@ -454,8 +463,8 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # print(temp_target_coord)
 
 
-# coord = MyCommon.Coordinates(98.8920 , 115.2048)
-# target = MyCommon.Coordinates(168.1835, 56.3206)
+# coord = MyCommon.Coordinates(115.9589 , 171.9589)
+# target = MyCommon.Coordinates(24.5, 45.5)
 # d = MyCommon.calculate_distance(coord, target, rounding=False)
 # print(d)
 

@@ -78,8 +78,8 @@ class MyMap():
 
         self.game_map = game_map
         self.my_id = game_map.my_id
-        self.height = game_map.height
-        self.width = game_map.width
+        self.height = game_map.height + 1
+        self.width = game_map.width + 1
         self.myMap_prev = myMap_prev
         self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
 

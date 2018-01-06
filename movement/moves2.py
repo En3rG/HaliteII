@@ -71,7 +71,7 @@ class MyMoves():
 
             seek_value = Matrix_val.PREDICTION_PLANET.value
 
-            heap = []
+            first_heap = [] ## DIFFERENT THAN HEAP TO BE USED LATER
 
             ## PLACE SHIPS IN HEAP BASE ON DISTANCE
             for ship_id in self.myMap.ships_new:
@@ -87,10 +87,10 @@ class MyMoves():
 
                 distance = MyCommon.calculate_distance(ship_coord, target_coord, rounding=False)
 
-                heapq.heappush(heap, (distance, ship_id, target_planet_id, ship_coord, target_coord))
+                heapq.heappush(first_heap, (distance, ship_id, target_planet_id, ship_coord, target_coord))
 
-            while heap:
-                distance, ship_id, target_planet_id, ship_coord, target_coord = heapq.heappop(heap)
+            while first_heap:
+                distance, ship_id, target_planet_id, ship_coord, target_coord = heapq.heappop(first_heap)
 
                 ## GET THRUST AND ANGLE
                 thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
@@ -108,33 +108,35 @@ class MyMoves():
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
-            #attacking.get_battling_ships(self)
+            attacking.get_battling_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW
             ## TURNS OUT A* IS RUNNING LONGER SINCE PATH IS UNREACHABLE, DUE TO ANOTHER SHIP BLOCKING ITS DESTINATION
 
             ## GET TARGET AND DISTANCES
-            ## SET distance_shipID_target
             heap = self.get_target_and_distances()
 
             ## MOVE OTHERS REMAINING
             # USING HEAPQ POP
             while heap:
                 planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord = heapq.heappop(heap)
+
                 logging.debug("at heap ship_id: {} planet_distance: {} target_planet_id: {} enemy_distance: {} enemy_target_coord: {}".format(ship_id, planet_distance, target_planet_id, enemy_distance, enemy_target_coord))
 
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
 
                 ## HAS ENEMY TARGET COORD
+                ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
                 if enemy_target_coord is not None:
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, enemy_target_coord, enemy_distance, target_planet_id=None)
                     attacking.set_commands_status(self, ship_id, thrust=thrust, angle=angle)
                     continue
+
                 else:
                     ## DOUBLE CHECK IF PLANET IS STILL AVAILABLE
                     if not(expanding.has_room_to_dock(self, target_planet_id)):
-                        ## GET A NEW PLANET ID
+                        ## NO MORE ROOM, GET A NEW PLANET ID
                         new_target_planet_id = expanding.get_next_target_planet(self, ship_id)
 
                         logging.debug("new_target_planet_id: {} target_planet_id: {}".format(new_target_planet_id, target_planet_id))
@@ -142,13 +144,13 @@ class MyMoves():
                         if new_target_planet_id is None:
                             ## NO MORE PLANETS TO CONQUER AT THIS TIME
                             ## ADD BACK TO HEAP
-                            planet_distance = 9999
+                            planet_distance = MyCommon.Constants.BIG_DISTANCE
                             enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
                             heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
                             continue
 
                         if new_target_planet_id != target_planet_id:
-                            ## TARGET PLANET CHANGED.  RECALCULATE DISTANCE, PUT BACK TO HEAP
+                            ## TARGET PLANET CHANGED.  RECALCULATE DISTANCE, AND PUT BACK TO HEAP
                             planet_coord = self.myMap.data_planets[new_target_planet_id]['coords']
                             planet_radius = self.myMap.data_planets[new_target_planet_id]['radius']
                             planet_distance = MyCommon.calculate_distance(ship_coord, planet_coord, rounding=False) - planet_radius
@@ -168,7 +170,7 @@ class MyMoves():
 
                         ## NO MORE PLANETS TO CONQUER AT THIS TIME
                         ## ADD BACK TO HEAP
-                        planet_distance = 9999
+                        planet_distance = MyCommon.Constants.BIG_DISTANCE
                         enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
                         heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
@@ -214,7 +216,7 @@ class MyMoves():
         """
         GET SHIP'S TARGET AND DISTANCE TO THAT TARGET COORD
 
-        IF SHIP HAS NO TARGET, SET SHIP TO MOVED FOR NOW
+        IF NO MORE PLANETS AVAILABLE, GET COORD OF CLOSEST SECTION WITH ENEMY
         """
         heap = []
 
@@ -236,7 +238,7 @@ class MyMoves():
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
                     #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
                     #attacking.closest_section_in_war(self, ship_id)
-                    planet_distance = 9999
+                    planet_distance = MyCommon.Constants.BIG_DISTANCE
                     enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
                     heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
@@ -250,7 +252,7 @@ class MyMoves():
                     #     self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
                     #     continue
 
-                    ## JUST CALCULATE DISTANCE
+                    ## CALCULATE PLANET DISTANCE
                     ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                     planet_coord = self.myMap.data_planets[target_planet_id]['coords']
                     planet_radius = self.myMap.data_planets[target_planet_id]['radius']
@@ -262,7 +264,6 @@ class MyMoves():
                     heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
         return heap
-        #return sorted(heap)
 
     def check_intermediate_collisions(self, ship_id, angle, thrust):
         """

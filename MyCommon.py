@@ -33,6 +33,8 @@ class Constants():
     NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
     SIZE_SECTIONS_RADIUS = 5
 
+    BIG_DISTANCE = 9999
+
 def disable_log(disable,log):
     """
     DISABLE LOGGING FOR THE GIVEN LOG

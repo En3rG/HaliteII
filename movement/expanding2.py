@@ -164,18 +164,19 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
 
                 ## NOT DOING INTERMEDIATE COLLISION
-                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                        and no_collision(mid_coord, current_coord, section_matrix):
+                # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
+                #         and no_collision(mid_coord, current_coord, section_matrix):
 
                 ## DOING INTERMEDIATE COLLISION
-                # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                #         and no_collision(MyMoves, ship_id, current_coord):
+                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
+                        and no_collision(MyMoves, ship_id, current_coord):
 
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                 else:
                     ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
                     break
+
 
             ## THEN DO INTERMEDIATE COLLISION HERE? ONCE FOUND MAXIMUM SPEED FOR A*?
 
@@ -204,34 +205,36 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     return thrust, angle
 
-#def no_collision(MyMoves, ship_id, current_coord):
-def no_collision(start_coord, target_coord, section_matrix):
+
+def no_collision(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLISION
+#def no_collision(start_coord, target_coord, section_matrix): ## NOT DOING INTERMEDIATE COLLISION
     """
     RETURNS TRUE IF NO COLLISION BETWEEN THE TWO COORDS
     """
     ## DOING INTERMEDIATE COLLISION
-    # mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
-    # mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
+    mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
+    mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
+
+    ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+    target_coord = MyCommon.Coordinates(ship_coord.y + (current_coord.y - mid_coord.y), ship_coord.x + (current_coord.x - mid_coord.x))
+    angle = MyCommon.get_angle(ship_coord, target_coord)
+    thrust = MyCommon.calculate_distance(ship_coord, target_coord)
+    safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
+
+    return thrust == safe_thrust
+
+    # ## NOT DOING INTERMEDIATE COLLISION
+    # angle = MyCommon.get_angle(start_coord, target_coord)
+    # distance = MyCommon.calculate_distance(start_coord, target_coord)
     #
-    # ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-    # target_coord = MyCommon.Coordinates(ship_coord.y + (current_coord.y - mid_coord.y), ship_coord.x + (current_coord.x - mid_coord.x))
-    # angle = MyCommon.get_angle(ship_coord, target_coord)
-    # thrust = MyCommon.calculate_distance(ship_coord, target_coord)
-    # safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
+    # for thrust in range(int(round(distance))):
+    #     temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
+    #     round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
+    #     if section_matrix[round_coord.y][round_coord.x] != 0:
+    #         return False
     #
-    # return thrust == safe_thrust
+    # return True
 
-    ## NOT DOING INTERMEDIATE COLLISION
-    angle = MyCommon.get_angle(start_coord, target_coord)
-    distance = MyCommon.calculate_distance(start_coord, target_coord)
-
-    for thrust in range(int(round(distance))):
-        temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
-        round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
-        if section_matrix[round_coord.y][round_coord.x] != 0:
-            return False
-
-    return True
 
     ## NOT USING GET DESTINATION COORDS
     ## SHOULD BE MORE OPTIMAL

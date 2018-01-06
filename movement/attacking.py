@@ -54,15 +54,8 @@ def get_battling_ships(MyMoves):
 
 
             if enemy_section_point: ## AN ENEMY WAS FOUND
-                ## HERE ENEMY_SECTION_POINT IS ONLY IN REFERENCE WITH JUST THE SECTION MATRIX
-                ## NEED TO TAKE INTO ACCOUNT THE SHIPS SECTION
-                # enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
-                #                        ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
-
-
                 ## PLACE THIS SECTION TO BATTLING
                 set_section_in_battle(MyMoves, ship_section, enemy_section_point)
-
 
                 if section_distance == 0:
                     ## ENEMY WITHIN THE SAME SECTION
@@ -87,19 +80,32 @@ def get_battling_ships(MyMoves):
                     heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None))
                 else:
                     ## ENEMY IN A DIFFERENT SECTION
+
+                    ## HERE ENEMY_SECTION_POINT IS ONLY IN REFERENCE WITH JUST THE SECTION MATRIX
+                    ## NEED TO TAKE INTO ACCOUNT THE SHIPS SECTION
+
+                    logging.debug("before updating: enemy_section_point {}".format(enemy_section_point))
+                    enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+                                           ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
+                    logging.debug("after updating: enemy_section_point {}".format(enemy_section_point))
+
+
                     ## GET ACTUAL ENEMY DISTANCE
                     section_coord = MyCommon.get_coord_from_section(enemy_section_point)
+
                     enemy_distance = MyCommon.calculate_distance(ship_coords, section_coord)
 
-                    angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS, MyCommon.Constants.SIZE_SECTIONS_RADIUS),
-                                               MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
+                    ## NO LONGER REQUIRED SINCE WE GOT ACTUAL COORD OF ENEMY
+                    # angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS, MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+                    #                            MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
+                    # target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
 
                     over_thrust = 10
 
-                    target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
-                    #target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH
+                    target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH
 
-                    logging.debug("section_coord {} target_coord {}".format(section_coord, target_coord))
+
+                    logging.debug("enemy_section_point {} section_coord {} target_coord {}".format(enemy_section_point, section_coord, target_coord))
 
                     heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust))
 
@@ -185,16 +191,16 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
     ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     ship_section = MyCommon.get_section_num(ship_coords)
 
-    min_distance = MyCommon.Constants.BIG_DISTANCE
+    least_distance = MyCommon.Constants.BIG_DISTANCE
     closest_section = None
 
     ## GET CLOSEST SECTION WITH ENEMY
     for section in MyMoves.myMap.section_with_enemy:
         distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
 
-        if distance < min_distance:
+        if distance < least_distance:
             closest_section = section
-            min_distance = distance
+            least_distance = distance
 
     target_coord = MyCommon.get_coord_from_section(closest_section)
 

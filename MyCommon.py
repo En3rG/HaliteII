@@ -400,7 +400,11 @@ def get_coord_from_section(section):
     GET COORD FROM SECTION PROVIDED
     """
     ## SUBTRACT HALF OF NUM SECTIONS TO GET THE MIDDLE FO THAT SECTION
-    return Coordinates(section[0] * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2), section[1] * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2) )
+    return Coordinates((section[0]+1) * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2),
+                       (section[1]+1) * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2) )
+
+
+
 
 # array = [
 #     [1, 2, 3, 4, 5, 6, 7, 8, 9],

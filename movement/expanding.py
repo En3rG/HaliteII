@@ -129,7 +129,7 @@ def get_mining_spot(MyMoves, ship_id, target_planet_id):
         for new_angle, new_thrust in values:
             new_angle = new_angle % 360  ## KEEP IT FROM 0-360 RANGE
             new_destination_coord = MyCommon.get_destination_coord(start, new_angle, new_thrust)
-            new_destination_point = (int(round(new_destination_coord.y)), int(round(new_destination_coord.x)))
+            new_destination_point = MyCommon.get_rounded_point(new_destination_coord)
 
             if new_destination_point not in MyMoves.myMap.taken_coords:
                 MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, new_thrust, new_angle))

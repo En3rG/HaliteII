@@ -351,7 +351,8 @@ def get_section_with_padding(a, center_coord, square_radius, pad_values):
     GET A SECTION FROM AN ARRAY, CONSIDER ADDING PADDING IF OVER THE BOUNDARY
     """
     ## MAKE SURE ITS ROUNDED
-    center_coord = Coordinates(int(round(center_coord.y)), int(round(center_coord.x)))
+    point = get_rounded_point(center_coord)
+    center_coord = Coordinates(point[0], point[1])
 
     return add_padding(a, center_coord, square_radius, 0)
 
@@ -404,7 +405,11 @@ def get_coord_from_section(section):
                        (section[1]+1) * Constants.NUM_SECTIONS - (Constants.NUM_SECTIONS/2) )
 
 
-
+def get_rounded_point(coord):
+    """
+    GET ROUNDED COORD
+    """
+    return (int(round(coord.y)), int(round(coord.x)))
 
 # array = [
 #     [1, 2, 3, 4, 5, 6, 7, 8, 9],

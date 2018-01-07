@@ -16,16 +16,22 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
 
     ADDING TRY/EXCEPT TO HANDLE OUT OF BOUNDS
     """
+
     position_matrix[ship_point[0]][ship_point[1]] = Matrix_val.ALLY_SHIP.value
 
     ## ALSO ITS NORTH, EAST, SOUTH AND WEST
     try: position_matrix[ship_point[0] - 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
+        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1,ship_point[1]))
     except: pass
     try: position_matrix[ship_point[0]][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0], ship_point[1] + 1))
     except: pass
     try: position_matrix[ship_point[0] + 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
+        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1]))
+
     except: pass
     try: position_matrix[ship_point[0]][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0], ship_point[1] - 1))
     except: pass
 
     ## A BIT FURTHER NORTH, EAST, SOUTH AND WEST
@@ -39,12 +45,16 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
         ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
         ## ALSO DIAGONALS?
         try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
         except: pass
         try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
         except: pass
         try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
         except: pass
         try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
         except: pass
 
 
@@ -58,8 +68,9 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
 
     for x in range(1, 7):  ## 7 WILL BE FILLED BY ANOTHER FUNCTION
         intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
-        intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
+        intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
 
+        # logging.debug("About to fill intermediate step: {}".format(x))
         fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=True)
         # if thrust == 0:
         #     ## IF THRUST IS 0, DOCKING
@@ -75,7 +86,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     WE"LL USE LOCAL/SECTIONED A*
     """
-    position_matrix = MyMoves.position_matrix[7]
 
     square_radius = MyCommon.Constants.SECTION_SQUARE_RADIUS
     circle_radius = MyCommon.Constants.SECTION_CIRCLE_RADIUS
@@ -88,9 +98,22 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     angle_towards_target = MyCommon.get_angle(ship_coord, target_coord)
 
 
+    ## GET SECTION (ONLY BASE ON LAST POSITION MATRIX)
+    # position_matrix = MyMoves.position_matrix[7]
+    # pad_values = -1
+    # section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius, pad_values)
+
     ## GET SECTION
+    ## GETTING SECTIONS FROM 7 POSITION MATRIXES
     pad_values = -1
-    section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius, pad_values)
+    section_matrixes = {}
+    for step in range(1,8):
+        section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step],
+                                                               ship_coord,
+                                                               circle_radius,
+                                                               square_radius,
+                                                               pad_values)
+
 
     logging.debug("get_thrust_angle_from_Astar:: angle_towards_target {}".format(angle_towards_target))
 
@@ -98,18 +121,14 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         ## TARGET IS INSIDE CIRCLE RADIUS
         temp_target_coord = target_coord
         logging.debug("get_thrust_angle_from_Astar:: target_distance {}".format(target_distance))
+        temp_thrust = target_distance
     else:
         ## TARGET IS OUTSIDE CIRCLE RADIUS
         temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
-
+        logging.debug("get_thrust_angle_from_Astar:: fake_target_thrust {}".format(fake_target_thrust))
+        temp_thrust = 7 ## SET TO 7 BECAUSE THAT IS THE MAX, NEED TO COMPARE THIS LATER TO A* THRUST
 
     logging.debug("get_thrust_angle_from_Astar:: temp_target_coord {}".format(temp_target_coord))
-
-    ## GET TARGET POINT ON THE SECTION MATRIX
-    ## ROUNDING temp_target_point CAUSES COLLISIONS OR NOT DOCKING SHIPS
-    # temp_target_point = (temp_target_coord.y - ship_coord.y, temp_target_coord.x - ship_coord.x)  ## THIS IS BETTER, DOCKS BETTER
-    # section_target_point = (int(MyCommon.Constants.SECTION_SQUARE_RADIUS + round(temp_target_point[0])), \
-    #                         int(MyCommon.Constants.SECTION_SQUARE_RADIUS + round(temp_target_point[1])))
 
     temp_target_point = (int(round(temp_target_coord.y)) - int(round(ship_coord.y)), \
                          int(round(temp_target_coord.x)) - int(round(ship_coord.x)))
@@ -121,7 +140,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     ## MID POINT OF THE SECTION MATRIX IS THE STARTING POINT (SHIP COORD IN SECTION MATRIX IS JUST THE MIDDLE)
     mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
     mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
-
 
 
     ## PERFORM A* TOWARDS TARGET
@@ -163,8 +181,13 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     else:
         ## GET FURTHEST POINT WITHIN THE CIRCLE
-        path_points = astar.a_star(section_matrix, mid_point, section_target_point)
-        #logging.debug("path_points: {}".format(path_points))
+
+        ## UPDATE SECTION MATRIX TO CLEAR MID POINT (JUST IN CASE NEW SHIPS WENT IN THIS LOCATION)
+
+
+        #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
+        path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
+
 
         if path_points:
             ## GOING FROM START POINT TO END POINT
@@ -192,6 +215,16 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
+
+            logging.debug("A* angle {}".format(angle))
+
+            logging.debug("temp_thrust {} vs thrust {}".format(temp_thrust, thrust))
+
+            if temp_thrust == thrust and (angle - 5 <= angle_towards_target <= angle + 5):
+                ## UPDATE ANGLE TO USE angle_towards_target
+                ## ANGLE TOWARDS TARGET IS MORE ACCURATE SINCE ITS WITHOUT ROUNDING
+                ## ONLY IF ANGLE IS CLOSE ENOUGH
+                angle = angle_towards_target
 
             logging.debug("angle {} thrust {}".format(angle, thrust))
 
@@ -337,11 +370,12 @@ def get_new_docking_coord(MyMoves, ship_id, target_planet_id, position_matrix, c
 
     for angle, thrust in positions:
         new_coord = MyCommon.get_destination_coord(coord, angle, thrust)
-        round_coord = MyCommon.Coordinates(int(round(new_coord.y)), int(round(new_coord.x)))
+        round_point = MyCommon.get_rounded_point(new_coord)
+        round_coord = MyCommon.Coordinates(round_point[0], round_point[1])
 
         if isPositionMatrix_free(position_matrix, round_coord) and ship_can_dock(MyMoves, new_coord, target_planet_id):
         #if isPositionMatrix_free(position_matrix, round_coord):
-            logging.debug("Good enough 1")
+            logging.debug("New docking coord found is good (Free and dockable: new_coord: {}".format(new_coord))
             #ship_can_dock(MyMoves, round_coord, target_planet_id)
             #return new_coord
             return round_coord ## THIS IS BETTER? LESS COLLISION?
@@ -369,7 +403,8 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
         hypotenuse = opposite / math.sin(math.radians(angle))
         new_angle = planet_angle + angle
         new_target_coord = MyCommon.get_destination_coord(planet_center, new_angle, hypotenuse)
-        round_coord = MyCommon.Coordinates(int(round(new_target_coord.y)), int(round(new_target_coord.x)))
+        round_point = MyCommon.get_rounded_point(new_target_coord)
+        round_coord = MyCommon.Coordinates(round_point[0], round_point[1])
 
         if isPositionMatrix_free(position_matrix, round_coord) and ship_can_dock(MyMoves, new_target_coord, target_planet_id):
         #if isPositionMatrix_free(position_matrix, round_coord):
@@ -380,7 +415,8 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
         ## GOING COUNTER CLOCKWISE
         new_angle_left = planet_angle_left - angle
         new_target_coord_left = MyCommon.get_destination_coord(planet_center, new_angle_left, hypotenuse)
-        round_coord = MyCommon.Coordinates(int(round(new_target_coord_left.y)), int(round(new_target_coord_left.x)))
+        round_point = MyCommon.get_rounded_point(new_target_coord_left)
+        round_coord = MyCommon.Coordinates(round_point[0], round_point[1])
 
         if isPositionMatrix_free(position_matrix, round_coord) and ship_can_dock(MyMoves, new_target_coord_left, target_planet_id):
         #if isPositionMatrix_free(position_matrix, round_coord):
@@ -402,7 +438,10 @@ def isPositionMatrix_free(position_matrix, coord):
     """
     RETURNS TRUE IF POSITION MATRIX IS AVAILABLE
     """
-    return position_matrix[int(round(coord.y))][int(round(coord.x))] == 0
+    logging.debug("At coord: {}.  Position_matrix value is: {}".format(coord, position_matrix[int(round(coord.y))][int(round(coord.x))]))
+
+    point = MyCommon.get_rounded_point(coord)
+    return position_matrix[point[0]][point[1]] == 0
 
 
 def ship_can_dock(MyMoves, coord, target_planet_id):
@@ -411,48 +450,25 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
     FIRST USING DOCKABLE MATRIX
     THEN IF NOT, DOUBLE CHECK DISTANCE FROM PLANET
     """
-    # ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-    # ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
 
     ## NO TARGET PLANET
     if target_planet_id is None:
         return False
-
-    round_coord = MyCommon.Coordinates(int(round(coord.y)), int(round(coord.x)))
 
     target_planet_coord = MyMoves.myMap.data_planets[target_planet_id]['coords']
     target_radius = MyMoves.myMap.data_planets[target_planet_id]['radius']
     d = MyCommon.calculate_distance(coord, target_planet_coord, rounding=False)
     dock_val = d - target_radius
 
-    ## REMOVING THIS SINCE CAN RETURN TRUE EVEN THOUGH WE ARE NOT DOCKING ON THAT PLANET
-    # if MyMoves.EXP.dockable_matrix[round_coord.y][round_coord.x] == 1:
-    #     # logging.debug("using dockable matrix")
-    #     # logging.debug("CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(coord, round_coord,
-    #     #                                                                                             target_planet_id, target_planet_coord, d,
-    #     #                                                                                             target_radius, dock_val))
-    #     return True
-
-    ## DIDNT FIND A 1 ABOVE, BUT DOUBLE CHECK DISTANCE
-    #logging.debug("ship_id: {} target_planet_id: {} target_planet_coord: {} target_radius: {} d: {}".format(ship_id, target_planet_id, target_planet_coord, target_radius, d))
-
     ## DOCKING RADIUS NOT REALLY 4??? SUTRACT XXX
-    if d <= target_radius + MyCommon.Constants.DOCK_RADIUS - 0.22:
-        #logging.debug("DOCKING!!!! even though first dock test failed. ship_id: {}".format(ship_id))
-        # logging.debug(
-        #     "CAN DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(
-        #         coord, round_coord,
-        #         target_planet_id, target_planet_coord, d,
-        #         target_radius, dock_val))
+    #if d <= target_radius + MyCommon.Constants.DOCK_RADIUS - 0.22:
+    if dock_val < MyCommon.Constants.DOCK_RADIUS:
         return True
 
     ## TOO FAR
-    # logging.debug(
-    #     "CAN NOT DOCK!!!!. coord: {} round_coord: {} target_planet_id: {} target_planet_coord: {} d: {} target_radius: {} dock_val: {}".format(
-    #         coord, round_coord,
-    #         target_planet_id, target_planet_coord, d,
-    #         target_radius, dock_val))
     return False
+
+
 
 
 
@@ -461,6 +477,7 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # fake_target_thrust = 10
 # temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
 # print(temp_target_coord)
+
 
 
 # coord = MyCommon.Coordinates(115.9589 , 171.9589)
@@ -477,73 +494,3 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
 # print(type(distances))
 
 
-
-# import random
-# import heapq
-# import datetime
-#
-# def someFunction(sum, val):
-#     sum += val
-#     return sum
-#
-# data_heap = []
-# data_list = []
-#
-# for x in range(1000):
-#     val1 = random.randint(1,10)
-#     val2 = random.randint(1, 10)
-#     heapq.heappush(data_heap, (val1,val2))
-#     data_list.append(val2)
-#
-#
-# ## METHOD 1
-# start = datetime.datetime.now()
-#
-# total = 0
-# total_somefunction = 0
-# for x in data_list:
-#     s = datetime.datetime.now()
-#     total = someFunction(total, x)
-#     total_somefunction += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
-#
-# print("all someFunction time in method #1", total_somefunction)
-# print("Total Method #1: ", datetime.timedelta.total_seconds(datetime.datetime.now() - start))
-#
-#
-#
-# ## METHOD 2
-# start = datetime.datetime.now()
-#
-# total = 0
-# total_somefunction = 0
-# while data_heap:
-#     _, x = heapq.heappop(data_heap)
-#     s = datetime.datetime.now()
-#     total = someFunction(total, x)
-#     total_somefunction += datetime.timedelta.total_seconds(datetime.datetime.now() - s)
-#
-# print("all someFunction time in method #2", total_somefunction)
-# print("Total Method #2: ",datetime.timedelta.total_seconds(datetime.datetime.now() - start))
-
-
-# import tensorflow as tf; print(tf.__version__)
-# import keras as k; print(k.__version__)
-
-
-# def get_section_with_padding(a, center_coord, square_radius, pad_values):
-#     return MyCommon.add_padding(a, center_coord, square_radius, 0)
-#
-# a = np.array([[1,2,3],[4,5,6],[7,8,9]])
-# [print(a)]
-# center_coord = MyCommon.Coordinates(0,0)
-# circle_radius = 2
-# square_radius = 2
-#
-# t = get_section_with_padding(a, center_coord, square_radius, 0)
-#
-# #t = MyCommon.add_padding(a, center_coord, square_radius, 0)
-#
-# print(t)
-
-# coord = MyCommon.Coordinates(79.7208, 165.3800)
-# print(MyCommon.get_section_num(coord))

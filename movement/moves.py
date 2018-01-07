@@ -212,7 +212,8 @@ class MyMoves():
             return None, None
 
         path_table = self.EXP.A_paths[path_key]
-        tentative_destination = path_table.get((int(round(coord.y)), int(round(coord.x))), None)
+        point = MyCommon.get_rounded_point(coord)
+        tentative_destination = path_table.get(point, None)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['Astar_dest_point'] = tentative_destination
         angle, thrust = MyCommon.get_angle_thrust(coord, MyCommon.Coordinates(tentative_destination[0],
                                                                               tentative_destination[1]))
@@ -347,7 +348,7 @@ class MyMoves():
         tentative_coord = MyCommon.get_destination_coord(coords, angle, thrust)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_coord'] = tentative_coord
 
-        tentative_point = (int(round(tentative_coord.y)), int(round(tentative_coord.x)))
+        tentative_point = MyCommon.get_rounded_point(tentative_coord)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_point'] = tentative_point
 
         if new_target_coord:

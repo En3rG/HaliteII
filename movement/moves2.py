@@ -279,7 +279,7 @@ class MyMoves():
             curr_thrust = int(round(dx * step_num))
 
             intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
-            intermediate_point = (int(round(intermediate_coord.y)), int(round(intermediate_coord.x)))
+            intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
 
             no_collision = self.no_intermediate_collision(step_num, intermediate_point)
             if no_collision:
@@ -347,7 +347,7 @@ class MyMoves():
         tentative_coord = MyCommon.get_destination_coord(coords, angle, thrust)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_coord'] = tentative_coord
 
-        tentative_point = (int(round(tentative_coord.y)), int(round(tentative_coord.x)))
+        tentative_point = MyCommon.get_rounded_point(tentative_coord)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_point'] = tentative_point
 
         ## FINAL TARGET

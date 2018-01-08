@@ -40,22 +40,47 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
     # position_matrix[ship_point[0] + 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
     # position_matrix[ship_point[0]][ship_point[1] - 2] = Matrix_val.ALLY_SHIP.value
 
-    if not(intermediate) or mining:
-        ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
-        ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
-        ## ALSO DIAGONALS?
-        try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
-        except: pass
-        try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
-        except: pass
-        try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
-        except: pass
-        try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-            # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
-        except: pass
+
+
+    # if not(intermediate) or mining:
+    #     ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
+    #     ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
+    #     ## ALSO DIAGONALS?
+    #     try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
+    #     except: pass
+    #     try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
+    #     except: pass
+    #     try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
+    #     except: pass
+    #     try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
+    #     except: pass
+
+
+    ## HERE ALWAYS FILLING DIAGONALS (EVEN ON INTERMEDIATE STEPS)
+    try:
+        position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
+    except:
+        pass
+    try:
+        position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
+    except:
+        pass
+    try:
+        position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
+    except:
+        pass
+    try:
+        position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
+    except:
+        pass
 
 
 
@@ -103,7 +128,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     # pad_values = -1
     # section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius, pad_values)
 
-    ## GET SECTION
+    ## GET SECTION (FOR A* 2nd Version)
     ## GETTING SECTIONS FROM 7 POSITION MATRIXES
     pad_values = -1
     section_matrixes = {}
@@ -188,11 +213,14 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
 
+        logging.debug("A* path_points: {}".format(path_points))
 
         if path_points:
             ## GOING FROM START POINT TO END POINT
             astar_destination_point = path_points[-2]
             for current_point in reversed(path_points[:-1]):
+                logging.debug("current_point: {} ".format(current_point))
+
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
 
                 ## NOT DOING INTERMEDIATE COLLISION
@@ -220,10 +248,10 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
             logging.debug("temp_thrust {} vs thrust {}".format(temp_thrust, thrust))
 
+            ## UPDATE ANGLE TO USE angle_towards_target
+            ## ANGLE TOWARDS TARGET IS MORE ACCURATE SINCE ITS WITHOUT ROUNDING
+            ## ONLY IF ANGLE IS CLOSE ENOUGH
             if temp_thrust == thrust and (angle - 5 <= angle_towards_target <= angle + 5):
-                ## UPDATE ANGLE TO USE angle_towards_target
-                ## ANGLE TOWARDS TARGET IS MORE ACCURATE SINCE ITS WITHOUT ROUNDING
-                ## ONLY IF ANGLE IS CLOSE ENOUGH
                 angle = angle_towards_target
 
             logging.debug("angle {} thrust {}".format(angle, thrust))
@@ -261,7 +289,9 @@ def no_collision(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLI
     target_coord = MyCommon.Coordinates(ship_coord.y + (current_coord.y - mid_coord.y), ship_coord.x + (current_coord.x - mid_coord.x))
     angle = MyCommon.get_angle(ship_coord, target_coord)
     thrust = MyCommon.calculate_distance(ship_coord, target_coord)
-    safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
+
+    #safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
+    safe_thrust = MyMoves.check_intermediate_collisions2(ship_id, angle, thrust)
 
     return thrust == safe_thrust
 

@@ -69,7 +69,7 @@ def save_json(filename,data):
 
 
 
-filename = "collision_still_bot_12.hlt"
+filename = "backandforthbot13collision.hlt"
 data = load_hlt(filename)
 
 save_json("test.txt",data)

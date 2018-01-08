@@ -6,7 +6,7 @@ import math
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4

@@ -122,9 +122,9 @@ class MyMoves():
             while heap:
                 planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord = heapq.heappop(heap)
 
-                logging.debug("at heap ship_id: {} planet_distance: {} target_planet_id: {} enemy_distance: {} enemy_target_coord: {}".format(ship_id, planet_distance, target_planet_id, enemy_distance, enemy_target_coord))
-
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+
+                logging.debug("at heap ship_id: {} ship_coord: {} planet_distance: {} target_planet_id: {} enemy_distance: {} enemy_target_coord: {}".format(ship_id, ship_coord,planet_distance, target_planet_id, enemy_distance, enemy_target_coord))
 
                 ## HAS ENEMY TARGET COORD
                 ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
@@ -275,8 +275,12 @@ class MyMoves():
         dx = thrust / 7
         prev_thrust = 0
 
+        logging.debug("check_intermediate_collisions thrust: {}".format(thrust))
+
         for step_num in range(1, 7):
             curr_thrust = int(round(dx * step_num))
+
+            logging.debug("curr_thrust {}".format(curr_thrust))
 
             intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
             intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
@@ -286,11 +290,43 @@ class MyMoves():
                 prev_thrust = curr_thrust
             else:
                 logging.debug(
-                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} prev_thrust: {}".format(
+                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} . Will return prev_thrust: {}".format(
                         ship_id, intermediate_point, step_num, prev_thrust))
                 return prev_thrust  ## CURRENT THRUST HAS COLLISION
 
         return thrust  ## RETURN ORIGINAL THRUST
+
+    def check_intermediate_collisions2(self, ship_id, angle, thrust):
+        """
+        CHECK IF AN INTERMEDIATE COLLISION EXISTS
+        IF SO, RETURN THE THRUST THAT HAS NO COLLISION
+        """
+
+        ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+        dx = thrust / 7
+        prev_thrust = 0
+
+        logging.debug("check_intermediate_collisions thrust: {}".format(thrust))
+
+        for step_num in range(1, 7):
+            curr_thrust = int(round(dx * step_num))
+
+            logging.debug("curr_thrust {}".format(curr_thrust))
+
+            intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
+            intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
+
+            no_collision = self.no_intermediate_collision(curr_thrust, intermediate_point)
+            if no_collision:
+                prev_thrust = curr_thrust
+            else:
+                logging.debug(
+                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} . Will return prev_thrust: {}".format(
+                        ship_id, intermediate_point, step_num, prev_thrust))
+                return prev_thrust  ## CURRENT THRUST HAS COLLISION
+
+        return thrust  ## RETURN ORIGINAL THRUST
+
 
     def no_intermediate_collision(self, step_num, point):
         """
@@ -298,7 +334,11 @@ class MyMoves():
         PROVIDED THE STEP_NUM AND THE POINT (y,x)
         """
         # return self.position_matrix[step_num][point[0]][point[1]] != Matrix_val.ALLY_SHIP.value
-        return self.position_matrix[step_num][point[0]][point[1]] == 0
+
+        if step_num == 0:
+            return True
+        else:
+            return self.position_matrix[step_num][point[0]][point[1]] == 0
 
 
     def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, target_coord):

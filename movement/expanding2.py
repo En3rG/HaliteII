@@ -216,16 +216,37 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         logging.debug("A* path_points: {}".format(path_points))
 
         if path_points:
+
+
+
             ## GOING FROM START POINT TO END POINT
-            astar_destination_point = path_points[-2]
-            for current_point in reversed(path_points[:-1]):
+            # astar_destination_point = path_points[-2]
+            # for current_point in reversed(path_points[:-1]):
+            #     logging.debug("current_point: {} ".format(current_point))
+            #
+            #     current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
+            #
+            #     ## NOT DOING INTERMEDIATE COLLISION
+            #     # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
+            #     #         and no_collision(mid_coord, current_coord, section_matrix):
+            #
+            #     ## DOING INTERMEDIATE COLLISION
+            #     if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
+            #             and no_collision(MyMoves, ship_id, current_coord):
+            #
+            #         astar_destination_point = current_point
+            #         logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
+            #     else:
+            #         ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
+            #         break
+
+
+            ## GOING FROM END POINT TO START POINT
+            astar_destination_point = None
+            for current_point in path_points:
                 logging.debug("current_point: {} ".format(current_point))
 
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
-
-                ## NOT DOING INTERMEDIATE COLLISION
-                # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                #         and no_collision(mid_coord, current_coord, section_matrix):
 
                 ## DOING INTERMEDIATE COLLISION
                 if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
@@ -233,12 +254,14 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
-                else:
-                    ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
                     break
+            if astar_destination_point is None:
+                ## THIS SHIP HAS COLLISION EVERYWHERE FROM A*
+                ## EVEN STAYING AT THIS LOCATION HAS COLLISION
+                ## NEED TO UPDATE THIS LATER
+                logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
+                astar_destination_point = mid_point
 
-
-            ## THEN DO INTERMEDIATE COLLISION HERE? ONCE FOUND MAXIMUM SPEED FOR A*?
 
 
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])

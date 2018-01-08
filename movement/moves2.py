@@ -303,12 +303,30 @@ class MyMoves():
         """
 
         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+        ship_point = MyCommon.get_rounded_point(ship_coord)
+
+        if thrust == 0: ## SHIP STAYING ITS IN CURRENT LOCATION
+            ##
+            if all([self.no_intermediate_collision(1, ship_point),
+                    self.no_intermediate_collision(2, ship_point),
+                    self.no_intermediate_collision(3, ship_point),
+                    self.no_intermediate_collision(4, ship_point),
+                    self.no_intermediate_collision(5, ship_point),
+                    self.no_intermediate_collision(6, ship_point),
+                    self.no_intermediate_collision(7, ship_point)]):
+                logging.debug("Thurst is 0 with no collision")
+                return thrust ## NO COLLISION
+            else:
+                logging.debug("Thurst is 0 BUT has collision")
+                return -1
+
+
         dx = thrust / 7
         prev_thrust = 0
 
         logging.debug("check_intermediate_collisions thrust: {}".format(thrust))
 
-        for step_num in range(1, 7):
+        for step_num in range(1, 8):
             curr_thrust = int(round(dx * step_num))
 
             logging.debug("curr_thrust {}".format(curr_thrust))

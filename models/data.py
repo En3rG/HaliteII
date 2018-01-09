@@ -83,7 +83,8 @@ class MyMap():
         self.myMap_prev = myMap_prev
         self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
 
-        self.section_summary = np.zeros(((self.height//MyCommon.Constants.NUM_SECTIONS) + 1, (self.width//MyCommon.Constants.NUM_SECTIONS) + 1), dtype=np.float16)
+        self.section_enemy_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1, (self.width // MyCommon.Constants.NUM_SECTIONS) + 1), dtype=np.float16)
+        self.section_ally_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1, (self.width // MyCommon.Constants.NUM_SECTIONS) + 1), dtype=np.float16)
 
         self.data_ships = self.get_ship_data()
         self.data_planets = {}
@@ -161,25 +162,33 @@ class MyMap():
                     ## GATHER DOCKED SHIPS
                     if docked:
                         self.ships_mining_ally.add(ship_id)
+
+                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=False)
                 else:
                     self.ships_enemy.add(ship_id)
                     ## GATHER ENEMY DOCKED SHIPS
                     if docked:
                         self.ships_mining_enemy.add(ship_id)
 
-                    self.set_section_summary(data[player_id][ship_id]['coords'])
+                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=True)
 
         return data
 
-    def set_section_summary(self, coord):
+    def set_section_summary(self, coord, enemy):
         """
         SET SHIP INTO SECTION SUMMARY
         """
-        section_point = MyCommon.get_section_num(coord)
-        self.section_summary[section_point[0]][section_point[1]] += 1
+        if enemy:
+            section_point = MyCommon.get_section_num(coord)
+            self.section_enemy_summary[section_point[0]][section_point[1]] += 1
 
-        ## ADD THIS SECTION TO SECTION WITH ENEMY
-        self.section_with_enemy.add(section_point)
+            ## ADD THIS SECTION TO SECTION WITH ENEMY
+            self.section_with_enemy.add(section_point)
+        else:
+            section_point = MyCommon.get_section_num(coord)
+            self.section_ally_summary[section_point[0]][section_point[1]] += 1
+
+
 
 
     def set_planet_status(self):

@@ -32,7 +32,7 @@ def get_battling_ships(MyMoves):
             ship_section = MyCommon.get_section_num(ship_coords)
             ship_section_coord = MyCommon.Coordinates(ship_section[0], ship_section[1])
             distances = MyMoves.EXP.sections_distance_table[ship_section]
-            values = MyMoves.myMap.section_summary
+            values = MyMoves.myMap.section_enemy_summary
 
             logging.debug("ship_id:: {} ship_coords: {} ship_section: {}".format(ship_id,ship_coords,ship_section))
 
@@ -48,6 +48,7 @@ def get_battling_ships(MyMoves):
 
             v_sectioned = MyCommon.get_section_with_padding(values, ship_section_coord, MyCommon.Constants.SIZE_SECTIONS_RADIUS, 0)
 
+
             ## GET CLOSEST/MOST ENEMIES SECTION POINT
             seek_val = 1
             enemy_section_point, section_distance = MyCommon.get_coord_closest_most_enemies_from_section(seek_val, v_sectioned, d_sectioned)
@@ -62,7 +63,7 @@ def get_battling_ships(MyMoves):
                     ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
                     value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
 
-                    # v_section = value[ship_point[0]-7:ship_point[0]+7+1, ship_point[1]-7:ship_point[1]+7+1]
+
                     v_section = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
 
                     d_section = MyMoves.EXP.sample_distance_matrix
@@ -72,12 +73,20 @@ def get_battling_ships(MyMoves):
                     enemy_point, enemy_distance = MyCommon.get_coord_closest_most_enemies_from_section(seek_val, v_section, d_section)
                     ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
 
+                    ## GET NUMBER OF ENEMIES IN THIS SECTION
+                    num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
+                    num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
+                    ## SEE IF OUR SECTION IS STRONG ENOUGH
+                    strong_enough = num_ally_in_section > num_enemy_in_section
+
                     angle = MyCommon.get_angle(MyCommon.Coordinates(7, 7), MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
 
                     ## ACTUAL COORDINATE OF ENEMY
                     target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
 
-                    heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None))
+
+
+                    heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None, strong_enough))
                 else:
                     ## ENEMY IN A DIFFERENT SECTION
 
@@ -104,29 +113,42 @@ def get_battling_ships(MyMoves):
 
                     target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH
 
-
                     logging.debug("enemy_section_point {} section_coord {} target_coord {}".format(enemy_section_point, section_coord, target_coord))
 
-                    heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust))
+                    strong_enough = None
+                    heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
 
             else:
                 ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
                 ## THIS SHOULDNT HAPPEN RIGHT? OR ELSE WHY IS IT IN BATTLING
                 section_distance = MyCommon.Constants.BIG_DISTANCE
                 enemy_distance = 0
-                heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, None, None))
+                target_coord = None
+                over_thrust = None
+                strong_enough = None
+                heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
 
     ## MOVE SHIPS IN ORDER (TO MINIMIZE COLLISION)
     while battle_heap:
-        section_distance, enemy_distance, ship_id, target_coord, over_thrust = heapq.heappop(battle_heap)
+        section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough = heapq.heappop(battle_heap)
 
         if target_coord: ## HAS TARGET
             if over_thrust is None:
                 ## MOVE THIS SHIP, IN THE SAME SECTION
-                logging.debug("ship_id: {} from handled_ships in same section".format(ship_id))
-                thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
-                logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                set_commands_status(MyMoves, ship_id, thrust, angle)
+
+                if strong_enough:
+                    logging.debug("ship_id: {} from handled_ships in same section (strong enough)".format(ship_id))
+                    thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
+                    logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                    set_commands_status(MyMoves, ship_id, thrust, angle)
+                else:
+                    logging.debug("ship_id: {} from handled_ships in same section (not strong enough)".format(ship_id))
+                    thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord,target_distance=enemy_distance,target_planet_id=None)
+                    thrust = MyCommon.Constants.MOVE_BACK_OFFENSE
+                    angle = MyCommon.get_reversed_angle(angle)
+                    logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                    set_commands_status(MyMoves, ship_id, thrust, angle)
+
             else:
                 ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION
                 logging.debug("ship_id: {} from handled_ships in different section".format(ship_id))

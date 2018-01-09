@@ -213,7 +213,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
 
-        logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+        #logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))  ## CAUSING TO TIMEOUT STILL?
 
         logging.debug("A* path_points: {}".format(path_points))
 

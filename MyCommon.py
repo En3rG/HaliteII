@@ -6,7 +6,7 @@ import math
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -34,6 +34,9 @@ class Constants():
     SIZE_SECTIONS_RADIUS = 5
 
     BIG_DISTANCE = 9999
+
+    ## ATTACKING
+    MOVE_BACK_OFFENSE = 3
 
 def disable_log(disable,log):
     """

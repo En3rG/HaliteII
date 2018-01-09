@@ -74,10 +74,16 @@ def get_battling_ships(MyMoves):
                     ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
 
                     ## GET NUMBER OF ENEMIES IN THIS SECTION
-                    num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
-                    num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
-                    ## SEE IF OUR SECTION IS STRONG ENOUGH
+                    # num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
+                    # num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
+
+                    ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
+                    num_enemy_in_section = (v_section==-1).sum()
+                    num_ally_in_section = (v_section==1).sum()
+
+
                     strong_enough = num_ally_in_section > num_enemy_in_section
+
 
                     angle = MyCommon.get_angle(MyCommon.Coordinates(7, 7), MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
 

@@ -92,6 +92,13 @@ class MyMoves():
             while first_heap:
                 distance, ship_id, target_planet_id, ship_coord, target_coord = heapq.heappop(first_heap)
 
+                ## DOUBLE CHECK IF PLANET IS STILL AVAILABLE
+                if not (expanding.has_room_to_dock(self, target_planet_id)):
+                    ## NO MORE ROOM, GET A NEW PLANET ID
+                    target_planet_id = expanding.get_next_target_planet(self, ship_id)
+                    target_coord = self.myMap.data_planets[target_planet_id]['coords']
+                    distance = MyCommon.calculate_distance(ship_coord, target_coord, rounding=False)
+
                 ## GET THRUST AND ANGLE
                 thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
 

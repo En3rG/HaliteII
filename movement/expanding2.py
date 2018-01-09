@@ -213,6 +213,8 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
 
+        logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+
         logging.debug("A* path_points: {}".format(path_points))
 
         if path_points:
@@ -242,8 +244,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
 
             ## GOING FROM END POINT TO START POINT
-            astar_destination_point = None
-            for current_point in path_points:
+            ## MAKING FIRST STEP (-2) AS DEFAULT (PREVENT JUST SITTING)
+            astar_destination_point = path_points[-2]
+            for current_point in path_points[:-2]:
                 logging.debug("current_point: {} ".format(current_point))
 
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
@@ -255,12 +258,12 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                     break
-            if astar_destination_point is None:
-                ## THIS SHIP HAS COLLISION EVERYWHERE FROM A*
-                ## EVEN STAYING AT THIS LOCATION HAS COLLISION
-                ## NEED TO UPDATE THIS LATER
-                logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
-                astar_destination_point = mid_point
+            # if astar_destination_point is None:
+            #     ## THIS SHIP HAS COLLISION EVERYWHERE FROM A*
+            #     ## EVEN STAYING AT THIS LOCATION HAS COLLISION
+            #     ## NEED TO UPDATE THIS LATER
+            #     logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
+            #     astar_destination_point = mid_point
 
 
 

@@ -35,8 +35,8 @@ class Constants():
 
     BIG_DISTANCE = 9999
 
-    ## ATTACKING
-    MOVE_BACK_OFFENSE = 3
+    ## ATTACKING (NOT STRONG ENOUGH)
+    MOVE_BACK_OFFENSE = 0
 
 def disable_log(disable,log):
     """

@@ -148,12 +148,19 @@ def get_battling_ships(MyMoves):
                     logging.debug("thrust: {} angle: {}".format(thrust, angle))
                     set_commands_status(MyMoves, ship_id, thrust, angle)
                 else:
+                    ## NOT STRONG ENOUGH (FLIP ANGLE)
                     logging.debug("ship_id: {} from handled_ships in same section (not strong enough)".format(ship_id))
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord,target_distance=enemy_distance,target_planet_id=None)
                     thrust = MyCommon.Constants.MOVE_BACK_OFFENSE
                     angle = MyCommon.get_reversed_angle(angle)
                     logging.debug("thrust: {} angle: {}".format(thrust, angle))
                     set_commands_status(MyMoves, ship_id, thrust, angle)
+
+                ## DOESNT CARE EVEN IF NOT STRONG ENOUGH
+                # logging.debug("ship_id: {} from handled_ships in same section (strong enough)".format(ship_id))
+                # thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
+                # logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                # set_commands_status(MyMoves, ship_id, thrust, angle)
 
             else:
                 ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION

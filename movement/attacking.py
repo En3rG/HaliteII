@@ -239,6 +239,8 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
 
     target_coord = MyCommon.get_coord_from_section(closest_section)
 
+    logging.debug("closest_section_with_enemy target_coord: {}".format(target_coord))
+
     ## INSTEAD OF DOING FINAL DISTANCE AS SECTION TO SECTION, LETS GET ACTUAL DISTANCE OF SHIP COORD TO THAT SECTION
     # final_distance = (min_distance + 1) * 7
     final_distance = MyCommon.calculate_distance(ship_coords, target_coord)

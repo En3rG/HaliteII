@@ -133,6 +133,8 @@ class MyMoves():
 
                 logging.debug("at heap ship_id: {} ship_coord: {} planet_distance: {} target_planet_id: {} enemy_distance: {} enemy_target_coord: {}".format(ship_id, ship_coord,planet_distance, target_planet_id, enemy_distance, enemy_target_coord))
 
+
+
                 ## HAS ENEMY TARGET COORD
                 ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
                 if enemy_target_coord is not None:
@@ -341,7 +343,7 @@ class MyMoves():
             intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
             intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
 
-            no_collision = self.no_intermediate_collision(curr_thrust, intermediate_point)
+            no_collision = self.no_intermediate_collision(step_num, intermediate_point)
             if no_collision:
                 prev_thrust = curr_thrust
             else:

@@ -8,8 +8,12 @@ BUT NOT SURE IF IT"LL TAKE TOO MUCH TIME
 """
 import numpy as np
 import pandas as pd
+import datetime
+import random
+import math
 
 ## SAMPLE GET DISTANCES FROM A POINT TO LIST OF POINTS
+## NOTICEABLY FASTER WHEN DATA IS VERY LARGE
 to_points = np.array([(0,1),(1,0),(-1,0),(0,-1),(2,2)])
 start = np.array([0,0])
 
@@ -31,6 +35,9 @@ result = -temp[:N]
 #print("values",values)
 #print("result_args",result_args)
 #print("result",result)
+
+
+
 
 
 ## SAMPLE GET TOP 3 VALUES FROM A COLUMN IN A NUMPY ARRAY
@@ -55,6 +62,9 @@ result = -temp[:N]
 # print("result",result)
 
 
+
+
+
 ## SAMPLE GET TOP 3 VALUES FROM A COLUMN IN A PANDA
 df = pd.DataFrame({1:[1,2,3,4],
                   2:[5,6,7,8],
@@ -62,5 +72,8 @@ df = pd.DataFrame({1:[1,2,3,4],
                   4:[13,14,15,16]})
 
 #print(df.nlargest(2,columns=1))
+
+
+
 
 

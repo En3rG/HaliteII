@@ -43,18 +43,28 @@ class Exploration():
         self.height = self.game_map.height + 1
         self.width = self.game_map.width + 1
 
+        logging.debug("Map height: {}".format(self.height))
+        logging.debug("Map width: {}".format(self.width))
+
+
         self.planets = self.get_planets()
+
         self.sections_distance_table = self.get_distances_section()                  ## DISTANCES FROM SECTION TO SECTION
+
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
 
         self.planets_distance_matrix = self.get_distances()
+
         self.myStartCoords = self.get_start_coords()
+
         self.distances_from_start = self.get_start_distances()
+
         self.best_planet_id = self.get_planets_score()
 
         matrix = np.zeros((self.height , self.width), dtype=np.float16)
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix = self.fill_planets_for_paths(matrix)
+
         self.get_launch_coords()
 
         self.sample_distance_matrix = self.get_sample_distance_matrix()
@@ -144,11 +154,11 @@ class Exploration():
         """
         table = {}
 
-        row_length = self.height //MyCommon.Constants.NUM_SECTIONS
-        col_length = self.width //MyCommon.Constants.NUM_SECTIONS
+        row_length = (self.height // MyCommon.Constants.NUM_SECTIONS) + 1  ## + 1 TO COUNT LAST ITEM FOR RANGE
+        col_length = (self.width // MyCommon.Constants.NUM_SECTIONS) + 1
 
-        for r in range(row_length + 1):
-            for c in range(col_length + 1):
+        for r in range(row_length):
+            for c in range(col_length):
                 curr_section = (r,c)
                 table[curr_section] = self.calculate_distance_sections(curr_section, row_length, col_length)
 
@@ -176,21 +186,36 @@ class Exploration():
         #
         # return dict
 
-        ## USING NUMPY
-        matrix = np.zeros((row_length + 1, col_length + 1), dtype=np.float16)
+        ## USING NUMPY  (LOOPING SO SLOW)
+        # matrix = np.zeros((row_length + 1, col_length + 1), dtype=np.float16)
+        #
+        # logging.debug("matrix size {}".format(matrix.size))
+        #
+        # for r in range(row_length + 1):
+        #     for c in range(col_length + 1):
+        #         if matrix[r][c] != 0:
+        #             ## ALREADY EXISTS
+        #             ## CALCULATED ALREADY
+        #             pass
+        #         else:
+        #             coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
+        #             coord2 = MyCommon.Coordinates(r, c)
+        #             matrix[r][c] = MyCommon.calculate_distance(coord1, coord2)
+        #
+        # return matrix
 
-        for r in range(row_length + 1):
-            for c in range(col_length + 1):
-                if matrix[r][c] != 0:
-                    ## ALREADY EXISTS
-                    ## CALCULATED ALREADY
-                    pass
-                else:
-                    coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
-                    coord2 = MyCommon.Coordinates(r, c)
-                    matrix[r][c] = MyCommon.calculate_distance(coord1, coord2)
 
-        return matrix
+        ## USING NUMPY (VECTORIZED)
+        matrix = np.zeros((row_length, col_length), dtype=np.float16)
+        indexes = [(y, x) for y, row in enumerate(matrix) for x, val in enumerate(row)]
+        to_points = np.array(indexes)
+        start_point = np.array([curr_section[0], curr_section[1]])
+        distances = np.linalg.norm(to_points - start_point, ord=2, axis=1.)
+
+        return distances.reshape((row_length, col_length))
+
+
+
 
     def get_distances_section_to_planet(self):
         """
@@ -200,11 +225,11 @@ class Exploration():
         """
         table = {}
 
-        row_length = self.height// MyCommon.Constants.NUM_SECTIONS
-        col_length = self.width// MyCommon.Constants.NUM_SECTIONS
+        row_length = (self.height// MyCommon.Constants.NUM_SECTIONS) + 1  ## +1 TO COUNT LAST ITEM IN RANGE
+        col_length = (self.width// MyCommon.Constants.NUM_SECTIONS) + 1
 
-        for r in range(row_length + 1):
-            for c in range(col_length + 1):
+        for r in range(row_length):
+            for c in range(col_length):
                 curr_section = (r, c)
                 table[curr_section] = self.calculate_distance_to_planets(curr_section)
 

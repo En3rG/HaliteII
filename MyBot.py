@@ -89,6 +89,7 @@ if __name__ == "__main__":
 
     try:
         while True:
+
             main_start = datetime.datetime.now()
             logging.info("Turn # {} Calling update_map() at: {}".format(turn,datetime.datetime.now()))
 
@@ -98,10 +99,99 @@ if __name__ == "__main__":
             logging.info("hlt update_map time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start)))
             start = datetime.datetime.now()
 
+
+
+
+
+            ## TESTING FOR JUST GOING TO THE CORNER
+            # if game_map.my_id == 1 or game_map.my_id == 2:
+            #     for player in game_map.all_players():
+            #         if player.id == 0 and game_map.my_id == 0:
+            #             command_queue = []
+            #             for ship in player.all_ships():
+            #                 if ship.id == 0:
+            #                     logging.debug("At player 0 with ship id 0")
+            #                     ship_coord = MyCommon.Coordinates(ship.y, ship.x)
+            #                     target_coord = MyCommon.get_destination_coord(ship_coord, angle=135, thrust=7)
+            #                     logging.info("ship_coord: {}".format(ship_coord))
+            #                     logging.info("target_coord: {}".format(target_coord))
+            #                     if target_coord.x < 2 or target_coord.y > game_map.height - 2:
+            #                         logging.info("over!")
+            #                         angle, thrust = MyCommon.get_angle_thrust(ship_coord,
+            #                                                                   MyCommon.Coordinates(game_map.height - 2,
+            #                                                                                        2))
+            #
+            #                         target_coord = MyCommon.get_destination_coord(ship_coord, angle=angle,
+            #                                                                       thrust=thrust)
+            #                         logging.info("new target_coord: {}".format(target_coord))
+            #
+            #                         comm = 't ' + str(ship.id) + ' ' + str(thrust) + ' ' + str(angle)
+            #                         command_queue.append(comm)
+            #                     else:
+            #                         comm = 't ' + str(ship.id) + ' ' + str(7) + ' ' + str(135)
+            #                         command_queue.append(comm)
+            #                     logging.info("Command_queue: {}".format(command_queue))
+            #             game.send_command_queue(command_queue)
+            #
+            #         if player.id == 2 and game_map.my_id == 2:
+            #             command_queue = []
+            #             for ship in player.all_ships():
+            #                 if ship.id == 7:
+            #                     logging.debug("At player 2 with ship id 2")
+            #                     ship_coord = MyCommon.Coordinates(ship.y, ship.x)
+            #                     target_coord = MyCommon.get_destination_coord(ship_coord, angle=144, thrust=7)
+            #                     logging.info("ship_coord: {}".format(ship_coord))
+            #                     logging.info("target_coord: {}".format(target_coord))
+            #                     if target_coord.x < 1 or target_coord.y > game_map.height - 1:
+            #                         logging.info("over!")
+            #                         angle, thrust = MyCommon.get_angle_thrust(ship_coord, MyCommon.Coordinates(game_map.height-1, 1))
+            #
+            #                         target_coord = MyCommon.get_destination_coord(ship_coord, angle=angle, thrust=thrust)
+            #                         logging.info("new target_coord: {}".format(target_coord))
+            #
+            #                         comm = 't ' + str(ship.id) + ' ' + str(thrust) + ' ' + str(angle)
+            #                         command_queue.append(comm)
+            #                     else:
+            #                         comm = 't ' + str(ship.id) + ' ' + str(7) + ' ' + str(144)
+            #                         command_queue.append(comm)
+            #                     logging.info("Command_queue: {}".format(command_queue))
+            #             game.send_command_queue(command_queue)
+            #
+            #         if player.id == 1 and game_map.my_id == 1:
+            #             command_queue = []
+            #             for ship in player.all_ships():
+            #                 if ship.id == 5:
+            #                     logging.debug("At player 1 with ship id 5")
+            #                     ship_coord = MyCommon.Coordinates(ship.y, ship.x)
+            #                     target_coord = MyCommon.get_destination_coord(ship_coord, angle=325, thrust=7)
+            #                     logging.info("ship_coord: {}".format(ship_coord))
+            #                     logging.info("target_coord: {}".format(target_coord))
+            #                     if target_coord.x > game_map.width - 1 or target_coord.y < 1:
+            #                         logging.info("over!")
+            #                         angle, thrust = MyCommon.get_angle_thrust(ship_coord,MyCommon.Coordinates(1, game_map.width - 1))
+            #
+            #                         target_coord = MyCommon.get_destination_coord(ship_coord, angle=angle, thrust=thrust)
+            #                         logging.info("new target_coord: {}".format(target_coord))
+            #
+            #                         comm = 't ' + str(ship.id) + ' ' + str(thrust) + ' ' + str(angle)
+            #                         command_queue.append(comm)
+            #                     else:
+            #                         comm = 't ' + str(ship.id) + ' ' + str(7) + ' ' + str(325)
+            #                         command_queue.append(comm)
+            #                     logging.info("Command_queue: {}".format(command_queue))
+            #             game.send_command_queue(command_queue)
+            #
+            # else:
+
+
+
+
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
             logging.info("myMap completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
+
+
 
             ## GET PROJECTIONS OF ENEMY SHIPS
             myProjection = MyProjection(myMap)

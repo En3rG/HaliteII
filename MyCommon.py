@@ -6,7 +6,7 @@ import math
 
 class Constants():
 
-    DISABLE_LOG = True
+    DISABLE_LOG = False
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -436,3 +436,4 @@ def get_rounded_point(coord):
 # print(get_destination_coord(coord, angle, 1))
 #
 # print(calculate_distance(coord, coord2))
+

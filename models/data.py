@@ -31,6 +31,8 @@ class Matrix_val(Enum):
 class ShipTasks(Enum):
     """
     VALUES FOR SHIPS TASKS
+
+    NOT REALLY USED YET
     """
     NONE = -1   ## DEFAULT
     MINING = 0
@@ -45,57 +47,66 @@ class MyMap():
     CONVERT GAME_MAP TO DICTIONARY
     ACCESS WITH PLAYER IDs AND SHIP IDs
     """
-    MAX_NODES = 2 ## USED FOR LIMITING NUMBER OF NODES IN MEMORY
+    MAX_NODES = 2       ## USED FOR LIMITING NUMBER OF NODES IN MEMORY
     NUM_NODES = 0
 
     def __init__(self,game_map, myMap_prev):
-        self.planets_owned = set()  ## PLANETS I OWN
-        self.planets_unowned = set()  ## PLANETS UNOWNED
-        self.planets_enemy = set()  ## PLANETS OWNED BY ENEMY
-        self.planets_existing = set() ## ALL PLANETS EXISTING IN THE MAP CURRENTLY
+        self.game_map = game_map
+        self.my_id = game_map.my_id
+        self.height = game_map.height + 1
+        self.width = game_map.width + 1
+        self.myMap_prev = myMap_prev
+
+        self.planets_owned = set()          ## PLANETS I OWN
+        self.planets_unowned = set()        ## PLANETS UNOWNED
+        self.planets_enemy = set()          ## PLANETS OWNED BY ENEMY
+        self.planets_existing = set()       ## ALL PLANETS EXISTING IN THE MAP CURRENTLY
 
         self.ships_enemy = set()
-        self.ships_owned = set()  ## SHIPS I OWN
-        self.ships_new = set()  ## SHIPS THAT DIDNT EXIST PREVIOUSLY
-        self.ships_died = set()  ## SHIPS THAT DIED
-        self.ships_mining_ally = set()  ## SHIPS THAT ARE DOCKED (MINE)
-        self.ships_mining_enemy = set()  ## SHIPS THAT ARE DOCKED (ENEMY)
-        self.ships_attacking = set()  ## THESE ARE CURRENTLY NOT USED
-        self.ships_defending = set()  ## THESE ARE CURRENTLY NOT USED
-        self.ships_expanding = set()  ## THESE ARE CURRENTLY NOT USED
-        self.ships_running = set()  ## THESE ARE CURRENTLY NOT USED
+        self.ships_owned = set()            ## SHIPS I OWN
+        self.ships_new = set()              ## SHIPS THAT DIDNT EXIST PREVIOUSLY
+        self.ships_died = set()             ## SHIPS THAT DIED
+        self.ships_mining_ally = set()      ## SHIPS THAT ARE DOCKED (MINE)
+        self.ships_mining_enemy = set()     ## SHIPS THAT ARE DOCKED (ENEMY)
+        self.ships_attacking = set()        ## THESE ARE CURRENTLY NOT USED
+        self.ships_defending = set()        ## THESE ARE CURRENTLY NOT USED
+        self.ships_expanding = set()        ## THESE ARE CURRENTLY NOT USED
+        self.ships_running = set()          ## THESE ARE CURRENTLY NOT USED
         self.ships_battling = {1:set(),\
                                2:set(),\
                                3:set(),\
                                4:set(),\
                                5:set()}
 
-        self.section_in_battle = set() ## WILL CONTAIN SECTIONS IN WAR
-        self.section_with_enemy = set() ## WILL CONTAIN SECTIONS WITH ENEMY
+        self.section_in_battle = set()      ## WILL CONTAIN SECTIONS IN WAR
+        self.sections_with_enemy = set()     ## WILL CONTAIN SECTIONS WITH ENEMY
 
-        self.ships_moved_already = set()  ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
-        self.taken_coords = set()
+        self.ships_moved_already = set()    ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
 
-        self.game_map = game_map
-        self.my_id = game_map.my_id
-        self.height = game_map.height + 1
-        self.width = game_map.width + 1
-        self.myMap_prev = myMap_prev
-        self.all_target_coords = set()  ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
 
-        self.section_enemy_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1, (self.width // MyCommon.Constants.NUM_SECTIONS) + 1), dtype=np.float16)
-        self.section_ally_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1, (self.width // MyCommon.Constants.NUM_SECTIONS) + 1), dtype=np.float16)
+        self.section_enemy_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1,
+                                               (self.width // MyCommon.Constants.NUM_SECTIONS) + 1),
+                                               dtype=np.float16)
+        self.section_ally_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1,
+                                              (self.width // MyCommon.Constants.NUM_SECTIONS) + 1),
+                                              dtype=np.float16)
 
         self.data_ships = self.get_ship_data()
         self.data_planets = {}
         self.set_planet_status()
         self.set_ships_status()
-        self.set_from_planet()  ## ASSOCIATE NEW SHIPS TO A PLANET
+        self.set_from_planet()               ## ASSOCIATE NEW SHIPS TO A PLANET
 
-        self.groups = grouping.Groups(self)
+        self.check_limit()  ## KEEP A LIMIT OF NODES IN MEMORY
 
-        ## KEEP A LIMIT OF NODES IN MEMORY
-        self.check_limit()
+
+        # self.taken_coords = set()          ## NO LONGER USED
+
+        # self.all_target_coords = set()     ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
+                                             ## NO LONGER USED
+
+        #self.groups = grouping.Groups(self) ## NO LONGER USED
+
 
     def check_limit(self):
         """
@@ -163,16 +174,17 @@ class MyMap():
                     if docked:
                         self.ships_mining_ally.add(ship_id)
 
-                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=False)
+                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=False)  ## SET SECTION FOR ALLY
                 else:
                     self.ships_enemy.add(ship_id)
                     ## GATHER ENEMY DOCKED SHIPS
                     if docked:
                         self.ships_mining_enemy.add(ship_id)
 
-                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=True)
+                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=True)  ## SET SECTION FOR ENEMY
 
         return data
+
 
     def set_section_summary(self, coord, enemy):
         """
@@ -183,12 +195,10 @@ class MyMap():
             self.section_enemy_summary[section_point[0]][section_point[1]] += 1
 
             ## ADD THIS SECTION TO SECTION WITH ENEMY
-            self.section_with_enemy.add(section_point)
+            self.sections_with_enemy.add(section_point)
         else:
             section_point = MyCommon.get_section_num(coord)
             self.section_ally_summary[section_point[0]][section_point[1]] += 1
-
-
 
 
     def set_planet_status(self):
@@ -365,6 +375,8 @@ class MyMatrix():
     def fill_planets_predictions(self,matrix):
         """
         FILL PLANETS FOR PREDICTION MATRIX
+
+        NO LONGER USED, SINCE WE ARE NO LONGER PREDICTING (NO NEURAL NET)
         """
         for planet_id, planet in self.myMap.data_planets.items():
             value = Matrix_val.PREDICTION_PLANET.value
@@ -463,6 +475,8 @@ class MyMatrix():
         ITS ACCUMULATIVE ATTACK POWER WILL
 
         MATRIX SHOULD BE FILLED WITH PLANETS INFO ALREADY
+
+        NO LONGER USED, SINCE NO LONGER PREDICTING (NO NEURAL NET)
         """
 
         for player_id, ships in predicted_coords.items():

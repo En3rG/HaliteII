@@ -78,14 +78,19 @@ class Exploration():
         DISTANCE MATRIX FOR 15x15 MATRIX
         ASSUMING START IS AT THE CENTER
         """
-        matrix = np.zeros((15, 15), dtype=np.float16)
-        start = MyCommon.Coordinates(7, 7)
+        ## LOOPING, STRAIGHT NUMPY SHOULD BE FASTER
+        # matrix = np.zeros((15, 15), dtype=np.float16)
+        # start = MyCommon.Coordinates(7, 7)
+        #
+        # for r in range(15):
+        #     for c in range(15):
+        #         matrix[r][c] = MyCommon.calculate_distance(start, MyCommon.Coordinates(r,c))
+        # return matrix
 
-        for r in range(15):
-            for c in range(15):
-                matrix[r][c] = MyCommon.calculate_distance(start, MyCommon.Coordinates(r,c))
-
-        return matrix
+        ## USING NUMPY VECTORIZED
+        start_point = (7,7)
+        n_rows, n_cols = 15, 15
+        return self.calculate_distance_sections(start_point, n_rows, n_cols)
 
 
     def get_planets(self):
@@ -103,6 +108,7 @@ class Exploration():
 
         return planets
 
+
     def get_distances(self):
         """
         GET DISTANCES OF EACH PLANET TO ONE ANOTHER
@@ -114,6 +120,7 @@ class Exploration():
         matrix = self.calculate_distance_matrix(matrix)
 
         return matrix
+
 
     def calculate_distance_matrix(self,matrix):
         """
@@ -145,6 +152,7 @@ class Exploration():
         #        [4.7044, 0., 6.0893, 3.3561],
         #        [1.6172, 6.0893, 0., 2.8477],
         #        [1.8856, 3.3561, 2.8477, 0.]])
+
 
     def get_distances_section(self):
         """
@@ -213,8 +221,6 @@ class Exploration():
         distances = np.linalg.norm(to_points - start_point, ord=2, axis=1.)
 
         return distances.reshape((row_length, col_length))
-
-
 
 
     def get_distances_section_to_planet(self):
@@ -353,6 +359,7 @@ class Exploration():
                                           cummulative=False)
         return matrix
 
+
     def fill_planets_for_paths(self, matrix):
         """
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
@@ -373,6 +380,7 @@ class Exploration():
             self.fill_one_planet(planet)
 
         return matrix
+
 
     def fill_one_planet(self, planet):
         """
@@ -437,6 +445,7 @@ class Exploration():
                     done.add((target_planet.id, planet_id))
 
         return paths
+
 
     def get_starting_ships_paths(self, paths):
         """

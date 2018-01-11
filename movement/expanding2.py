@@ -34,6 +34,7 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0], ship_point[1] - 1))
     except: pass
 
+
     ## A BIT FURTHER NORTH, EAST, SOUTH AND WEST
     # position_matrix[ship_point[0] - 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
     # position_matrix[ship_point[0]][ship_point[1] + 2] = Matrix_val.ALLY_SHIP.value
@@ -61,26 +62,21 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
 
 
     ## HERE ALWAYS FILLING DIAGONALS (EVEN ON INTERMEDIATE STEPS)
-    try:
-        position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
-    except:
-        pass
-    try:
-        position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    except: pass
+
+    try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
-    except:
-        pass
-    try:
-        position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    except: pass
+
+    try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
-    except:
-        pass
-    try:
-        position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    except: pass
+
+    try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
-    except:
-        pass
+    except: pass
 
 
 
@@ -111,7 +107,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     WE"LL USE LOCAL/SECTIONED A*
     """
-
     square_radius = MyCommon.Constants.SECTION_SQUARE_RADIUS
     circle_radius = MyCommon.Constants.SECTION_CIRCLE_RADIUS
     max_travel_distance = MyCommon.Constants.MAX_TRAVEL_DISTANCE
@@ -121,7 +116,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     ## GET ANGLE TO TARGET
     angle_towards_target = MyCommon.get_angle(ship_coord, target_coord)
-
 
     ## GET SECTION (ONLY BASE ON LAST POSITION MATRIX)
     # position_matrix = MyMoves.position_matrix[7]
@@ -166,7 +160,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
     mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
 
-
     ## PERFORM A* TOWARDS TARGET
     ## WE DONT REALLY NEED TABLE OR SIMPLIFIED PATHS HERE
     #path_table_forward, simplified_paths = astar.get_Astar_table(section_matrix, mid_point, section_target_point)
@@ -209,18 +202,12 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
         ## UPDATE SECTION MATRIX TO CLEAR MID POINT (JUST IN CASE NEW SHIPS WENT IN THIS LOCATION)
 
-
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
-
-        #logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))  ## CAUSING TO TIMEOUT STILL?
 
         logging.debug("A* path_points: {}".format(path_points))
 
         if path_points:
-
-
-
             ## GOING FROM START POINT TO END POINT
             # astar_destination_point = path_points[-2]
             # for current_point in reversed(path_points[:-1]):
@@ -265,8 +252,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             #     logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
             #     astar_destination_point = mid_point
 
-
-
             astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
             angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
 
@@ -291,7 +276,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             astar_destination_coord = mid_coord  ## NEED TO UPDATE THIS LATER, GET A NEW TARGET!!
             angle, thrust = 0, 0
             logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
-
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
     slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.SECTION_SQUARE_RADIUS, \
@@ -354,33 +338,32 @@ def no_collision(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLI
 def get_docking_coord(MyMoves, target_planet_id, ship_id):
     """
     RETURN TARGET COORD TOWARDS A SPECIFIED PLANET
+    AND THE DISTANCE
     """
     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     target_planet_coord = MyMoves.myMap.data_planets[target_planet_id]['coords']
 
     angle = MyCommon.get_angle(ship_coord, target_planet_coord)
 
+    ## WE CAN DOCK ALREADY, SO JUST RETURN DISTANCE 0 SO WE CAN JUST DOCK
     if ship_can_dock(MyMoves, ship_coord, target_planet_id):
-        ## WE CAN DOCK ALREADY, SO JUST RETURN DISTANCE 0 SO WE CAN JUST DOCK
         docking_coord = ship_coord
         distance = 0
         return docking_coord, distance
 
-
     ## GET MATRIX OF JUST THE TARGET PLANET
     target_planet_matrix = MyMoves.EXP.planet_matrix[target_planet_id]
-
     seek_value = Matrix_val.PREDICTION_PLANET.value
-
     value_coord = MyCommon.get_coord_of_value_in_angle(target_planet_matrix, ship_coord, seek_value, angle)
 
     if value_coord:
         reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-        docking_coord = MyCommon.get_destination_coord(value_coord, reverse_angle,
-                                                       MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
+        docking_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)
     else:
         logging.error("Did not get closest target, given the angle.")
 
+    ## CHECK IF DOCKING COORD FOUND IS FREE/AVAILABLE
+    ## IF NOT, TRY TO GET NEW COORDS
     if not(isPositionMatrix_free(MyMoves.position_matrix[7], docking_coord)):
         #new_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
 
@@ -395,7 +378,9 @@ def get_docking_coord(MyMoves, target_planet_id, ship_id):
     else:
         distance = MyCommon.calculate_distance(ship_coord ,docking_coord)
 
+    ## DISTANCE IS NONE, MEANS NO DOCKING COORD FOUND
     return docking_coord, distance
+
 
 def get_new_docking_coord(MyMoves, ship_id, target_planet_id, position_matrix, coord, reverse_angle):
     """
@@ -490,9 +475,11 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
     logging.debug("No new position2 found for ship_id: {} target_planet_id: {} coord: {}".format(ship_id, target_planet_id, old_target_coord))
     return None
 
+
 def isPositionMatrix_free(position_matrix, coord):
     """
     RETURNS TRUE IF POSITION MATRIX IS AVAILABLE
+    GIVEN CURRENT POSITION MATRIX AND COORD
     """
     logging.debug("At coord: {}.  Position_matrix value is: {}".format(coord, position_matrix[int(round(coord.y))][int(round(coord.x))]))
 

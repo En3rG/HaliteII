@@ -101,7 +101,7 @@ def a_star2(arrays, start_point, goal_point):
 
     UPDATED A* ABOVE, THIS TIME IT WILL TAKE MULTIPLE ARRAYS (INCLUDING INTERMEDIATE STEPS)
 
-    ARRAY WILL BE A DICTIONARY OF STEPSe
+    ARRAY WILL BE A DICTIONARY OF STEPS
     """
     ## MAKE SURE COORDS ARE ROUNDED AS INTS
     start = (int(round(start_point[0])),int(round(start_point[1])))
@@ -111,7 +111,6 @@ def a_star2(arrays, start_point, goal_point):
     goal_distance = MyCommon.calculate_distance(MyCommon.Coordinates(start_point[0], start_point[1]),
                                                 MyCommon.Coordinates(goal_point[0], goal_point[1]))
     goal_distance = min(7, goal_distance)  ## SOMETIMES GOAL CAN BE VERY FAR, BUT LIMIT TO 7 ONLY
-
 
     index_per_step = 7/goal_distance  ## THIS WILL BE THE INCREASE IN INDEX (POSITION MATRIX) PER STEP
 

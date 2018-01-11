@@ -26,6 +26,9 @@ it will then have -2.  This can help us decide whether to move there or not. Or 
 """
 
 class Target():
+    """
+    SHOULD WE DELETE? NOT REALLY BEING UTILIZED
+    """
     NOTHING = -1
     PLANET = 0
     SHIP = 1
@@ -41,13 +44,23 @@ class MyMoves():
         self.EXP = EXP
         self.myMap = myMap
         self.myMatrix = myMatrix
-        self.position_matrix = {1: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-                                2: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-                                3: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-                                4: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-                                5: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-                                6: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-                                7: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),}  ## SECOND ONE IS HP MATRIX
+
+        # self.position_matrix = {1: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+        #                         2: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+        #                         3: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+        #                         4: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+        #                         5: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+        #                         6: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
+        #                         7: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),}  ## SECOND ONE IS HP MATRIX
+
+        ## USING NP.COPY (BARELY FASTER)
+        self.position_matrix = {1: np.copy(myMatrix.matrix[myMap.my_id][0]),
+                                2: np.copy(myMatrix.matrix[myMap.my_id][0]),
+                                3: np.copy(myMatrix.matrix[myMap.my_id][0]),
+                                4: np.copy(myMatrix.matrix[myMap.my_id][0]),
+                                5: np.copy(myMatrix.matrix[myMap.my_id][0]),
+                                6: np.copy(myMatrix.matrix[myMap.my_id][0]),
+                                7: np.copy(myMatrix.matrix[myMap.my_id][0]),}  ## SECOND ONE IS HP MATRIX
 
         self.get_my_moves()
 
@@ -57,7 +70,7 @@ class MyMoves():
         GET THE MOVES PER SHIP ID
         """
         if self.myMap.myMap_prev is None:
-            # FIRST TURN
+            # FIRST TURN ONLY
 
             ## GET BEST PLANET
             target_planet_id = self.EXP.best_planet_id
@@ -73,7 +86,7 @@ class MyMoves():
 
             first_heap = [] ## DIFFERENT THAN HEAP TO BE USED LATER
 
-            ## PLACE SHIPS IN HEAP BASE ON DISTANCE
+            ## PLACE SHIPS IN HEAP BASED ON DISTANCE
             for ship_id in self.myMap.ships_new:
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                 value_coord = MyCommon.get_coord_of_value_in_angle(planet_matrix, ship_coord, seek_value, angle)
@@ -109,31 +122,30 @@ class MyMoves():
                 self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, target_coord)
 
         else:
+            ## EVERY OTHER TURN (EXCEPT FIRST TURN)
+
             ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
                 self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
-            attacking.get_battling_ships(self)
+            attacking.move_battling_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW
             ## TURNS OUT A* IS RUNNING LONGER SINCE PATH IS UNREACHABLE, DUE TO ANOTHER SHIP BLOCKING ITS DESTINATION
 
-            ## GET TARGET AND DISTANCES
+            ## GET TARGET AND DISTANCES FOR THE SHIPS THAT HASNT MOVED YET
             heap = self.get_target_and_distances()
 
             ## MOVE OTHERS REMAINING
-            # USING HEAPQ POP
             while heap:
                 planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord = heapq.heappop(heap)
 
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
 
                 logging.debug("at heap ship_id: {} ship_coord: {} planet_distance: {} target_planet_id: {} enemy_distance: {} enemy_target_coord: {}".format(ship_id, ship_coord,planet_distance, target_planet_id, enemy_distance, enemy_target_coord))
-
-
 
                 ## HAS ENEMY TARGET COORD
                 ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
@@ -150,16 +162,16 @@ class MyMoves():
 
                         logging.debug("new_target_planet_id: {} target_planet_id: {}".format(new_target_planet_id, target_planet_id))
 
+                        ## NO MORE PLANETS TO CONQUER AT THIS TIME
+                        ## ADD BACK TO HEAP
                         if new_target_planet_id is None:
-                            ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                            ## ADD BACK TO HEAP
                             planet_distance = MyCommon.Constants.BIG_DISTANCE
                             enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
                             heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
                             continue
 
+                        ## TARGET PLANET CHANGED.  RECALCULATE DISTANCE, AND PUT BACK TO HEAP
                         if new_target_planet_id != target_planet_id:
-                            ## TARGET PLANET CHANGED.  RECALCULATE DISTANCE, AND PUT BACK TO HEAP
                             planet_coord = self.myMap.data_planets[new_target_planet_id]['coords']
                             planet_radius = self.myMap.data_planets[new_target_planet_id]['radius']
                             planet_distance = MyCommon.calculate_distance(ship_coord, planet_coord, rounding=False) - planet_radius
@@ -218,7 +230,6 @@ class MyMoves():
 
                     ## SET SHIP STATUSES
                     self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
-
 
 
     def get_target_and_distances(self):
@@ -388,6 +399,7 @@ class MyMoves():
         ## SET SHIP HAS MOVED AND FILL POSITION MATRIX
         self.set_ship_moved_and_fill_position(ship_id, angle, thrust)
 
+
     def set_ship_moved_and_fill_position(self, ship_id, angle, thrust, mining=False):
         """
         ADD SHIP TO MOVED ALREADY
@@ -404,6 +416,7 @@ class MyMoves():
 
         ## FILL IN INTERMEDIATE POSITION MATRIX
         expanding2.fill_position_matrix_intermediate_steps(self, ship_id, angle, thrust, mining)
+
 
     def set_ship_destination(self, ship_id, coords, angle, thrust, target_coord):
         """
@@ -423,7 +436,6 @@ class MyMoves():
         ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle
 
-        ##
 
     def set_ship_target_id(self, ship_id, target_type, target_id):
         """
@@ -431,6 +443,7 @@ class MyMoves():
         WITH SHIP ID, TARGET TYPE, AND TARGET ID PROVIDED
         """
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'] = (target_type, target_id)
+
 
     def set_ship_task(self, ship_id, ship_task):
         """
@@ -443,11 +456,11 @@ class MyMoves():
         if ship_task == ShipTasks.EXPANDING:
             self.myMap.ships_expanding.add(ship_id)
 
+
     def set_planet_myminer(self, planet_id, ship_id):
         """
         SET PLANET MY MINER IN MYMAP DATA PLANETS
         REGARDING MY SHIPS THAT ARE GOING TO MINE THIS PLANET
         """
         self.myMap.data_planets[planet_id]['my_miners'].add(ship_id)
-
 

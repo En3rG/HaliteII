@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02cba0c9-f6b0-4114-b540-93cb9b5b278a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyBot.py" afterPath="$PROJECT_DIR$/MyBot.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyCommon.py" afterPath="$PROJECT_DIR$/MyCommon.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/attacking.py" afterPath="$PROJECT_DIR$/movement/attacking.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/moves2.py" afterPath="$PROJECT_DIR$/movement/moves2.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run_game.bat" afterPath="$PROJECT_DIR$/run_game.bat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/training/train.py" afterPath="$PROJECT_DIR$/training/train.py" />
     </list>
     <ignored path="MYBOT.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,8 +28,8 @@
       <file leaf-file-name="expanding2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2074">
-              <caret line="131" column="28" selection-start-line="131" selection-start-column="28" selection-end-line="131" selection-end-column="28" />
+            <state relative-caret-position="777">
+              <caret line="462" column="33" selection-start-line="462" selection-start-column="12" selection-end-line="462" selection-end-column="33" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
                 <marker date="1515633560110" expanded="true" signature="15539:16013" placeholder="..." />
@@ -54,9 +52,11 @@
       <file leaf-file-name="moves2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/moves2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="34" />
-              <folding />
+            <state relative-caret-position="692">
+              <caret line="215" column="78" selection-start-line="215" selection-start-column="51" selection-end-line="215" selection-end-column="78" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -71,14 +71,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="attacking.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="attacking.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/movement/attacking.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="47" column="83" selection-start-line="47" selection-start-column="83" selection-end-line="47" selection-end-column="83" />
+            <state relative-caret-position="238">
+              <caret line="35" column="12" selection-start-line="35" selection-start-column="12" selection-end-line="35" selection-end-column="12" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/training/train.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="513">
+              <caret line="65" column="7" selection-start-line="65" selection-start-column="7" selection-end-line="65" selection-end-column="7" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -113,11 +123,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MyCommon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="35" column="23" selection-start-line="35" selection-start-column="23" selection-end-line="35" selection-end-column="23" />
+            <state relative-caret-position="321">
+              <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -140,7 +150,6 @@
         <option value="$PROJECT_DIR$/multiprocessor/processors.py" />
         <option value="$PROJECT_DIR$/movement/expanding.py" />
         <option value="$PROJECT_DIR$/movement/moves.py" />
-        <option value="$PROJECT_DIR$/training/train.py" />
         <option value="$PROJECT_DIR$/models/data2.py" />
         <option value="$PROJECT_DIR$/initialization/astar.py" />
         <option value="$PROJECT_DIR$/movement/expanding2.py" />
@@ -150,13 +159,14 @@
         <option value="$PROJECT_DIR$/movement/moves3.py" />
         <option value="$PROJECT_DIR$/MyBot.py" />
         <option value="$PROJECT_DIR$/movement/attacking.py" />
+        <option value="$PROJECT_DIR$/training/train.py" />
         <option value="$PROJECT_DIR$/MyCommon.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="220" />
-    <option name="y" value="49" />
+    <option name="x" value="84" />
+    <option name="y" value="84" />
     <option name="width" value="1662" />
     <option name="height" value="956" />
   </component>
@@ -316,7 +326,7 @@
       <recent name="C:\Users\Gio\Desktop\Gio's Folder\Python\HALITE\HALITE II\MYBOT\models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.attacking">
+  <component name="RunManager" selected="Python.train">
     <configuration default="false" name="expanding2" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -330,23 +340,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="MYBOT" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/movement/expanding2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="data2" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/models" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="MYBOT" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/models/data2.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -398,6 +391,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="MYBOT" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/movement/attacking.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="train" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/training" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="MYBOT" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/training/train.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -538,18 +548,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.expanding2" />
-      <item index="1" class="java.lang.String" itemvalue="Python.data2" />
-      <item index="2" class="java.lang.String" itemvalue="Python.MyCommon" />
-      <item index="3" class="java.lang.String" itemvalue="Python.moves2" />
-      <item index="4" class="java.lang.String" itemvalue="Python.attacking" />
+      <item index="1" class="java.lang.String" itemvalue="Python.MyCommon" />
+      <item index="2" class="java.lang.String" itemvalue="Python.moves2" />
+      <item index="3" class="java.lang.String" itemvalue="Python.attacking" />
+      <item index="4" class="java.lang.String" itemvalue="Python.train" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.attacking" />
-        <item index="1" class="java.lang.String" itemvalue="Python.moves2" />
-        <item index="2" class="java.lang.String" itemvalue="Python.expanding2" />
-        <item index="3" class="java.lang.String" itemvalue="Python.MyCommon" />
-        <item index="4" class="java.lang.String" itemvalue="Python.data2" />
+        <item index="0" class="java.lang.String" itemvalue="Python.train" />
+        <item index="1" class="java.lang.String" itemvalue="Python.attacking" />
+        <item index="2" class="java.lang.String" itemvalue="Python.moves2" />
+        <item index="3" class="java.lang.String" itemvalue="Python.expanding2" />
+        <item index="4" class="java.lang.String" itemvalue="Python.MyCommon" />
       </list>
     </recent_temporary>
   </component>
@@ -570,7 +580,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="220" y="49" width="1662" height="956" extended-state="0" />
+    <frame x="84" y="84" width="1662" height="956" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13001215" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -578,12 +588,12 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16646989" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32625" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1675" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28915662" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32625" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12517007" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -691,7 +701,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -903,13 +915,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="67" column="42" selection-start-line="67" selection-start-column="42" selection-end-line="67" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/movement/expanding.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1275">
@@ -928,18 +933,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-335">
           <caret line="595" column="28" selection-start-line="595" selection-start-column="28" selection-end-line="595" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2074">
-          <caret line="131" column="28" selection-start-line="131" selection-start-column="28" selection-end-line="131" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-            <marker date="1515633560110" expanded="true" signature="15539:16013" placeholder="..." />
-            <marker date="1515633560110" expanded="true" signature="24534:24703" placeholder="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -968,14 +961,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/movement/moves2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MyBot.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="467">
@@ -992,20 +977,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/movement/attacking.py">
+    <entry file="file://$PROJECT_DIR$/training/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="47" column="83" selection-start-line="47" selection-start-column="83" selection-end-line="47" selection-end-column="83" />
+        <state relative-caret-position="513">
+          <caret line="65" column="7" selection-start-line="65" selection-start-column="7" selection-end-line="65" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="777">
+          <caret line="462" column="33" selection-start-line="462" selection-start-column="12" selection-end-line="462" selection-end-column="33" />
           <folding>
-            <element signature="e#0#14#0" expanded="true" />
+            <element signature="e#0#12#0" expanded="true" />
+            <marker date="1515633560110" expanded="true" signature="15539:16013" placeholder="..." />
+            <marker date="1515633560110" expanded="true" signature="24534:24703" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/MyCommon.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="35" column="23" selection-start-line="35" selection-start-column="23" selection-end-line="35" selection-end-column="23" />
+        <state relative-caret-position="321">
+          <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/moves2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="692">
+          <caret line="215" column="78" selection-start-line="215" selection-start-column="51" selection-end-line="215" selection-end-column="78" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/attacking.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="35" column="12" selection-start-line="35" selection-start-column="12" selection-end-line="35" selection-end-column="12" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

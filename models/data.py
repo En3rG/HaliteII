@@ -317,7 +317,9 @@ class MyMatrix():
         self.input_matrix_y = input_matrix_y
         self.input_matrix_x = input_matrix_x
         self.prediction_matrix = None
+        self.ally_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
+
 
         ## WILL CONTAIN LOCATION OF BACKUPS NEEDED
         self.backup_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
@@ -352,6 +354,7 @@ class MyMatrix():
                 curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
                 self.prediction_matrix = self.fill_planets_predictions(curr_matrix)
 
+                self.ally_matrix, _ = self.fill_ships_ally(self.ally_matrix, copy.deepcopy(matrix_hp), ships)
 
             matrix_current = copy.deepcopy(matrix)
             matrix_hp_current = copy.deepcopy(matrix_hp)

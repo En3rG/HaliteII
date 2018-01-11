@@ -58,12 +58,16 @@ def move_battling_ships(MyMoves):
                     ## ENEMY WITHIN THE SAME SECTION
                     ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
                     value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
-                    v_section = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+                    v_enemy = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+
+                    value = MyMoves.myMatrix.ally_matrix
+                    v_ally = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+
                     d_section = MyMoves.EXP.distance_matrix_15x15
 
                     ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
                     seek_val = -0.75
-                    enemy_point, enemy_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_section, d_section)
+                    enemy_point, enemy_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
                     ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
 
                     ## GET NUMBER OF ENEMIES IN THIS SECTION
@@ -71,8 +75,8 @@ def move_battling_ships(MyMoves):
                     # num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
 
                     ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
-                    num_enemy_in_section = (v_section==-1).sum()
-                    num_ally_in_section = (v_section==1).sum()
+                    num_enemy_in_section = (v_enemy==-1).sum()
+                    num_ally_in_section = (v_ally==1).sum()
 
                     strong_enough = num_ally_in_section > num_enemy_in_section
 
@@ -293,3 +297,8 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
         set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle)
     else:
         return final_distance, target_coord
+
+
+
+
+

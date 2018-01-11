@@ -194,17 +194,17 @@ if __name__ == "__main__":
 
 
             ## GET PROJECTIONS OF ENEMY SHIPS
-            myProjection = MyProjection(myMap)
-            logging.info("myProjection completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
+            # myProjection = MyProjection(myMap)
+            # logging.info("myProjection completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            # start = datetime.datetime.now()
 
 
 
             ## FOR TESTING ONLY
             ## SEE IF ENEMY IS ONCOMING
-            myProjection.check_for_enemy()
-            logging.info("myProjection.check_for_enemy completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
+            # myProjection.check_for_enemy()
+            # logging.info("myProjection.check_for_enemy completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
+            # start = datetime.datetime.now()
 
 
 

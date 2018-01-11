@@ -18,8 +18,6 @@ import datetime
 
 
 """
-NOTE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
 when deciding where to go, should we place -1 on all enemy ranges, and if 2 enemy can attack that area,
 it will then have -2.  This can help us decide whether to move there or not. Or whether we can win or not
 

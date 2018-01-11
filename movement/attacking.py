@@ -3,6 +3,7 @@ import numpy as np
 import MyCommon
 import movement.expanding2 as expanding2
 import heapq
+from models.data import Matrix_val
 
 def set_commands_status(MyMoves, ship_id, thrust, angle):
     """
@@ -26,18 +27,26 @@ def move_battling_ships(MyMoves):
 
     ## FASTER WAY THAN LOOPING ABOVE
     ## BASICALLY COMBINING ALL SET FROM THE DICTIONARY
-    handled_ships = set.union(*MyMoves.myMap.ships_battling.values())  ## * TO UNPACK OR ELSE WONT WORK
-
-    logging.debug("handled_ships: {}".format(handled_ships))
+    #handled_ships = set.union(*MyMoves.myMap.ships_battling.values())  ## * TO UNPACK OR ELSE WONT WORK
 
     ## ONLY DETERMINE THE DISTANCES AND PLACE INTO THE HEAP, WILL MOVE LATER
-    for ship_id in handled_ships:
+    #for ship_id in handled_ships:
+    for ship_id, ship in MyMoves.myMap.data_ships[MyMoves.myMap.my_id].items(): ## INSTEAD OF JUST LOOPING THROUGH HANDLED_SHIPS
         if ship_id not in MyMoves.myMap.ships_moved_already:
             ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
             ship_section = MyCommon.get_section_num(ship_coords)
             ship_section_coord = MyCommon.Coordinates(ship_section[0], ship_section[1])
             distances = MyMoves.EXP.sections_distance_table[ship_section]
             values = MyMoves.myMap.section_enemy_summary
+
+            ## CHECK IF ENEMIES WITHIN 4 TURNS
+            enemy_matrix = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
+            perimeter = MyCommon.get_section_with_padding(enemy_matrix, ship_coords, MyCommon.Constants.PERIMETER_CHECK_RADIUS, pad_values=0)
+
+            if Matrix_val.ENEMY_SHIP.value not in perimeter or Matrix_val.ENEMY_SHIP_DOCKED.value not in perimeter:
+                ## NO ENEMY FOUND, SKIP
+                logging.debug("ship_id: {} did not find any enemy".format(ship_id))
+                continue
 
             logging.debug("ship_id:: {} ship_coords: {} ship_section: {}".format(ship_id,ship_coords,ship_section))
 
@@ -297,8 +306,5 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
         set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle)
     else:
         return final_distance, target_coord
-
-
-
 
 

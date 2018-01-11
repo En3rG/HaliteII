@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="02cba0c9-f6b0-4114-b540-93cb9b5b278a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/data.py" afterPath="$PROJECT_DIR$/models/data.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyBot.py" afterPath="$PROJECT_DIR$/MyBot.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyCommon.py" afterPath="$PROJECT_DIR$/MyCommon.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/attacking.py" afterPath="$PROJECT_DIR$/movement/attacking.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run_game.bat" afterPath="$PROJECT_DIR$/run_game.bat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/moves2.py" afterPath="$PROJECT_DIR$/movement/moves2.py" />
     </list>
     <ignored path="MYBOT.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,7 +30,7 @@
       <file leaf-file-name="expanding2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="214">
+            <state relative-caret-position="2074">
               <caret line="131" column="28" selection-start-line="131" selection-start-column="28" selection-end-line="131" selection-end-column="28" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
@@ -43,7 +44,7 @@
       <file leaf-file-name="moves.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/moves.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="185">
+            <state relative-caret-position="3060">
               <caret line="190" column="39" selection-start-line="190" selection-start-column="39" selection-end-line="190" selection-end-column="39" />
               <folding />
             </state>
@@ -53,8 +54,28 @@
       <file leaf-file-name="moves2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/movement/moves2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7072">
-              <caret line="443" column="11" selection-start-line="443" selection-start-column="11" selection-end-line="443" selection-end-column="11" />
+            <state relative-caret-position="238">
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MyBot.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MyBot.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="467">
+              <caret line="207" column="0" selection-start-line="207" selection-start-column="0" selection-end-line="207" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="attacking.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/movement/attacking.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="47" column="83" selection-start-line="47" selection-start-column="83" selection-end-line="47" selection-end-column="83" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -62,20 +83,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="attacking.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/movement/attacking.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="63" column="88" selection-start-line="63" selection-start-column="88" selection-end-line="63" selection-end-column="88" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="explore.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/initialization/explore.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
+            <state relative-caret-position="1037">
               <caret line="70" column="43" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="43" />
               <folding />
             </state>
@@ -85,7 +96,7 @@
       <file leaf-file-name="data2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/data2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="536">
+            <state relative-caret-position="1241">
               <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
               <folding />
             </state>
@@ -95,18 +106,18 @@
       <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="141">
-              <caret line="319" column="92" selection-start-line="319" selection-start-column="92" selection-end-line="319" selection-end-column="92" />
+            <state relative-caret-position="8381">
+              <caret line="501" column="77" selection-start-line="501" selection-start-column="77" selection-end-line="501" selection-end-column="77" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MyCommon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="8" column="23" selection-start-line="8" selection-start-column="23" selection-end-line="8" selection-end-column="23" />
+            <state relative-caret-position="525">
+              <caret line="35" column="23" selection-start-line="35" selection-start-column="23" selection-end-line="35" selection-end-column="23" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -131,22 +142,23 @@
         <option value="$PROJECT_DIR$/movement/moves.py" />
         <option value="$PROJECT_DIR$/training/train.py" />
         <option value="$PROJECT_DIR$/models/data2.py" />
-        <option value="$PROJECT_DIR$/MyBot.py" />
         <option value="$PROJECT_DIR$/initialization/astar.py" />
         <option value="$PROJECT_DIR$/movement/expanding2.py" />
-        <option value="$PROJECT_DIR$/movement/moves2.py" />
         <option value="$PROJECT_DIR$/initialization/explore.py" />
-        <option value="$PROJECT_DIR$/MyCommon.py" />
         <option value="$PROJECT_DIR$/models/data.py" />
+        <option value="$PROJECT_DIR$/movement/moves2.py" />
+        <option value="$PROJECT_DIR$/movement/moves3.py" />
+        <option value="$PROJECT_DIR$/MyBot.py" />
         <option value="$PROJECT_DIR$/movement/attacking.py" />
+        <option value="$PROJECT_DIR$/MyCommon.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="285" />
-    <option name="y" value="64" />
-    <option name="width" value="1468" />
-    <option name="height" value="909" />
+    <option name="x" value="220" />
+    <option name="y" value="49" />
+    <option name="width" value="1662" />
+    <option name="height" value="956" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -173,7 +185,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -293,6 +304,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -300,8 +312,8 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Gio\Desktop\Gio's Folder\Python\HALITE\HALITE II\MYBOT\models" />
       <recent name="C:\Users\Gio\Desktop\Gio's Folder\Python\HALITE\HALITE II\MYBOT\movement" />
+      <recent name="C:\Users\Gio\Desktop\Gio's Folder\Python\HALITE\HALITE II\MYBOT\models" />
     </key>
   </component>
   <component name="RunManager" selected="Python.attacking">
@@ -558,19 +570,19 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="285" y="64" width="1468" height="909" extended-state="0" />
+    <frame x="220" y="49" width="1662" height="956" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12672177" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13001215" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32625" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20625" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32625" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1675" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28915662" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -612,16 +624,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/movement/moves2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="935">
-          <caret line="68" column="29" selection-start-line="68" selection-start-column="29" selection-end-line="68" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MyCommon.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5423">
@@ -652,9 +654,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5202">
           <caret line="316" column="37" selection-start-line="316" selection-start-column="22" selection-end-line="316" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#14#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -662,7 +662,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1785">
           <caret line="110" column="8" selection-start-line="110" selection-start-column="8" selection-end-line="110" selection-end-column="72" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -670,7 +669,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="578">
           <caret line="40" column="56" selection-start-line="40" selection-start-column="56" selection-end-line="40" selection-end-column="56" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -678,7 +676,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1139">
           <caret line="69" column="70" selection-start-line="69" selection-start-column="49" selection-end-line="69" selection-end-column="70" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -694,9 +691,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -730,9 +725,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1870">
           <caret line="120" column="87" selection-start-line="120" selection-start-column="87" selection-end-line="120" selection-end-column="87" />
-          <folding>
-            <element signature="e#0#14#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -752,7 +745,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="19" column="7" selection-start-line="19" selection-start-column="7" selection-end-line="19" selection-end-column="7" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -760,7 +752,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
           <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -800,7 +791,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
           <caret line="46" column="71" selection-start-line="46" selection-start-column="71" selection-end-line="46" selection-end-column="71" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -824,9 +814,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#14#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -841,7 +829,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1887">
           <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -877,28 +864,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="257">
           <caret line="52" column="10" selection-start-line="52" selection-start-column="8" selection-end-line="52" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training/test.txt">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MyBot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="635">
-          <caret line="266" column="0" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/training/test.txt" />
     <entry file="file://$PROJECT_DIR$/initialization/astar.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="111">
           <caret line="253" column="20" selection-start-line="253" selection-start-column="20" selection-end-line="253" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -906,7 +879,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -914,7 +886,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="151">
           <caret line="34" column="23" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -922,7 +893,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="366">
           <caret line="135" column="8" selection-start-line="135" selection-start-column="2" selection-end-line="135" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -930,7 +900,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="103">
           <caret line="69" column="28" selection-start-line="69" selection-start-column="28" selection-end-line="69" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -938,7 +907,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="399">
           <caret line="67" column="42" selection-start-line="67" selection-start-column="42" selection-end-line="67" selection-end-column="42" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -946,7 +914,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1275">
           <caret line="90" column="12" selection-start-line="90" selection-start-column="6" selection-end-line="90" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -954,7 +921,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="214">
           <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -962,13 +928,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-335">
           <caret line="595" column="28" selection-start-line="595" selection-start-column="28" selection-end-line="595" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
+        <state relative-caret-position="2074">
           <caret line="131" column="28" selection-start-line="131" selection-start-column="28" selection-end-line="131" selection-end-column="28" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
@@ -980,61 +945,70 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/movement/moves.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
+        <state relative-caret-position="3060">
           <caret line="190" column="39" selection-start-line="190" selection-start-column="39" selection-end-line="190" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/initialization/explore.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1037">
+          <caret line="70" column="43" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/moves3.py" />
+    <entry file="file://$PROJECT_DIR$/models/data2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1241">
+          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/movement/moves2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7072">
-          <caret line="443" column="11" selection-start-line="443" selection-start-column="11" selection-end-line="443" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/initialization/explore.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="70" column="43" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="43" />
+        <state relative-caret-position="238">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="34" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MyCommon.py">
+    <entry file="file://$PROJECT_DIR$/MyBot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="8" column="23" selection-start-line="8" selection-start-column="23" selection-end-line="8" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/data2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="536">
-          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
+        <state relative-caret-position="467">
+          <caret line="207" column="0" selection-start-line="207" selection-start-column="0" selection-end-line="207" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/models/data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
-          <caret line="319" column="92" selection-start-line="319" selection-start-column="92" selection-end-line="319" selection-end-column="92" />
+        <state relative-caret-position="8381">
+          <caret line="501" column="77" selection-start-line="501" selection-start-column="77" selection-end-line="501" selection-end-column="77" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/movement/attacking.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="63" column="88" selection-start-line="63" selection-start-column="88" selection-end-line="63" selection-end-column="88" />
-          <folding />
+        <state relative-caret-position="340">
+          <caret line="47" column="83" selection-start-line="47" selection-start-column="83" selection-end-line="47" selection-end-column="83" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MyCommon.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="35" column="23" selection-start-line="35" selection-start-column="23" selection-end-line="35" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

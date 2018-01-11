@@ -319,6 +319,9 @@ class MyMatrix():
         self.prediction_matrix = None
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
+        ## WILL CONTAIN LOCATION OF BACKUPS NEEDED
+        self.backup_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
 

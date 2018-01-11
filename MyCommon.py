@@ -360,7 +360,7 @@ def get_section_with_padding(a, center_coord, square_radius, pad_values):
     return add_padding(a, center_coord, square_radius, 0)
 
 
-def get_coord_closest_most_enemies_from_section(seek_val, values, distances):
+def get_coord_closest_seek_value(seek_val, values, distances):
     """
     GET CLOSESTS AND MOST ENEMIES FROM THE SECTION PROVIDED
 

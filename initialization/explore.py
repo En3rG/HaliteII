@@ -67,13 +67,15 @@ class Exploration():
 
         self.get_launch_coords()
 
-        self.sample_distance_matrix = self.get_sample_distance_matrix()
+        self.distance_matrix_15x15 = self.get_distance_matrix(7, 15)
+        self.distance_matrix_section_square = self.get_distance_matrix(MyCommon.Constants.SECTION_SQUARE_RADIUS,
+                                                                       MyCommon.Constants.SECTION_SQUARE_RADIUS*2 + 1)
 
         #self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
 
         #self.A_paths = self.get_paths() ## NO LONGER USED??
 
-    def get_sample_distance_matrix(self):
+    def get_distance_matrix(self, center, square_diameter):
         """
         DISTANCE MATRIX FOR 15x15 MATRIX
         ASSUMING START IS AT THE CENTER
@@ -88,8 +90,8 @@ class Exploration():
         # return matrix
 
         ## USING NUMPY VECTORIZED
-        start_point = (7,7)
-        n_rows, n_cols = 15, 15
+        start_point = (center,center)
+        n_rows, n_cols = square_diameter, square_diameter
         return self.calculate_distance_sections(start_point, n_rows, n_cols)
 
 

@@ -218,7 +218,9 @@ def move_battle_heap(MyMoves, battle_heap):
                     set_commands_status(MyMoves, ship_id, thrust, angle)
 
                     ## ADD TO BACKUP MATRIX
-                    MyMoves.myMatrix.backup_matrix[ship_point[0], ship_point[1]] = 1
+                    ## +2 TO MOVE BACK FURTHER FOR BACKUP TO GO THERE
+                    backup_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust+2, rounding=True)
+                    MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
 
             else:
                 ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION

@@ -53,13 +53,17 @@ class Exploration():
 
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
 
+        self.sections_planet_score_table = self.get_scores_section_to_planet()  ## DISTANCES FROM SECTION TO PLANET
+
         self.planets_distance_matrix = self.get_distances()
+
+        self.planets_score_matrix = self.get_planets_score()
 
         self.myStartCoords = self.get_start_coords()
 
         self.distances_from_start = self.get_start_distances()
 
-        self.best_planet_id = self.get_planets_score()
+        self.best_planet_id = self.get_best_planet()
 
         matrix = np.zeros((self.height , self.width), dtype=np.float16)
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
@@ -128,17 +132,17 @@ class Exploration():
         """
         FILLS THE MATRIX WITH ACTUAL DISTANCES BETWEEN PLANETS
         """
-        for id, val in self.planets.items():
-            for id2, val2 in self.planets.items():
+        for id, planet in self.planets.items():
+            for id2, planet2 in self.planets.items():
 
                 if id == id2:
-                    ## DISTANCE TO ITSELF WILL STAY 99999
+                    ## DISTANCE TO ITSELF WILL STAY 0
                     pass
                 elif matrix[id][id2] != 0:
                     ## ALREADY CALCULATED BEFORE
                     pass
                 else:
-                    matrix[id][id2] = MyCommon.calculate_distance(val['coords'],val2['coords'])
+                    matrix[id][id2] = MyCommon.calculate_distance(planet['coords'],planet2['coords'])
                     matrix[id2][id] = matrix[id][id2]
 
         return matrix
@@ -258,6 +262,42 @@ class Exploration():
 
         return dict
 
+    def get_scores_section_to_planet(self):
+        """
+        GET TABLE OF EACH SECTION'S SCORES TO EACH PLANETS
+
+        table[curr_section][planet_id] = distance
+        """
+        table = {}
+
+        row_length = (self.height // MyCommon.Constants.NUM_SECTIONS) + 1  ## +1 TO COUNT LAST ITEM IN RANGE
+        col_length = (self.width // MyCommon.Constants.NUM_SECTIONS) + 1
+
+        for r in range(row_length):
+            for c in range(col_length):
+                curr_section = (r, c)
+                table[curr_section] = self.calculate_scores_to_planets(curr_section)
+
+        return table
+
+    def calculate_scores_to_planets(self, curr_section):
+        """
+        GET FROM CURRENT SECTION TO EACH PLANETS
+        """
+        dict = {}
+
+        for planet_id, planet in self.planets.items():
+            planet_coords = planet['coords']
+            planet_section = MyCommon.get_section_num(planet_coords)
+
+            distance = self.sections_distance_table[curr_section][planet_section[0]][planet_section[1]]
+            num_docks = planet['docks']
+            score = num_docks/distance
+            dict[planet_id] = score
+
+        return dict
+
+
 
     def get_start_coords(self):
         """
@@ -283,8 +323,35 @@ class Exploration():
 
         return distances
 
-
     def get_planets_score(self):
+        """
+        GET SCORE OF PLANETS
+        TOTAL DOCKS / TOTAL DISTANCES
+        """
+
+        length = len(self.planets)
+
+        ## INITIALIZE MATRIX
+        matrix = [[0 for x in range(length)] for y in range(length)]
+
+        for id, planet in self.planets.items():
+            for id2, planet2 in self.planets.items():
+
+                if id == id2:
+                    ## SCORE TO ITSELF WILL STAY 0
+                    pass
+                else:
+                    distance = MyCommon.calculate_distance(planet['coords'],planet2['coords'])
+                    num_docks = planet2['docks']
+                    score = num_docks/distance
+                    matrix[id][id2] = score
+
+        return matrix
+
+
+
+
+    def get_best_planet(self):
         """
         GET SCORE OF TARGET PLANET
         INCLUDING ITS TOP 2 NEIGHBORING PLANET

@@ -17,25 +17,60 @@ def get_next_target_planet(MyMoves, ship_id):
     """
     from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
 
+
+    ## BASED ON DISTANCE ONLY
+    # if from_planet_id:
+    #     distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
+    #     length = len(distances_to_other_planets)
+    #
+    #     ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+    #     least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
+    #
+    # else:
+    #     ## from_planet_id IS NONE
+    #     ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
+    #     ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
+    #     ship_section = MyCommon.get_section_num(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords'])
+    #     distance_table = MyMoves.EXP.sections_planet_distance_table[ship_section]
+    #     length = len(distance_table)
+    #
+    #     ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
+    #     least_distance_order = heapq.nsmallest(length, ((distance, id) for id, distance in distance_table.items()))
+    #
+    # for distance, planet_id in least_distance_order:
+    #     ## NOT OWNED BY ANYBODY YET
+    #     if planet_id in MyMoves.myMap.planets_unowned:
+    #         if has_room_to_dock(MyMoves, planet_id):
+    #             return planet_id
+    #
+    #     ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
+    #     elif planet_id in MyMoves.myMap.planets_owned:
+    #         if has_room_to_dock(MyMoves, planet_id):
+    #             return planet_id
+    #
+    # return None  ## NO MORE PLANETS
+
+
+    ## GETTING SCORE, NOT DISTANCE
     if from_planet_id:
-        distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
-        length = len(distances_to_other_planets)
+        scores_to_other_planets = MyMoves.EXP.planets_score_matrix[from_planet_id]
+        length = len(scores_to_other_planets)
 
         ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
-        least_distance_order = heapq.nsmallest(length, ((v, i) for i, v in enumerate(distances_to_other_planets)))
+        most_score_order = heapq.nlargest(length, ((v, i) for i, v in enumerate(scores_to_other_planets)))
+
     else:
         ## from_planet_id IS NONE
         ## NO from_planet SET, MUST BE OLD SHIP WITH NO TARGET
         ## NEED TO FIGURE OUT WHICH PLANET TO TAKE
         ship_section = MyCommon.get_section_num(MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords'])
-        distance_table = MyMoves.EXP.sections_planet_distance_table[ship_section]
-        length = len(distance_table)
+        score_table = MyMoves.EXP.sections_planet_score_table[ship_section]
+        length = len(score_table)
 
         ## GET LOWEST TO HIGHEST VALUE OF THE LIST PROVIDED
-        least_distance_order = heapq.nsmallest(length, ((distance, id) for id, distance in distance_table.items()))
+        most_score_order = heapq.nlargest(length, ((score, id) for id, score in score_table.items()))
 
-
-    for distance, planet_id in least_distance_order:
+    for distance, planet_id in most_score_order:
         ## NOT OWNED BY ANYBODY YET
         if planet_id in MyMoves.myMap.planets_unowned:
             if has_room_to_dock(MyMoves, planet_id):

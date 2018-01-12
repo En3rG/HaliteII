@@ -109,19 +109,22 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
             ## ONLY GRAB A SECTION (STRONG ENOUGH RADIUS) OF THE SECTION (ATTACKING RADIUS)
             ## INCLUDE DOCKED SHIPS WHEN CALCULATING ALLY POWER
             ## TO PREVENT ONE SHIP FROM BACKING OUT WHEN PROTECTING DOCKED SHIPS AGAINST 1 ENEMY SHIP
-            num_enemy_in_section = (v_enemy[MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
-                                    MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == -1).sum()  ## JUST GET A 7x7 matrix
-            num_ally_in_section = (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
-                                   MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 1).sum() \
-                                  + (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
-                                     MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 0.75).sum()
+            num_enemy_in_section = (v_enemy==-1).sum()
+            num_ally_in_section = (v_ally==1).sum()
+            # num_enemy_in_section = (v_enemy[MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+            #                         MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == -1).sum()  ## JUST GET A 7x7 matrix
+            # num_ally_in_section = (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+            #                        MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 1).sum() \
+            #                       + (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+            #                          MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 0.75).sum()
 
             strong_enough = num_ally_in_section > num_enemy_in_section
 
             ## ACTUAL COORDINATE OF ENEMY (MINUS SOME TO AVOID COLLIDING)
             target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
 
-            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None, strong_enough))
+            over_thrust = None
+            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
         else:
             ## ENEMY IN A DIFFERENT SECTION
 
@@ -201,6 +204,8 @@ def move_battle_heap(MyMoves, battle_heap):
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
                     logging.debug("thrust: {} angle: {}".format(thrust, angle))
                     set_commands_status(MyMoves, ship_id, thrust, angle)
+
+
                 else:
                     ## NOT STRONG ENOUGH (FLIP ANGLE)
                     logging.debug("ship_id: {} from handled_ships in same section (not strong enough)".format(ship_id))

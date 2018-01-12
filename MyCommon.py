@@ -26,7 +26,7 @@ class Constants():
     ## FOR A* SECTIONED
     SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
     SECTION_CIRCLE_RADIUS = 7 ## 7. 14 TIMES OUT
-    FILL_PLANET_PAD = 1
+    FILL_PLANET_PAD = 0
     MOVE_BACK = 1
 
     ## FOR DIVIDING WHOLE MAP INTO SECTIONS
@@ -37,7 +37,7 @@ class Constants():
 
     ## ATTACKING
     MOVE_BACK_OFFENSE = 0       ## NO LONGER USED
-    PERIMETER_CHECK_RADIUS = 21 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK
+    PERIMETER_CHECK_RADIUS = 28 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK
     ATTACKING_RADIUS = 14       ## CONSIDERED IN IMMINENT BATTLE
     BACKUP_CIRCLE_RADIUS = 14   ## RADIUS TO CHECK FOR BACKUP NEEDED
     BACKUP_SQUARE_RADIUS = 14
@@ -45,7 +45,7 @@ class Constants():
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    CIRCLE_RADIUS_EXTRA_EDGES = 0.47 ## 0.47 MULTIPLIED TO RADIUS
+    CIRCLE_RADIUS_EXTRA_EDGES = 0.80 ## 0.47 or 0.80? MULTIPLIED TO RADIUS
 
 def disable_log(disable,log):
     """
@@ -485,7 +485,7 @@ def get_rounded_point(coord):
 # print(fill_circle(array, center, radius, value, cummulative=False))
 #
 # print("testing")
-#
+
 # array = np.zeros((25, 25), dtype=np.float16)
 # center = Coordinates(10,10)
 # radius = 5

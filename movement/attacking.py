@@ -79,16 +79,17 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         ## PLACE THIS SECTION TO BATTLING
         set_section_in_battle(MyMoves, ship_section, enemy_section_point)
 
-        if section_distance == 0:
+        ## IF WITHIN ATTACKING_RADIUS
+        if section_distance == 0 or section_distance == 1:
             ## ENEMY WITHIN THE SAME SECTION
             ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
             value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
-            v_enemy = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+            v_enemy = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
 
             value = MyMoves.myMatrix.ally_matrix
-            v_ally = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+            v_ally = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
 
-            d_section = MyMoves.EXP.distance_matrix_15x15
+            d_section = MyMoves.EXP.distance_matrix_RxR
 
             ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
             seek_val = -0.75
@@ -106,11 +107,11 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
             strong_enough = num_ally_in_section > num_enemy_in_section
 
             ## GET ANGLE FROM MIDDLE OF MATRIX (7,7) TO ENEMY POINT
-            mid_point = (7,7)
+            mid_point = (MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS)
             angle = MyCommon.get_angle(MyCommon.Coordinates(mid_point[0], mid_point[1]),
                                        MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
 
-            ## ACTUAL COORDINATE OF ENEMY
+            ## ACTUAL COORDINATE OF ENEMY (MINUS SOME TO AVOID COLLIDING)
             target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
 
             heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None, strong_enough))
@@ -220,18 +221,18 @@ def move_battle_heap(MyMoves, battle_heap):
                 pad_values = 0
                 area_matrix = MyCommon.get_circle_in_square(MyMoves.myMatrix.backup_matrix,
                                                             ship_coords,
-                                                            MyCommon.Constants.SECTION_CIRCLE_RADIUS,
-                                                            MyCommon.Constants.SECTION_SQUARE_RADIUS,
+                                                            MyCommon.Constants.BACKUP_CIRCLE_RADIUS,
+                                                            MyCommon.Constants.BACKUP_SQUARE_RADIUS,
                                                             pad_values)
                 seek_val = 1
                 backup_point, backup_distance = MyCommon.get_coord_closest_seek_value(seek_val,
                                                                                       area_matrix,
-                                                                                      MyMoves.EXP.distance_matrix_section_square)
+                                                                                      MyMoves.EXP.distance_matrix_backup)
 
                 if backup_point:
                     ## MOVE TOWARDS BACKUP
                     logging.debug("ship_id: {} from handled_ships in different section. Going to back up".format(ship_id))
-                    slope = (backup_point[0] - MyCommon.Constants.SECTION_SQUARE_RADIUS, backup_point[1] - MyCommon.Constants.SECTION_SQUARE_RADIUS)
+                    slope = (backup_point[0] - MyCommon.Constants.BACKUP_SQUARE_RADIUS, backup_point[1] - MyCommon.Constants.BACKUP_SQUARE_RADIUS)
                     new_target_coord = MyCommon.Coordinates(ship_point[0] + slope[0], ship_point[1] + slope[1])
                     logging.debug("backup found at coord: {}".format(new_target_coord))
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, new_target_coord,

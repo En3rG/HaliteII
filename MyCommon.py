@@ -27,7 +27,7 @@ class Constants():
     SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
     SECTION_CIRCLE_RADIUS = 7 ## 7. 14 TIMES OUT
     FILL_PLANET_PAD = 1
-    MOVE_BACK = 2
+    MOVE_BACK = 1
 
     ## FOR DIVIDING WHOLE MAP INTO SECTIONS
     NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE MANY SECTIONS
@@ -35,9 +35,16 @@ class Constants():
 
     BIG_DISTANCE = 9999
 
-    ## ATTACKING (NOT STRONG ENOUGH)
-    MOVE_BACK_OFFENSE = 0
-    PERIMETER_CHECK_RADIUS = 28
+    ## ATTACKING
+    MOVE_BACK_OFFENSE = 0       ## NO LONGER USED
+    PERIMETER_CHECK_RADIUS = 28 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK
+    ATTACKING_RADIUS = 14       ## CONSIDERED IN IMMINENT BATTLE
+    BACKUP_CIRCLE_RADIUS = 14   ## RADIUS TO CHECK FOR BACKUP NEEDED
+    BACKUP_SQUARE_RADIUS = 14
+
+    ## ADDED TO WITHIN CIRCLE
+    ## TO INCLUDE 7.2 WITHIN 7 RADIUS
+    WITHIN_CIRCLE_EXTRA = 3.3
 
 def disable_log(disable,log):
     """
@@ -200,7 +207,10 @@ def within_circle(point_coord, center_coord, radius):
     WHETHER point IS INSIDE THE CIRCLE, AT center WITH radius provided
     point AND center HAVE (y,x) FORMAT
     """
-    return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2)
+    ## ADDING 3.3 BECAUSE SOMETIMES WHEN IT ROUNDS IT DOESNT INCLUDE IT ANYMORE WITHIN THE CIRCLE
+    ## SO DISTANCE 7.23 WILL STILL BE CONSIDERED WITHIN THE CIRCLE
+    #return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2)
+    return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2) + Constants.WITHIN_CIRCLE_EXTRA
 
 
 def calculate_distance(coords1, coords2, rounding=True):
@@ -431,10 +441,34 @@ def get_rounded_point(coord):
 # print(get_circle_in_matrix(a, Coordinates(4,1), circle_radius, square_radius))
 
 
-# coord = Coordinates(95,35)
-# coord2 = Coordinates(96,36)
-# angle = 39
-# print(get_destination_coord(coord, angle, 1))
+# coord = Coordinates(0,0)
+# angle = 45
+# thrust = 7.22
+# coord2 = get_destination_coord(coord,angle,thrust,rounding=False)
+# # print(coord2)
+# # coord2 = get_destination_coord(coord,angle,thrust,rounding=True)
+# print("Rounded: ",coord2)
+# print("Distance:",calculate_distance(coord, coord2))
+# print("in circle: ",within_circle(coord2,coord,7))
 #
-# print(calculate_distance(coord, coord2))
+#
+# print(calculate_distance(coord,coord2,rounding=False))
+
+
+
+# def get_distances(start, height, width):
+#     matrix = np.zeros((height, width), dtype=np.float16)
+#     indexes = [(y, x) for y, row in enumerate(matrix) for x, val in enumerate(row)]
+#     to_points = np.array(indexes)
+#     start_point = np.array(start)
+#     distances = np.linalg.norm(to_points - start_point, ord=2, axis=1.)
+#
+#     return distances.reshape((height, width))
+#
+#
+# height = 16
+# width = 16
+# start = [8, 8]
+# distance_matrix = get_distances(start, height, width)
+# print(distance_matrix)
 

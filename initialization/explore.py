@@ -67,7 +67,7 @@ class Exploration():
 
         self.get_launch_coords()
 
-        self.distance_matrix_RxR = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS*2 + 1)
+        self.distance_matrix_RxR = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS * 2 + 1)
         self.distance_matrix_backup = self.get_distance_matrix(MyCommon.Constants.BACKUP_SQUARE_RADIUS,
                                                                MyCommon.Constants.BACKUP_SQUARE_RADIUS * 2 + 1)
 

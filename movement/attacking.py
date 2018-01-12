@@ -100,16 +100,23 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
             # num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
             # num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
 
-            ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
-            num_enemy_in_section = (v_enemy==-1).sum()
-            num_ally_in_section = (v_ally==1).sum()
-
-            strong_enough = num_ally_in_section > num_enemy_in_section
-
             ## GET ANGLE FROM MIDDLE OF MATRIX (7,7) TO ENEMY POINT
             mid_point = (MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS)
             angle = MyCommon.get_angle(MyCommon.Coordinates(mid_point[0], mid_point[1]),
                                        MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
+
+            ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
+            ## ONLY GRAB A SECTION (STRONG ENOUGH RADIUS) OF THE SECTION (ATTACKING RADIUS)
+            ## INCLUDE DOCKED SHIPS WHEN CALCULATING ALLY POWER
+            ## TO PREVENT ONE SHIP FROM BACKING OUT WHEN PROTECTING DOCKED SHIPS AGAINST 1 ENEMY SHIP
+            num_enemy_in_section = (v_enemy[MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+                                    MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == -1).sum()  ## JUST GET A 7x7 matrix
+            num_ally_in_section = (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+                                   MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 1).sum() \
+                                  + (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+                                     MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 0.75).sum()
+
+            strong_enough = num_ally_in_section > num_enemy_in_section
 
             ## ACTUAL COORDINATE OF ENEMY (MINUS SOME TO AVOID COLLIDING)
             target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
@@ -329,5 +336,6 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
         set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle)
     else:
         return final_distance, target_coord
+
 
 

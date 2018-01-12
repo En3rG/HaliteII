@@ -6,7 +6,7 @@ import math
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -37,14 +37,15 @@ class Constants():
 
     ## ATTACKING
     MOVE_BACK_OFFENSE = 0       ## NO LONGER USED
-    PERIMETER_CHECK_RADIUS = 28 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK
+    PERIMETER_CHECK_RADIUS = 32 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK
     ATTACKING_RADIUS = 14       ## CONSIDERED IN IMMINENT BATTLE
     BACKUP_CIRCLE_RADIUS = 14   ## RADIUS TO CHECK FOR BACKUP NEEDED
     BACKUP_SQUARE_RADIUS = 14
+    STRONG_ENOUGH_RADIUS = 7    ## RADIUS WHEN DETERMINING STRONG ENOUGH ATTACK POWER
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    WITHIN_CIRCLE_EXTRA = 3.3
+    CIRCLE_RADIUS_EXTRA_EDGES = 0.47 ## MULTIPLIED TO RADIUS
 
 def disable_log(disable,log):
     """
@@ -99,7 +100,8 @@ def fill_circle(array, center, radius, value, cummulative=False):
     ## x IS JUST AN ARRAY OF 1xX (COLS)
     y, x = np.ogrid[-center.y:height - center.y, -center.x:width - center.x]
     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
-    mask = x * x + y * y <= radius * radius
+    #mask = x * x + y * y <= radius * radius
+    mask = x * x + y * y <= radius * radius + radius*Constants.CIRCLE_RADIUS_EXTRA_EDGES  ## WHEN WANT TO BE MORE CIRCLE (DUE TO ROUNDING)
 
     if cummulative:  ## VALUE KEEPS GETTING ADDED
         array[mask] += value
@@ -107,6 +109,7 @@ def fill_circle(array, center, radius, value, cummulative=False):
         array[mask] = value
 
     return array
+
 
 
 def get_angle(coords, target_coords):
@@ -210,7 +213,7 @@ def within_circle(point_coord, center_coord, radius):
     ## ADDING 3.3 BECAUSE SOMETIMES WHEN IT ROUNDS IT DOESNT INCLUDE IT ANYMORE WITHIN THE CIRCLE
     ## SO DISTANCE 7.23 WILL STILL BE CONSIDERED WITHIN THE CIRCLE
     #return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2)
-    return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2) + Constants.WITHIN_CIRCLE_EXTRA
+    return ((point_coord.y - center_coord.y) ** 2 + (point_coord.x - center_coord.x) ** 2) < (radius ** 2) + radius*Constants.CIRCLE_RADIUS_EXTRA_EDGES
 
 
 def calculate_distance(coords1, coords2, rounding=True):
@@ -472,3 +475,19 @@ def get_rounded_point(coord):
 # distance_matrix = get_distances(start, height, width)
 # print(distance_matrix)
 
+
+
+
+# array = np.zeros((25, 25), dtype=np.float16)
+# center = Coordinates(10,10)
+# radius = 5
+# value = 1
+# print(fill_circle(array, center, radius, value, cummulative=False))
+#
+# print("testing")
+#
+# array = np.zeros((25, 25), dtype=np.float16)
+# center = Coordinates(10,10)
+# radius = 5
+# value = 1
+# print(fill_circle2(array, center, radius, value, cummulative=False))

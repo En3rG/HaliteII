@@ -29,109 +29,130 @@ def move_battling_ships(MyMoves):
     ## BASICALLY COMBINING ALL SET FROM THE DICTIONARY
     #handled_ships = set.union(*MyMoves.myMap.ships_battling.values())  ## * TO UNPACK OR ELSE WONT WORK
 
+    # ## MOVE SHIPS FROM PROJECTIONS
+    # for ship_id in handled_ships:
+    #     if ship_id not in MyMoves.myMap.ships_moved_already:
+    #         get_battling_ships_heap(MyMoves, ship_id, battle_heap)
+    #
+    # ## MOVE SHIPS IN ORDER (TO MINIMIZE COLLISIONS)
+    # move_battle_heap(MyMoves, battle_heap)
+
     ## ONLY DETERMINE THE DISTANCES AND PLACE INTO THE HEAP, WILL MOVE LATER
-    #for ship_id in handled_ships:
     for ship_id, ship in MyMoves.myMap.data_ships[MyMoves.myMap.my_id].items(): ## INSTEAD OF JUST LOOPING THROUGH HANDLED_SHIPS
         if ship_id not in MyMoves.myMap.ships_moved_already:
-            ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-            ship_section = MyCommon.get_section_num(ship_coords)
-            ship_section_coord = MyCommon.Coordinates(ship_section[0], ship_section[1])
-            distances = MyMoves.EXP.sections_distance_table[ship_section]
-            values = MyMoves.myMap.section_enemy_summary
-
-            ## CHECK IF ENEMIES WITHIN 4 TURNS
-            enemy_matrix = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
-            perimeter = MyCommon.get_section_with_padding(enemy_matrix, ship_coords, MyCommon.Constants.PERIMETER_CHECK_RADIUS, pad_values=0)
-
-            if Matrix_val.ENEMY_SHIP.value not in perimeter or Matrix_val.ENEMY_SHIP_DOCKED.value not in perimeter:
-                ## NO ENEMY FOUND, SKIP
-                logging.debug("ship_id: {} did not find any enemy".format(ship_id))
-                continue
-
-            logging.debug("ship_id:: {} ship_coords: {} ship_section: {}".format(ship_id,ship_coords,ship_section))
-
-            ## GET SECTIONED MATRIX
-            ## NEED TO MASK WHEN SECTION IS OUT OF BOUNDS
-            d_sectioned = MyCommon.get_section_with_padding(distances, ship_section_coord, MyCommon.Constants.SIZE_SECTIONS_RADIUS, 0)
-            v_sectioned = MyCommon.get_section_with_padding(values, ship_section_coord, MyCommon.Constants.SIZE_SECTIONS_RADIUS, 0)
-
-            ## GET CLOSEST/MOST ENEMIES SECTION POINT
-            seek_val = 1
-            enemy_section_point, section_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned)
-
-            if enemy_section_point: ## AN ENEMY WAS FOUND
-                ## PLACE THIS SECTION TO BATTLING
-                set_section_in_battle(MyMoves, ship_section, enemy_section_point)
-
-                if section_distance == 0:
-                    ## ENEMY WITHIN THE SAME SECTION
-                    ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
-                    value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
-                    v_enemy = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
-
-                    value = MyMoves.myMatrix.ally_matrix
-                    v_ally = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
-
-                    d_section = MyMoves.EXP.distance_matrix_15x15
-
-                    ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
-                    seek_val = -0.75
-                    enemy_point, enemy_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
-                    ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
-
-                    ## GET NUMBER OF ENEMIES IN THIS SECTION
-                    # num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
-                    # num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
-
-                    ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
-                    num_enemy_in_section = (v_enemy==-1).sum()
-                    num_ally_in_section = (v_ally==1).sum()
-
-                    strong_enough = num_ally_in_section > num_enemy_in_section
-
-                    ## GET ANGLE FROM MIDDLE OF MATRIX (7,7) TO ENEMY POINT
-                    mid_point = (7,7)
-                    angle = MyCommon.get_angle(MyCommon.Coordinates(mid_point[0], mid_point[1]),
-                                               MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
-
-                    ## ACTUAL COORDINATE OF ENEMY
-                    target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
-
-                    heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None, strong_enough))
-                else:
-                    ## ENEMY IN A DIFFERENT SECTION
-
-                    ## HERE ENEMY_SECTION_POINT IS ONLY IN REFERENCE WITH JUST THE SECTION MATRIX
-                    ## NEED TO TAKE INTO ACCOUNT THE SHIPS SECTION
-                    enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
-                                           ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
-
-                    ## GET ACTUAL ENEMY DISTANCE (FROM MIDDLE OF ENEMY SECTION)
-                    section_coord = MyCommon.get_coord_from_section(enemy_section_point)
-                    enemy_distance = MyCommon.calculate_distance(ship_coords, section_coord)
-
-                    ## NO LONGER REQUIRED SINCE WE GOT ACTUAL COORD OF ENEMY
-                    # angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS, MyCommon.Constants.SIZE_SECTIONS_RADIUS),
-                    #                            MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
-                    # target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
-
-                    over_thrust = 10
-                    target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH (MIDDLE)
-
-                    strong_enough = None
-                    heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
-
-            else:
-                ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
-                ## THIS SHOULDNT HAPPEN RIGHT? OR ELSE WHY IS IT IN BATTLING
-                section_distance = MyCommon.Constants.BIG_DISTANCE
-                enemy_distance = 0
-                target_coord = None
-                over_thrust = None
-                strong_enough = None
-                heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
+            get_battling_ships_heap(MyMoves, ship_id, battle_heap)
 
     ## MOVE SHIPS IN ORDER (TO MINIMIZE COLLISIONS)
+    move_battle_heap(MyMoves, battle_heap)
+
+def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
+    """
+    GET SHIPS INFO (IF BATTLING)
+    """
+    ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+    ship_section = MyCommon.get_section_num(ship_coords)
+    ship_section_coord = MyCommon.Coordinates(ship_section[0], ship_section[1])
+    distances = MyMoves.EXP.sections_distance_table[ship_section]
+    values = MyMoves.myMap.section_enemy_summary
+
+    ## CHECK IF ENEMIES WITHIN A PERIMETER
+    enemy_matrix = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
+    perimeter = MyCommon.get_section_with_padding(enemy_matrix, ship_coords, MyCommon.Constants.PERIMETER_CHECK_RADIUS, pad_values=0)
+
+    if Matrix_val.ENEMY_SHIP.value not in perimeter and Matrix_val.ENEMY_SHIP_DOCKED.value not in perimeter:
+        ## NO ENEMY FOUND, SKIP
+        logging.debug("ship_id: {} did not find any enemy".format(ship_id))
+        return
+
+    logging.debug("ship_id:: {} ship_coords: {} ship_section: {}".format(ship_id,ship_coords,ship_section))
+
+    ## GET SECTIONED MATRIX
+    ## NEED TO MASK WHEN SECTION IS OUT OF BOUNDS
+    d_sectioned = MyCommon.get_section_with_padding(distances, ship_section_coord, MyCommon.Constants.SIZE_SECTIONS_RADIUS, 0)
+    v_sectioned = MyCommon.get_section_with_padding(values, ship_section_coord, MyCommon.Constants.SIZE_SECTIONS_RADIUS, 0)
+
+    ## GET CLOSEST/MOST ENEMIES SECTION POINT
+    seek_val = 1
+    enemy_section_point, section_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned)
+
+    if enemy_section_point: ## AN ENEMY WAS FOUND
+        ## PLACE THIS SECTION TO BATTLING
+        set_section_in_battle(MyMoves, ship_section, enemy_section_point)
+
+        if section_distance == 0:
+            ## ENEMY WITHIN THE SAME SECTION
+            ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
+            value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
+            v_enemy = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+
+            value = MyMoves.myMatrix.ally_matrix
+            v_ally = MyCommon.get_section_with_padding(value, ship_coords, 7, 0)
+
+            d_section = MyMoves.EXP.distance_matrix_15x15
+
+            ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
+            seek_val = -0.75
+            enemy_point, enemy_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
+            ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
+
+            ## GET NUMBER OF ENEMIES IN THIS SECTION
+            # num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
+            # num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
+
+            ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
+            num_enemy_in_section = (v_enemy==-1).sum()
+            num_ally_in_section = (v_ally==1).sum()
+
+            strong_enough = num_ally_in_section > num_enemy_in_section
+
+            ## GET ANGLE FROM MIDDLE OF MATRIX (7,7) TO ENEMY POINT
+            mid_point = (7,7)
+            angle = MyCommon.get_angle(MyCommon.Coordinates(mid_point[0], mid_point[1]),
+                                       MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
+
+            ## ACTUAL COORDINATE OF ENEMY
+            target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
+
+            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, None, strong_enough))
+        else:
+            ## ENEMY IN A DIFFERENT SECTION
+
+            ## HERE ENEMY_SECTION_POINT IS ONLY IN REFERENCE WITH JUST THE SECTION MATRIX
+            ## NEED TO TAKE INTO ACCOUNT THE SHIPS SECTION
+            enemy_section_point = (ship_section[0] + (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+                                   ship_section[1] + (enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS))
+
+            ## GET ACTUAL ENEMY DISTANCE (FROM MIDDLE OF ENEMY SECTION)
+            section_coord = MyCommon.get_coord_from_section(enemy_section_point)
+            enemy_distance = MyCommon.calculate_distance(ship_coords, section_coord)
+
+            ## NO LONGER REQUIRED SINCE WE GOT ACTUAL COORD OF ENEMY
+            # angle = MyCommon.get_angle(MyCommon.Coordinates(MyCommon.Constants.SIZE_SECTIONS_RADIUS, MyCommon.Constants.SIZE_SECTIONS_RADIUS),
+            #                            MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1]))
+            # target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=over_thrust)
+
+            over_thrust = 10
+            target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH (MIDDLE)
+
+            strong_enough = None
+            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
+
+    else:
+        ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
+        ## THIS SHOULDNT HAPPEN RIGHT? OR ELSE WHY IS IT IN BATTLING
+        section_distance = MyCommon.Constants.BIG_DISTANCE
+        enemy_distance = 0
+        target_coord = None
+        over_thrust = None
+        strong_enough = None
+        heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
+
+
+
+def move_battle_heap(MyMoves, battle_heap):
+    """
+    MOVE SHIPS ACCORDING TO THE HEAP PROVIDED
+    """
     while battle_heap:
         section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough = heapq.heappop(battle_heap)
 
@@ -232,6 +253,7 @@ def move_battling_ships(MyMoves):
             logging.debug("ship_id: {} from handled_ships no enemy found around it".format(ship_id))
             ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
             closest_section_with_enemy(MyMoves, ship_id, move_now=True)
+
 
 
 def set_section_in_battle(MyMoves, ship_section, enemy_section_point):

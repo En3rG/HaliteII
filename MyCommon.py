@@ -37,7 +37,7 @@ class Constants():
 
     ## ATTACKING (NOT STRONG ENOUGH)
     MOVE_BACK_OFFENSE = 0
-    PERIMETER_CHECK_RADIUS = 25
+    PERIMETER_CHECK_RADIUS = 28
 
 def disable_log(disable,log):
     """

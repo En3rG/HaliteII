@@ -320,6 +320,7 @@ class MyMatrix():
         self.ally_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
+        self.add_new_ships_to_position_matrix()
 
         ## WILL CONTAIN LOCATION OF BACKUPS NEEDED
         self.backup_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
@@ -377,6 +378,13 @@ class MyMatrix():
 
         return final_matrix
 
+
+    def add_new_ships_to_position_matrix(self):
+        """
+        FILL POSITION MATRIX WHERE NEW SHIPS ARE, TO PREVENT NEW SHIPS FROM HAVING NO PLACE TO GO
+        """
+        ## IF WE FILL A BOX HERE, THE NEW SHIP WILL NOT GET AN A* PATH...
+        pass
 
     def fill_planets_predictions(self,matrix):
         """

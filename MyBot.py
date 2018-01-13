@@ -12,7 +12,7 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
 import multiprocessor.processors as processors
 from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
-from models.model import NeuralNet, make_keras_picklable
+#from models.model import NeuralNet, make_keras_picklable
 from models.data import MyMap, MyMatrix
 from projection.projection import MyProjection
 from movement import moves
@@ -56,14 +56,14 @@ if __name__ == "__main__":
 
         ## INITIALIZE PROCESSES
         ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
-        MP = MyProcesses(game,
-                         MyCommon.Constants.DISABLE_LOG,
-                         MyCommon.Constants.WAIT_TIME,
-                         MyCommon.Constants.INPUT_MATRIX_Y,
-                         MyCommon.Constants.INPUT_MATRIX_X,
-                         MyCommon.Constants.INPUT_MATRIX_Z,
-                         MyCommon.Constants.NUM_EPOCH,
-                         MyCommon.Constants.BATCH_SIZE)
+        # MP = MyProcesses(game,
+        #                  MyCommon.Constants.DISABLE_LOG,
+        #                  MyCommon.Constants.WAIT_TIME,
+        #                  MyCommon.Constants.INPUT_MATRIX_Y,
+        #                  MyCommon.Constants.INPUT_MATRIX_X,
+        #                  MyCommon.Constants.INPUT_MATRIX_Z,
+        #                  MyCommon.Constants.NUM_EPOCH,
+        #                  MyCommon.Constants.BATCH_SIZE)
 
         start = datetime.datetime.now()
 
@@ -223,8 +223,8 @@ if __name__ == "__main__":
             start = datetime.datetime.now()
 
             ## FOR TRAINING/PREDICTING MODEL
-            predictions, turn = processors.model_handler(MP,turn, myMap, myMatrix)
-            #turn += 1
+            #predictions, turn = processors.model_handler(MP,turn, myMap, myMatrix)
+            turn += 1
             logging.info("model_handler completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
             ## GETTING MEMORY USAGE IS QUITE SLOW (TIMES OUT)
@@ -232,8 +232,8 @@ if __name__ == "__main__":
             # logging.debug("mem_usage: {}".format(mem_usage))
 
             ## TRANSLATE PREDICTIONS
-            predicted_moves = NeuralNet.translate_predictions(predictions)
-            myMatrix.fill_prediction_matrix(predicted_moves)
+            #predicted_moves = NeuralNet.translate_predictions(predictions)
+            #myMatrix.fill_prediction_matrix(predicted_moves)
             logging.info("Predictions completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
 

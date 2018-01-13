@@ -45,7 +45,7 @@ class Constants():
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    CIRCLE_RADIUS_EXTRA_EDGES = 0.47 ## 0.47 or 0.80? MULTIPLIED TO RADIUS
+    CIRCLE_RADIUS_EXTRA_EDGES = 0.80 ## 0.47 or 0.80? MULTIPLIED TO RADIUS
 
 def disable_log(disable,log):
     """
@@ -491,3 +491,6 @@ def get_rounded_point(coord):
 # radius = 5
 # value = 1
 # print(fill_circle2(array, center, radius, value, cummulative=False))
+
+
+

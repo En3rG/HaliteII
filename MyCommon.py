@@ -45,7 +45,7 @@ class Constants():
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    CIRCLE_RADIUS_EXTRA_EDGES = 0.85 ## 0.47 or 0.85? MULTIPLIED TO RADIUS
+    CIRCLE_RADIUS_EXTRA_EDGES = 0.80 ## 0.47 or 0.85? MULTIPLIED TO RADIUS
 
 def disable_log(disable,log):
     """

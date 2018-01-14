@@ -222,7 +222,8 @@ def move_battle_heap(MyMoves, battle_heap):
                     #MyMoves.myMatrix.backup_matrix[ship_point[0], ship_point[1]] = 1  ## WAS ON BOT25
                     ## +2 TO MOVE BACK FURTHER FOR BACKUP TO GO THERE
                     backup_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust+2, rounding=True)
-                    MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
+                    try: MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
+                    except: MyMoves.myMatrix.backup_matrix[backup_coord.y-2, backup_coord.x-2] = 1  ## GOING OVER THE MAP
 
             else:
                 ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION

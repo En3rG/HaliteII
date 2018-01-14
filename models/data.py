@@ -311,11 +311,12 @@ class MyMatrix():
     MAX_NODES = 2
     NUM_NODES = 0
 
-    def __init__(self, myMap,myMatrix_prev,input_matrix_y,input_matrix_x):
+    def __init__(self, myMap,myMatrix_prev,EXP,input_matrix_y,input_matrix_x):
         self.myMap = myMap
         self.matrix_prev = myMatrix_prev
         self.input_matrix_y = input_matrix_y
         self.input_matrix_x = input_matrix_x
+        self.EXP = EXP
         self.prediction_matrix = None
         self.ally_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
@@ -344,22 +345,26 @@ class MyMatrix():
         GET MAP MATRIX PER PLAYER ID
         """
         final_matrix = {}
-        matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
-        matrix_hp = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+        # matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+        # matrix_hp = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
 
         #for player in self.game_map.all_players():
         for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.myMap.my_id:
                 ## SET PLANET TO PREDICTION MATRIX
                 #self.prediction_matrix = copy.deepcopy(EXP.all_planet_matrix)
-                curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
-                self.prediction_matrix = self.fill_planets_predictions(curr_matrix)
+                #curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+                #self.prediction_matrix = self.fill_planets_predictions(curr_matrix) ## NO LONGER USED
 
-                self.ally_matrix, _ = self.fill_ships_ally(self.ally_matrix, copy.deepcopy(matrix_hp), ships)
+                self.ally_matrix, _ = self.fill_ships_ally(self.ally_matrix, np.copy(self.EXP.all_planet_matrix), ships)
 
-            matrix_current = copy.deepcopy(matrix)
-            matrix_hp_current = copy.deepcopy(matrix_hp)
-            matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player_id)
+            ## FILLING PLANET MATRIX PER TURN
+            # matrix_current = copy.deepcopy(matrix)
+            # matrix_hp_current = copy.deepcopy(matrix_hp)
+            # matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player_id)
+
+            ## JUST TAKING MATRIX FROM EXPLORATION
+            matrix_current, matrix_hp_current = np.copy(self.EXP.all_planet_matrix), np.copy(self.EXP.all_planet_hp_matrix)
 
             if player_id != self.myMap.my_id:
                 ## NOT FILLING OUR SHIPS SINCE IT"LL BE ADDED ONCE ME MOVE EACH SHIPS

@@ -24,8 +24,8 @@ class Constants():
     GET_TIMEOUT = 0.005  ## TIMEOUT SET FOR .GET()
 
     ## FOR A* SECTIONED
-    SECTION_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
-    SECTION_CIRCLE_RADIUS = 7 ## 7. 14 TIMES OUT
+    ASTAR_SQUARE_RADIUS = 8 ## 8.  WILL BE 17x17
+    ASTAR_CIRCLE_RADIUS = 7 ## 7. 14 TIMES OUT
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
 
@@ -45,7 +45,7 @@ class Constants():
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    CIRCLE_RADIUS_EXTRA_EDGES = 0.80 ## 0.47 or 0.80? MULTIPLIED TO RADIUS
+    CIRCLE_RADIUS_EXTRA_EDGES = 0.85 ## 0.47 or 0.85? MULTIPLIED TO RADIUS
 
 def disable_log(disable,log):
     """
@@ -87,7 +87,7 @@ class Coordinates():
         return "y: {} x: {}".format(self.y,self.x)
 
 
-def fill_circle(array, center, radius, value, cummulative=False):
+def fill_circle(array, center, radius, value, cummulative=False, override_edges=None):
     """
     MASK A CIRCLE ON THE ARRAY SPECIFIED WITH VALUE PROVIDED
 
@@ -101,7 +101,11 @@ def fill_circle(array, center, radius, value, cummulative=False):
     y, x = np.ogrid[-center.y:height - center.y, -center.x:width - center.x]
     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
     #mask = x * x + y * y <= radius * radius
-    mask = x * x + y * y <= radius * radius + radius*Constants.CIRCLE_RADIUS_EXTRA_EDGES  ## WHEN WANT TO BE MORE CIRCLE (DUE TO ROUNDING)
+
+    if override_edges:
+        mask = x * x + y * y <= radius * radius + radius * override_edges  ## USED FOR FILLING PLANETS IN EXPLORE
+    else:
+        mask = x * x + y * y <= radius * radius + radius*Constants.CIRCLE_RADIUS_EXTRA_EDGES  ## WHEN WANT TO BE MORE CIRCLE (DUE TO ROUNDING)
 
     if cummulative:  ## VALUE KEEPS GETTING ADDED
         array[mask] += value
@@ -478,19 +482,15 @@ def get_rounded_point(coord):
 
 
 
-# array = np.zeros((25, 25), dtype=np.float16)
-# center = Coordinates(10,10)
-# radius = 5
+# array = np.zeros((17, 17), dtype=np.float16)
+# center = Coordinates(8,8)
+# radius = 7
 # value = 1
+# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
 # print(fill_circle(array, center, radius, value, cummulative=False))
-#
-# print("testing")
+# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
 
-# array = np.zeros((25, 25), dtype=np.float16)
-# center = Coordinates(10,10)
-# radius = 5
-# value = 1
-# print(fill_circle2(array, center, radius, value, cummulative=False))
+
 
 
 

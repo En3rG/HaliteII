@@ -374,7 +374,9 @@ class MyMoves():
         if step_num == 0:
             return True
         else:
-            return self.position_matrix[step_num][point[0]][point[1]] == 0
+            #return self.position_matrix[step_num][point[0]][point[1]] == 0
+            return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value)
+
 
 
     def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, target_coord):

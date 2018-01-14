@@ -218,7 +218,7 @@ if __name__ == "__main__":
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(myMap,myMatrix_prev,MyCommon.Constants.INPUT_MATRIX_Y,MyCommon.Constants.INPUT_MATRIX_X)
+            myMatrix = MyMatrix(myMap,myMatrix_prev,EXP,MyCommon.Constants.INPUT_MATRIX_Y,MyCommon.Constants.INPUT_MATRIX_X)
             logging.info("myMatrix completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
 

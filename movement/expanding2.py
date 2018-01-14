@@ -107,10 +107,10 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     WE"LL USE LOCAL/SECTIONED A*
     """
-    square_radius = MyCommon.Constants.SECTION_SQUARE_RADIUS
-    circle_radius = MyCommon.Constants.SECTION_CIRCLE_RADIUS
+    square_radius = MyCommon.Constants.ASTAR_SQUARE_RADIUS
+    circle_radius = MyCommon.Constants.ASTAR_CIRCLE_RADIUS
     max_travel_distance = MyCommon.Constants.MAX_TRAVEL_DISTANCE
-    fake_target_thrust = MyCommon.Constants.SECTION_SQUARE_RADIUS ## 10
+    fake_target_thrust = MyCommon.Constants.ASTAR_SQUARE_RADIUS ## 10
     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
 
@@ -151,13 +151,13 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     temp_target_point = (int(round(temp_target_coord.y)) - int(round(ship_coord.y)), \
                          int(round(temp_target_coord.x)) - int(round(ship_coord.x)))
-    section_target_point = (int(MyCommon.Constants.SECTION_SQUARE_RADIUS + temp_target_point[0]), \
-                            int(MyCommon.Constants.SECTION_SQUARE_RADIUS + temp_target_point[1]))
+    section_target_point = (int(MyCommon.Constants.ASTAR_SQUARE_RADIUS + temp_target_point[0]), \
+                            int(MyCommon.Constants.ASTAR_SQUARE_RADIUS + temp_target_point[1]))
 
     logging.debug("get_thrust_angle_from_Astar:: section_target_point {}".format(section_target_point))
 
     ## MID POINT OF THE SECTION MATRIX IS THE STARTING POINT (SHIP COORD IN SECTION MATRIX IS JUST THE MIDDLE)
-    mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
+    mid_point = (MyCommon.Constants.ASTAR_SQUARE_RADIUS, MyCommon.Constants.ASTAR_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
     mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
 
     ## PERFORM A* TOWARDS TARGET
@@ -217,11 +217,11 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             #
             #     ## NOT DOING INTERMEDIATE COLLISION
             #     # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-            #     #         and no_collision(mid_coord, current_coord, section_matrix):
+            #     #         and theta_clear(mid_coord, current_coord, section_matrix):
             #
             #     ## DOING INTERMEDIATE COLLISION
             #     if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-            #             and no_collision(MyMoves, ship_id, current_coord):
+            #             and theta_clear(MyMoves, ship_id, current_coord):
             #
             #         astar_destination_point = current_point
             #         logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
@@ -240,7 +240,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
                 ## DOING INTERMEDIATE COLLISION
                 if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                        and no_collision(MyMoves, ship_id, current_coord):
+                        and theta_clear(MyMoves, ship_id, current_coord):
 
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
@@ -278,21 +278,21 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
-    slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.SECTION_SQUARE_RADIUS, \
-                            astar_destination_coord.x - MyCommon.Constants.SECTION_SQUARE_RADIUS)
+    slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
+                            astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
     taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
     fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
 
     return thrust, angle
 
 
-def no_collision(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLISION
-#def no_collision(start_coord, target_coord, section_matrix): ## NOT DOING INTERMEDIATE COLLISION
+def theta_clear(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLISION
+#def theta_clear(start_coord, target_coord, section_matrix): ## NOT DOING INTERMEDIATE COLLISION
     """
     RETURNS TRUE IF NO COLLISION BETWEEN THE TWO COORDS
     """
     ## DOING INTERMEDIATE COLLISION
-    mid_point = (MyCommon.Constants.SECTION_SQUARE_RADIUS, MyCommon.Constants.SECTION_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
+    mid_point = (MyCommon.Constants.ASTAR_SQUARE_RADIUS, MyCommon.Constants.ASTAR_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
     mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
 
     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']

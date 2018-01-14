@@ -4,7 +4,7 @@ import math
 import heapq
 import numpy as np
 import MyCommon
-from models.data import MyMatrix, Matrix_val
+from models.data import Matrix_val
 from initialization.astar import a_star
 import datetime
 import initialization.astar as astar
@@ -65,9 +65,9 @@ class Exploration():
 
         self.best_planet_id = self.get_best_planet()
 
-        matrix = np.zeros((self.height , self.width), dtype=np.float16)
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
-        self.all_planet_matrix = self.fill_planets_for_paths(matrix)
+        self.all_planet_matrix, self.all_planet_hp_matrix = self.fill_planets_for_paths()
+
 
         self.get_launch_coords()
 
@@ -429,7 +429,7 @@ class Exploration():
         return matrix
 
 
-    def fill_planets_for_paths(self, matrix):
+    def fill_planets_for_paths(self):
         """
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
 
@@ -437,18 +437,36 @@ class Exploration():
 
         STILL USED, EVEN WHEN USING JUST SECTIONED A*
         """
+        matrix = np.zeros((self.height, self.width), dtype=np.float16)
+        matrix_hp = np.zeros((self.height, self.width), dtype=np.float16)
+
         for planet in self.game_map.all_planets():
             value = Matrix_val.PREDICTION_PLANET.value
+
+            ## WITHOUT PADDING
+            matrix = MyCommon.fill_circle(matrix, \
+                                          MyCommon.Coordinates(planet.y, planet.x), \
+                                          planet.radius, \
+                                          value, \
+                                          cummulative=True, \
+                                          override_edges=2)
+
+            ## WITH PADDING
             matrix = MyCommon.fill_circle(matrix, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
                                           planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
                                           value, \
-                                          cummulative=False)
+                                          cummulative=True)
+
+            matrix_hp = MyCommon.fill_circle(matrix_hp, \
+                                             MyCommon.Coordinates(planet.y, planet.x), \
+                                             planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
+                                             planet.health / Matrix_val.MAX_SHIP_HP.value)
 
             ## FILL THIS SPECIFIC PLANET
             self.fill_one_planet(planet)
 
-        return matrix
+        return matrix, matrix_hp
 
 
     def fill_one_planet(self, planet):

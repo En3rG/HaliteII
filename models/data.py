@@ -25,7 +25,7 @@ class Matrix_val(Enum):
     MAX_SHIP_HP = 255
 
     ## FOR MATRIX PREDICTIONS
-    PREDICTION_PLANET = -100
+    PREDICTION_PLANET = 100
     PREDICTION_ENEMY_SHIP_DOCKED = 0.5
 
 class ShipTasks(Enum):

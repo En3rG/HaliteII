@@ -128,7 +128,8 @@ class MyMoves():
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
-            attacking.move_battling_ships(self)
+            if self.myMap.my_id == 0:
+                attacking.move_battling_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW
@@ -412,7 +413,7 @@ class MyMoves():
         ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
 
         ## ADD TO POSITION MATRIX
-        expanding2.fill_position_matrix(self.position_matrix[7], ship_point, mining)
+        #expanding2.fill_position_matrix(self.position_matrix[7], ship_point, mining)
 
         ## FILL IN INTERMEDIATE POSITION MATRIX
         expanding2.fill_position_matrix_intermediate_steps(self, ship_id, angle, thrust, mining)

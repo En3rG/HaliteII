@@ -100,6 +100,14 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
         # else:
         #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
 
+    ## LAST TURN
+    x = 7
+    intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx * x)))
+    intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
+
+    fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=False)
+
+
 
 def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id):
     """
@@ -204,6 +212,8 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
+
+        #logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
 
         logging.debug("A* path_points: {}".format(path_points))
 

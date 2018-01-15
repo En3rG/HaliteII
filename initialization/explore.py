@@ -449,14 +449,15 @@ class Exploration():
                                           planet.radius, \
                                           value, \
                                           cummulative=True, \
-                                          override_edges=2)
+                                          override_edges=1.5)
 
             ## WITH PADDING
             matrix = MyCommon.fill_circle(matrix, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
                                           planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
                                           value, \
-                                          cummulative=True)
+                                          cummulative=True, \
+                                          override_edges=0)
 
             matrix_hp = MyCommon.fill_circle(matrix_hp, \
                                              MyCommon.Coordinates(planet.y, planet.x), \

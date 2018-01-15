@@ -152,7 +152,10 @@ def a_star2(arrays, start_point, goal_point):
             ## BASE ON INDEX IN POSITION MATRIX
             ## THIS IS TO TAKE INTO ACCOUNT INTERMEDIATE STEPS
             if isBadNeighbor(arrays[index_value], neighbor_point):
-                continue
+                if neighbor_point == goal:
+                    pass
+                else:
+                    continue
 
             if neighbor_point in visited_points and tentative_g_score >= gscore.get(neighbor_point, 0): ## 0 DEFAULT VALUE
                 continue
@@ -260,12 +263,31 @@ def get_Astar_table(matrix, starting_point, target_point):
 #     [1,1,1,1,1,1,1,1,1,1,1,1,0,1],
 #     [0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
 #
+# nmap = numpy.array([
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,    200,     0,      0,      0,      0,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,    100,    200,   200,    200,    200,      0,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,    100,    200,   200,    200,    200,    200,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,    100,    200,   200,    200,    200,    200,    200,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,    100,   200,    200,    200,    200,    200,    200,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,    100,   200,    200,    200,    200,    200,    200,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,   100,    200,    200,    200,    200,    200,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,    100,    200,    200,    200,    200,    200,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,    100,    200,    200,    200,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,    100,    200,    200,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,    100,    100,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,     -0.75,    0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,      0,      0,      0,      0  ],
+#  [   0,      0,      0,      0,      0,      0,      0,      0,      0,     0,      0,      0,      0,      0,      0,      0,      0  ]])
+#
 # arr = {1:nmap, 2:nmap, 3:nmap, 4:nmap ,5:nmap ,6:nmap, 7:nmap}
 #
 # start = datetime.datetime.now()
 #
-# path = a_star(nmap, (0,0), (5,4))
-# #path = a_star2(arr, (0,0), (0,3))
+# #path = a_star(nmap, (0,0), (5,4))
+# path = a_star2(arr, (8,8), (12,13))
 #
 # end = datetime.datetime.now()
 # print("Length: {} Path: {}".format(len(path),path))

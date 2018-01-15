@@ -157,6 +157,11 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     logging.debug("get_thrust_angle_from_Astar:: temp_target_coord {}".format(temp_target_coord))
 
+    ## GET NEW ANGLE AND TARGET IF GOING OUTSIDE THE MAP
+    logging.debug("temp_target_coord {} angle_towards_target {} ship_coord {} fake_target_thrust {}".format(temp_target_coord, angle_towards_target, ship_coord, fake_target_thrust))
+    angle_towards_target, temp_target_coord = get_angle_target_if_outside_map(temp_target_coord, angle_towards_target, MyMoves, ship_coord, fake_target_thrust)
+
+
     temp_target_point = (int(round(temp_target_coord.y)) - int(round(ship_coord.y)), \
                          int(round(temp_target_coord.x)) - int(round(ship_coord.x)))
     section_target_point = (int(MyCommon.Constants.ASTAR_SQUARE_RADIUS + temp_target_point[0]), \
@@ -213,7 +218,14 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
 
-        #logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[0]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[1]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[2]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[3]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[4]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[5]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[6]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
 
         logging.debug("A* path_points: {}".format(path_points))
 
@@ -294,6 +306,36 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
 
     return thrust, angle
+
+
+def get_angle_target_if_outside_map(temp_target_coord, angle_towards_target, MyMoves, ship_coord, fake_target_thrust):
+
+    if not (MyCommon.isInside_map(temp_target_coord, MyMoves)):  ## TARGET IS OUTSIDE MAP
+        logging.debug("temp_target_coord is outside map")
+        logging.debug("angle_towards_target: {}".format(angle_towards_target))
+        if angle_towards_target < 45:
+            angle_towards_target = angle_towards_target + 90
+        elif angle_towards_target < 90:
+            angle_towards_target = 0
+        elif angle_towards_target < 135:
+            angle_towards_target = angle_towards_target + 90
+        elif angle_towards_target < 180:
+            angle_towards_target = angle_towards_target - 90
+        elif angle_towards_target < 225:
+            angle_towards_target = angle_towards_target + 90
+        elif angle_towards_target < 270:
+            angle_towards_target = angle_towards_target - 90
+        elif angle_towards_target < 315:
+            angle_towards_target = 0
+        else:
+            angle_towards_target = 270
+
+        logging.debug("updated angle_towards_target: {}".format(angle_towards_target))
+        temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
+
+        return angle_towards_target, temp_target_coord
+
+    return angle_towards_target, temp_target_coord
 
 
 def theta_clear(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLISION

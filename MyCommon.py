@@ -458,6 +458,12 @@ def get_rounded_point(coord):
     """
     return (int(round(coord.y)), int(round(coord.x)))
 
+def isInside_map(coord, MyMoves):
+    """
+    CHECK IF COORD IS OUTSIDE THE MAP
+    """
+    return 0 <= coord.y <= MyMoves.EXP.height and 0 <= coord.x <= MyMoves.EXP.width
+
 # array = [
 #     [1, 2, 3, 4, 5, 6, 7, 8, 9],
 #     [2, 3, 4, 5, 6, 7, 8, 9, 1],

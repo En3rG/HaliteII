@@ -128,8 +128,7 @@ class MyMoves():
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
-            if self.myMap.my_id == 0:
-                attacking.move_battling_ships(self)
+            attacking.move_battling_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW

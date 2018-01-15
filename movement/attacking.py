@@ -215,10 +215,15 @@ def move_battle_heap(MyMoves, battle_heap):
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
                     logging.debug("thrust: {} angle: {} enemy_distance: {}".format(thrust, angle, enemy_distance))
 
-                    ## IF TARGET IS REACH, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
-                    # if int(round(enemy_distance)) == thrust:
-                    #     thrust = max(0, thrust - 1)
-                    #     logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
+                    ## IF TARGET IS REACHABLE, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
+                    ## COMMENTING THIS OUT GIVES A HIGHER RANKING
+                    if int(round(enemy_distance)) == thrust:
+                        target_point = (int(round(target_coord.y)), int(round(target_coord.x)))
+                        enemy_ship = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0][target_point[0]][target_point[1]]
+                        logging.debug("enemy_ship: {} ".format(enemy_ship))
+                        if enemy_ship == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
+                            thrust = max(0, thrust - 2)
+                            logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
 
                     ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
                     set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)

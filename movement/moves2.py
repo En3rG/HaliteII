@@ -10,6 +10,7 @@ import movement.attacking as attacking
 import movement.expanding as expanding
 import movement.expanding2 as expanding2
 import movement.attacking as attacking
+import movement.running as running
 import copy
 from models.data import Matrix_val
 import numpy as np
@@ -129,6 +130,9 @@ class MyMoves():
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
             attacking.move_battling_ships(self)
+
+            ## MOVE RUNNING SHIPS
+            running.move_running_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW

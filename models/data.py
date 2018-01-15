@@ -28,18 +28,7 @@ class Matrix_val(Enum):
     PREDICTION_PLANET = 100
     PREDICTION_ENEMY_SHIP_DOCKED = 0.5
 
-class ShipTasks(Enum):
-    """
-    VALUES FOR SHIPS TASKS
 
-    NOT REALLY USED YET
-    """
-    NONE = -1   ## DEFAULT
-    MINING = 0
-    EXPANDING = 1
-    DEFENDING = 2
-    ATTACKING = 3
-    RUNNING = 4
 
 
 class MyMap():
@@ -68,9 +57,12 @@ class MyMap():
         self.ships_died = set()             ## SHIPS THAT DIED
         self.ships_mining_ally = set()      ## SHIPS THAT ARE DOCKED (MINE)
         self.ships_mining_enemy = set()     ## SHIPS THAT ARE DOCKED (ENEMY)
-        self.ships_attacking = set()        ## THESE ARE CURRENTLY NOT USED
+        self.ships_attacking_frontline = set()
+        self.ships_attacking = set()
+        self.ships_supporting = set()
+        self.ships_evading = set()
         self.ships_defending = set()        ## THESE ARE CURRENTLY NOT USED
-        self.ships_expanding = set()        ## THESE ARE CURRENTLY NOT USED
+        self.ships_expanding = set()
         self.ships_running = set()          ## THESE ARE CURRENTLY NOT USED
         self.ships_battling = {1:set(),\
                                2:set(),\
@@ -162,7 +154,7 @@ class MyMap():
                                             ## WHERE IMMEDIATE DESTINATION IS
                                             ## SINCE SOMETIMES WITH THE ROUNDING, IT MAY NOT HIT EXACTLY AT THAT POINT
                                             'Astar_dest_point': None, \
-                                            'task':ShipTasks.NONE}
+                                            'task':MyCommon.ShipTasks.NONE}
                                              ## from_planet IS ONLY SET ON NEW SHIPS
 
                 docked = not(ship.docking_status.value == 0)
@@ -173,6 +165,7 @@ class MyMap():
                     ## GATHER DOCKED SHIPS
                     if docked:
                         self.ships_mining_ally.add(ship_id)
+                        data[player_id][ship_id]['target_id'] = (MyCommon.Target.PLANET, ship.planet.id)
 
                     self.set_section_summary(data[player_id][ship_id]['coords'], enemy=False)  ## SET SECTION FOR ALLY
                 else:
@@ -234,7 +227,7 @@ class MyMap():
         SHIPS ARE MINE ONLY
         """
         for ship_id in ships:
-            self.data_ships[self.game_map.my_id][ship_id]['task'] = ShipTasks.MINING
+            self.data_ships[self.game_map.my_id][ship_id]['task'] = MyCommon.ShipTasks.MINING
 
 
     def set_planet_data(self, planet):

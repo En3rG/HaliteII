@@ -3,7 +3,6 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
 import hlt
 from enum import Enum
 import math
-from models.data import ShipTasks
 import MyCommon
 import heapq
 import initialization.astar as astar
@@ -23,13 +22,7 @@ it will then have -2.  This can help us decide whether to move there or not. Or 
 
 """
 
-class Target():
-    """
-    SHOULD WE DELETE? NOT REALLY BEING UTILIZED
-    """
-    NOTHING = -1
-    PLANET = 0
-    SHIP = 1
+
 
 class MyMoves():
     """
@@ -117,14 +110,21 @@ class MyMoves():
                 self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
 
                 ## SET SHIP STATUSES
-                self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, thrust, target_coord)
+                target_type = MyCommon.Target.PLANET
+                ship_task = MyCommon.ShipTasks.EXPANDING
+                self.set_ship_statuses(ship_id, target_type ,target_planet_id, ship_coord, ship_task, angle, thrust, target_coord)
 
         else:
             ## EVERY OTHER TURN (EXCEPT FIRST TURN)
 
             ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
-                self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
+                #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
+                ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+                target_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
+                target_type = MyCommon.Target.PLANET
+                ship_task = MyCommon.ShipTasks.MINING
+                self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
@@ -149,7 +149,8 @@ class MyMoves():
                 ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
                 if enemy_target_coord is not None:
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, enemy_target_coord, enemy_distance, target_planet_id=None)
-                    attacking.set_commands_status(self, ship_id, thrust=thrust, angle=angle)
+                    ship_task = MyCommon.ShipTasks.ATTACKING
+                    attacking.set_commands_status(self, ship_id, thrust=thrust, angle=angle, target_coord=enemy_target_coord, ship_task=ship_task)
                     continue
 
                 else:
@@ -227,7 +228,9 @@ class MyMoves():
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
 
                     ## SET SHIP STATUSES
-                    self.set_ship_statuses(ship_id, target_planet_id, ship_coord, angle, safe_thrust, target_coord)
+                    target_type = MyCommon.Target.PLANET
+                    ship_task = MyCommon.ShipTasks.EXPANDING
+                    self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, safe_thrust, target_coord)
 
 
     def get_target_and_distances(self):
@@ -379,19 +382,20 @@ class MyMoves():
 
 
 
-    def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, target_coord):
+    def set_ship_statuses(self,ship_id, target_type, target_id, ship_coord, ship_task, angle, thrust, target_coord):
         """
         SET STATUSES OF THE SPECIFIC SHIP
         """
 
         ## SET SHIP'S TARGET
-        self.set_ship_target_id(ship_id, Target.PLANET, target_planet_id)
+        self.set_ship_target_id(ship_id, target_type, target_id)
 
         ## SET SHIP'S TASK
-        self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+        self.set_ship_task(ship_id, ship_task)
 
         ## SET PLANET'S MY MINER
-        self.set_planet_myminer(target_planet_id, ship_id)
+        if target_type == MyCommon.Target.PLANET:
+            self.set_planet_myminer(target_id, ship_id)
 
         ## GET DESTINATION COORDS (y,x)
         self.set_ship_destination(ship_id, ship_coord, angle, thrust, target_coord)
@@ -453,8 +457,21 @@ class MyMoves():
         self.myMap.data_ships[self.myMap.my_id][ship_id]['task'] = ship_task
 
         ## ADD TO SHIP SETS
-        if ship_task == ShipTasks.EXPANDING:
+        if ship_task == MyCommon.ShipTasks.EXPANDING:
             self.myMap.ships_expanding.add(ship_id)
+
+        elif ship_task == MyCommon.ShipTasks.ATTACKING_FRONTLINE:
+            self.myMap.ships_attacking_frontline.add(ship_id)
+
+        elif ship_task == MyCommon.ShipTasks.ATTACKING:
+            self.myMap.ships_attacking.add(ship_id)
+
+        elif ship_task == MyCommon.ShipTasks.SUPPORTING:
+            self.myMap.ships_supporting.add(ship_id)
+
+        elif ship_task == MyCommon.ShipTasks.EVADING:
+            self.myMap.ships_evading.add(ship_id)
+
 
 
     def set_planet_myminer(self, planet_id, ship_id):

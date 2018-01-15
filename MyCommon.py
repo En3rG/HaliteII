@@ -2,6 +2,7 @@ import logging
 import datetime
 import numpy as np
 import math
+from enum import Enum
 
 
 class Constants():
@@ -46,6 +47,31 @@ class Constants():
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
     CIRCLE_RADIUS_EXTRA_EDGES = 0.80 ## 0.47 or 0.85? MULTIPLIED TO RADIUS
+
+class Target():
+    """
+    SHOULD WE DELETE? NOT REALLY BEING UTILIZED
+    """
+    NOTHING = -1
+    PLANET = 0
+    SHIP = 1
+
+class ShipTasks(Enum):
+    """
+    VALUES FOR SHIPS TASKS
+
+    NOT REALLY USED YET
+    """
+    NONE = -1   ## DEFAULT
+    MINING = 0
+    EXPANDING = 1
+    DEFENDING = 2
+    ATTACKING_FRONTLINE = 3
+    ATTACKING = 4
+    SUPPORTING = 5
+    EVADING = 6
+    RUNNING = 7
+
 
 def disable_log(disable,log):
     """

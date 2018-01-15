@@ -3,7 +3,6 @@ from testing.test_logs import log_players, log_planets, log_myShip, log_dimensio
 import hlt
 from enum import Enum
 import math
-from models.data import ShipTasks
 import MyCommon
 import heapq
 import initialization.astar as astar
@@ -331,7 +330,7 @@ class MyMoves():
         self.set_ship_target_id(ship_id, Target.PLANET, target_planet_id)
 
         ## SET SHIP'S TASK
-        self.set_ship_task(ship_id, ShipTasks.EXPANDING)
+        self.set_ship_task(ship_id, MyCommon.ShipTasks.EXPANDING)
 
         ## SET PLANET'S MY MINER
         self.set_planet_myminer(target_planet_id, ship_id)
@@ -376,7 +375,7 @@ class MyMoves():
         self.myMap.data_ships[self.myMap.my_id][ship_id]['task'] = ship_task
 
         ## ADD TO SHIP SETS
-        if ship_task == ShipTasks.EXPANDING:
+        if ship_task == MyCommon.ShipTasks.EXPANDING:
             self.myMap.ships_expanding.add(ship_id)
 
     def set_planet_myminer(self, planet_id, ship_id):

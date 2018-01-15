@@ -88,7 +88,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         ## IF WITHIN ATTACKING_RADIUS
         #if section_distance == 0:
         #if section_distance == 0 or section_distance == 1:
-        if section_distance <= 2:
+        if section_distance <= 1.5:
             ## ENEMY WITHIN THE SAME SECTION
             ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
             value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
@@ -219,11 +219,11 @@ def move_battle_heap(MyMoves, battle_heap):
 
                     ## IF TARGET IS REACHABLE, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
                     ## COMMENTING THIS OUT GIVES A HIGHER RANKING
-                    # if int(round(enemy_distance)) == thrust:
-                    #     logging.debug("enemy_val: {} ".format(enemy_val))
-                    #     if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
-                    #         thrust = max(0, thrust - 2)
-                    #         logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
+                    if int(round(enemy_distance)) == thrust:
+                        logging.debug("enemy_val: {} ".format(enemy_val))
+                        if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
+                            thrust = max(0, thrust - 1)
+                            logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
 
                     ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
                     set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)

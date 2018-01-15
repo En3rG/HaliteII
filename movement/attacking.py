@@ -77,7 +77,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
 
     ## GET CLOSEST/MOST ENEMIES SECTION POINT
     seek_val = 1
-    enemy_section_point, section_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned)
+    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned)
 
     #logging.debug("v_sectioned {}".format(v_sectioned))
 
@@ -88,7 +88,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         ## IF WITHIN ATTACKING_RADIUS
         #if section_distance == 0:
         #if section_distance == 0 or section_distance == 1:
-        if section_distance < 1.5:
+        if section_distance <= 2:
             ## ENEMY WITHIN THE SAME SECTION
             ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
             value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
@@ -101,7 +101,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
 
             ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
             seek_val = -0.75
-            enemy_point, enemy_distance = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
+            enemy_point, enemy_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
             ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
 
 
@@ -135,7 +135,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
             target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
 
             over_thrust = None
-            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
+            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough, enemy_val))
         else:
             ## ENEMY IN A DIFFERENT SECTION
 
@@ -157,7 +157,8 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
             target_coord = section_coord  ## SECTION COORD SHOULD BE GOOD ENOUGH (MIDDLE)
 
             strong_enough = None
-            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
+            enemy_val = None
+            heapq.heappush(battle_heap, (section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough, enemy_val))
 
     else:
         ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
@@ -167,7 +168,8 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         target_coord = None
         over_thrust = None
         strong_enough = None
-        heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, target_coord, over_thrust, strong_enough))
+        enemy_val = None
+        heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, target_coord, over_thrust, strong_enough, enemy_val))
 
 
 
@@ -176,7 +178,7 @@ def move_battle_heap(MyMoves, battle_heap):
     MOVE SHIPS ACCORDING TO THE HEAP PROVIDED
     """
     while battle_heap:
-        section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough = heapq.heappop(battle_heap)
+        section_distance, enemy_distance, ship_id, target_coord, over_thrust, strong_enough, enemy_val = heapq.heappop(battle_heap)
 
         ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
         ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
@@ -217,13 +219,11 @@ def move_battle_heap(MyMoves, battle_heap):
 
                     ## IF TARGET IS REACHABLE, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
                     ## COMMENTING THIS OUT GIVES A HIGHER RANKING
-                    if int(round(enemy_distance)) == thrust:
-                        target_point = (int(round(target_coord.y)), int(round(target_coord.x)))
-                        enemy_ship = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0][target_point[0]][target_point[1]]
-                        logging.debug("enemy_ship: {} ".format(enemy_ship))
-                        if enemy_ship == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
-                            thrust = max(0, thrust - 2)
-                            logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
+                    # if int(round(enemy_distance)) == thrust:
+                    #     logging.debug("enemy_val: {} ".format(enemy_val))
+                    #     if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
+                    #         thrust = max(0, thrust - 2)
+                    #         logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
 
                     ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
                     set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
@@ -265,7 +265,7 @@ def move_battle_heap(MyMoves, battle_heap):
                                                             MyCommon.Constants.BACKUP_SQUARE_RADIUS,
                                                             pad_values)
                 seek_val = 1
-                backup_point, backup_distance = MyCommon.get_coord_closest_seek_value(seek_val,
+                backup_point, backup_distance, backup_val = MyCommon.get_coord_closest_seek_value(seek_val,
                                                                                       area_matrix,
                                                                                       MyMoves.EXP.distance_matrix_backup)
 

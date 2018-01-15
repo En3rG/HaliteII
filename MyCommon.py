@@ -430,11 +430,11 @@ def get_coord_closest_seek_value(seek_val, values, distances):
 
         # Index into r,c with the lowest dist indices and
         # from those select maxed one based off v
-        return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di
+        return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
 
     else:
         ## NO ENEMIES FOUND
-        return None, None
+        return None, None, None
 
 
 def get_section_num(coord):

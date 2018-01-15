@@ -127,12 +127,12 @@ class MyMoves():
                 ship_task = MyCommon.ShipTasks.MINING
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
 
+            ## MOVE RUNNING SHIPS
+            running.move_running_ships(self)
+
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
             attacking.move_battling_ships(self)
-
-            ## MOVE RUNNING SHIPS
-            running.move_running_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW

@@ -203,7 +203,7 @@ def move_battle_heap(MyMoves, battle_heap):
                         ## IF TARGET IS REACHABLE, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
                         ## COMMENTING THIS OUT GIVES A HIGHER RANKING
                         if int(round(enemy_distance)) == thrust:
-                            logging.debug("enemy_val: {} ".format(enemy_val))
+                            logging.debug("docked enemy_val: {} ".format(enemy_val))
                             if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
                                 thrust = max(0, thrust - 1)
                                 logging.debug("updated thrust: {} angle: {}".format(thrust, angle))

@@ -48,7 +48,7 @@ class Constants():
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    CIRCLE_RADIUS_EXTRA_EDGES = 0.80 ## 0.47 or 0.85? MULTIPLIED TO RADIUS
+    CIRCLE_RADIUS_EXTRA_EDGES = 1.2 ## 0.47 or 0.80 MULTIPLIED TO RADIUS. 1.2 Better??
 
 class Target():
     """
@@ -534,15 +534,6 @@ def isInside_map(coord, MyMoves):
 # print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
 # np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
 #
-# print("-------")
-#
-# array = np.zeros((31,31), dtype=np.float16)
-# center = Coordinates(15,15)
-# radius = 10
-# value = 1
-# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
-# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0.8))
-# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
 #
 # print("-------")
 #
@@ -558,10 +549,19 @@ def isInside_map(coord, MyMoves):
 #
 # array = np.zeros((31,31), dtype=np.float16)
 # center = Coordinates(15,15)
-# radius = 10 + 1
+# radius = 10
+# value = 1
+# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
+# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=2.1))
+# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
+#
+# print("-------")
+#
+# array = np.zeros((20,20), dtype=np.float16)
+# center = Coordinates(9,9)
+# radius = 7
 # value = 1
 # np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
 # print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
 # np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-
 

@@ -3,6 +3,7 @@ import datetime
 import numpy as np
 import math
 from enum import Enum
+import heapq
 
 
 class Constants():
@@ -437,6 +438,13 @@ def get_coord_closest_seek_value(seek_val, values, distances):
         return None, None, None
 
 
+def get_ship_ids_in_array(seek_val, values, distances):
+    """
+    GET COORDS OF ALL VALUES FOUND, ORDER BY DISTANCE
+    """
+    return values[np.where(values >= seek_val)][np.argsort(distances[np.where(values >= seek_val)])]
+
+
 def get_section_num(coord):
     """
     TAKES A COORD AND RETURN THE SECTION VALUE
@@ -513,16 +521,41 @@ def isInside_map(coord, MyMoves):
 
 
 
-
-# array = np.zeros((17, 17), dtype=np.float16)
-# center = Coordinates(8,8)
-# radius = 7
+# array = np.zeros((31,31), dtype=np.float16)
+# center = Coordinates(15,15)
+# radius = 10
 # value = 1
 # np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
-# print(fill_circle(array, center, radius, value, cummulative=False))
+# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
 # np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-
-
-
-
+#
+# print("-------")
+#
+# array = np.zeros((31,31), dtype=np.float16)
+# center = Coordinates(15,15)
+# radius = 10
+# value = 1
+# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
+# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0.8))
+# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
+#
+# print("-------")
+#
+# array = np.zeros((31,31), dtype=np.float16)
+# center = Coordinates(15,15)
+# radius = 10
+# value = 1
+# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
+# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=2))
+# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
+#
+# print("-------")
+#
+# array = np.zeros((31,31), dtype=np.float16)
+# center = Coordinates(15,15)
+# radius = 10 + 1
+# value = 1
+# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
+# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
+# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
 

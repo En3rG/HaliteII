@@ -312,6 +312,7 @@ class MyMatrix():
         self.EXP = EXP
         self.prediction_matrix = None
         self.ally_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
+        self.ally_matrix.fill(-1.0)
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
         self.add_new_ships_to_position_matrix()
@@ -454,9 +455,8 @@ class MyMatrix():
             else:
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
-            #matrix[round(ship['y'])][round(ship['x'])] = value
-            #matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health']/Matrix_val.MAX_SHIP_HP.value
-            matrix[ship['point'][0]][ship['point'][1]] = value
+            #matrix[ship['point'][0]][ship['point'][1]] = value
+            matrix[ship['point'][0]][ship['point'][1]] = ship_id
             matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp

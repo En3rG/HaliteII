@@ -381,8 +381,8 @@ class MyMoves():
         if step_num == 0:
             return True
         else:
-            return self.position_matrix[step_num][point[0]][point[1]] == 0
-            #return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value)
+            #return self.position_matrix[step_num][point[0]][point[1]] == 0
+            return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value)
 
 
 

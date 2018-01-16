@@ -311,8 +311,8 @@ class MyMatrix():
         self.input_matrix_x = input_matrix_x
         self.EXP = EXP
         self.prediction_matrix = None
-        self.ally_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
-        self.ally_matrix.fill(-1.0)
+        self.ally_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.int16)
+        self.ally_matrix.fill(-1)
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
         self.add_new_ships_to_position_matrix()

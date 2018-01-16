@@ -193,29 +193,6 @@ def move_battle_heap(MyMoves, battle_heap):
                 if over_thrust is None:
                     ## MOVE THIS SHIP, IN THE SAME SECTION
 
-                    ## DOESNT CARE EVEN IF NOT STRONG ENOUGH
-                    # logging.debug("ship_id: {} from handled_ships in same section (strong enough)".format(ship_id))
-                    # thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
-                    # logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                    # set_commands_status(MyMoves, ship_id, thrust, angle)
-
-                    ## IF NOT STRONG ENOUGH, JUST BACK UP SOME DISTANCE
-                    # if strong_enough:
-                    #     ## STRONG ENOUGH, CAN JUST ATTACK TOWARDS ENEMY
-                    #     logging.debug("ship_id: {} from handled_ships in same section (strong enough)".format(ship_id))
-                    #     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
-                    #     logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                    #     set_commands_status(MyMoves, ship_id, thrust, angle)
-                    # else:
-                    #     ## NOT STRONG ENOUGH (FLIP ANGLE)
-                    #     logging.debug("ship_id: {} from handled_ships in same section (not strong enough)".format(ship_id))
-                    #     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord,target_distance=enemy_distance,target_planet_id=None)
-                    #     thrust = MyCommon.Constants.MOVE_BACK_OFFENSE
-                    #     angle = MyCommon.get_reversed_angle(angle)
-                    #     logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                    #     set_commands_status(MyMoves, ship_id, thrust, angle)
-
-
                     ## IF NOT STRONG ENOUGH, GO BACK 7 UNITS, BUT ALSO KEEP TRACK OF BACKUP MATRIX
                     if strong_enough:
                         ## STRONG ENOUGH, CAN JUST ATTACK TOWARDS ENEMY
@@ -247,65 +224,111 @@ def move_battle_heap(MyMoves, battle_heap):
                         ship_task = MyCommon.ShipTasks.EVADING
 
                         ## COMMENTING THIS OUT BECAUSE WILL MOVE LATER
-                        set_commands_status(MyMoves, ship_id, thrust, angle, new_target_coord, ship_task)
+                        #set_commands_status(MyMoves, ship_id, thrust, angle, new_target_coord, ship_task)
 
                         ## ADD TO BACKUP MATRIX
                         #MyMoves.myMatrix.backup_matrix[ship_point[0], ship_point[1]] = 1  ## WAS ON BOT25
                         ## +2 TO MOVE BACK FURTHER FOR BACKUP TO GO THERE
-                        backup_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust+2, rounding=True)
-                        try: MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
-                        except: MyMoves.myMatrix.backup_matrix[backup_coord.y-2, backup_coord.x-2] = 1  ## GOING OVER THE MAP
+
+                        try:
+                            backup_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust + 2, rounding=True)
+                            MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
+                        except:
+                            ## GOING OVER THE MAP
+                            backup_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust, rounding=True)
+                            MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
+
+                        get_backup_ships(MyMoves, ship_id, ship_task, backup_coord)
 
                 else:
                     ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION
 
                     ## LOOK FOR BACKUP FIRST, IF NONE FOUND MOVE TOWARDS TARGET LIKE NORMAL
-                    pad_values = 0
-                    area_matrix = MyCommon.get_circle_in_square(MyMoves.myMatrix.backup_matrix,
-                                                                ship_coords,
-                                                                MyCommon.Constants.BACKUP_CIRCLE_RADIUS,
-                                                                MyCommon.Constants.BACKUP_SQUARE_RADIUS,
-                                                                pad_values)
-                    seek_val = 1
-                    backup_point, backup_distance, backup_val = MyCommon.get_coord_closest_seek_value(seek_val,
-                                                                                          area_matrix,
-                                                                                          MyMoves.EXP.distance_matrix_backup)
+                    # pad_values = 0
+                    # area_matrix = MyCommon.get_circle_in_square(MyMoves.myMatrix.backup_matrix,
+                    #                                             ship_coords,
+                    #                                             MyCommon.Constants.BACKUP_CIRCLE_RADIUS,
+                    #                                             MyCommon.Constants.BACKUP_SQUARE_RADIUS,
+                    #                                             pad_values)
+                    # seek_val = 1
+                    # backup_point, backup_distance, backup_val = MyCommon.get_coord_closest_seek_value(seek_val,
+                    #                                                                       area_matrix,
+                    #                                                                       MyMoves.EXP.distance_matrix_backup)
+                    #
+                    # if backup_point:
+                    #     ## MOVE TOWARDS BACKUP
+                    #     logging.debug("ship_id: {} from handled_ships in different section. Going to back up".format(ship_id))
+                    #     slope = (backup_point[0] - MyCommon.Constants.BACKUP_SQUARE_RADIUS, backup_point[1] - MyCommon.Constants.BACKUP_SQUARE_RADIUS)
+                    #     new_target_coord = MyCommon.Coordinates(ship_point[0] + slope[0], ship_point[1] + slope[1])
+                    #     logging.debug("backup found at coord: {}".format(new_target_coord))
+                    #     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, new_target_coord,
+                    #                                                            target_distance=backup_distance,
+                    #                                                            target_planet_id=None)
+                    #     logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                    #     ship_task = MyCommon.ShipTasks.SUPPORTING
+                    #     set_commands_status(MyMoves, ship_id, thrust, angle, new_target_coord, ship_task)
+                    #
+                    # else:
+                    #     ## NO BACKUP CLOSE BY, JUST MOVE TOWARDS ENEMY
+                    #     logging.debug("ship_id: {} from handled_ships in different section".format(ship_id))
+                    #     logging.debug("section_distance: {} enemy_distance {} target_coord {}".format(section_distance, enemy_distance, target_coord, over_thrust))
+                    #     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
+                    #     logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                    #     ship_task = MyCommon.ShipTasks.ATTACKING
+                    #     set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
-                    if backup_point:
-                        ## MOVE TOWARDS BACKUP
-                        logging.debug("ship_id: {} from handled_ships in different section. Going to back up".format(ship_id))
-                        slope = (backup_point[0] - MyCommon.Constants.BACKUP_SQUARE_RADIUS, backup_point[1] - MyCommon.Constants.BACKUP_SQUARE_RADIUS)
-                        new_target_coord = MyCommon.Coordinates(ship_point[0] + slope[0], ship_point[1] + slope[1])
-                        logging.debug("backup found at coord: {}".format(new_target_coord))
-                        thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, new_target_coord,
-                                                                               target_distance=backup_distance,
-                                                                               target_planet_id=None)
-                        logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                        ship_task = MyCommon.ShipTasks.SUPPORTING
-                        set_commands_status(MyMoves, ship_id, thrust, angle, new_target_coord, ship_task)
 
-                    else:
-                        ## NO BACKUP CLOSE BY, JUST MOVE TOWARDS ENEMY
-                        logging.debug("ship_id: {} from handled_ships in different section".format(ship_id))
-                        logging.debug("section_distance: {} enemy_distance {} target_coord {}".format(section_distance, enemy_distance, target_coord, over_thrust))
-                        thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
-                        logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                        ship_task = MyCommon.ShipTasks.ATTACKING
-                        set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
-
-                    ## BACKUP IS MOVED ALREADY AT THIS POINT
-                    # logging.debug("ship_id: {} from handled_ships in different section".format(ship_id))
-                    # logging.debug("section_distance: {} enemy_distance {} target_coord {}".format(section_distance, enemy_distance, target_coord, over_thrust))
-                    # thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
-                    # logging.debug("thrust: {} angle: {}".format(thrust, angle))
-                    # ship_task = MyCommon.ShipTasks.ATTACKING
-                    # set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+                    ## BACKUP IS MOVED ALREADY AT THIS POINT (USING GET SHIPS IN ARRAY)
+                    logging.debug("ship_id: {} from handled_ships in different section".format(ship_id))
+                    logging.debug("section_distance: {} enemy_distance {} target_coord {}".format(section_distance, enemy_distance, target_coord, over_thrust))
+                    thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
+                    logging.debug("thrust: {} angle: {}".format(thrust, angle))
+                    ship_task = MyCommon.ShipTasks.ATTACKING
+                    set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
 
             else:
                 logging.debug("ship_id: {} from handled_ships no enemy found around it".format(ship_id))
                 ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
                 closest_section_with_enemy(MyMoves, ship_id, move_now=True)
+
+
+def get_backup_ships(MyMoves, ship_id, ship_task, backup_coord):
+    """
+    GET BACKUP SHIPS AROUND THIS AREA
+    """
+    ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+
+    pad_values = -1
+    area_matrix = MyCommon.get_circle_in_square(MyMoves.myMatrix.ally_matrix,
+                                                backup_coord,
+                                                MyCommon.Constants.BACKUP_CIRCLE_RADIUS,
+                                                MyCommon.Constants.BACKUP_SQUARE_RADIUS,
+                                                pad_values,
+                                                pad_outside_circle=True)
+
+    #logging.debug("area_matrix {}".format(area_matrix))
+
+    ships = MyCommon.get_ship_ids_in_array(area_matrix, MyMoves.EXP.distance_matrix_backup)
+
+
+    for _ship_id in ships:
+        _ship_id = int(_ship_id)
+        if _ship_id != ship_id and _ship_id not in MyMoves.myMap.ships_moved_already:
+            logging.debug("_ship_id: {}".format(_ship_id))
+            ## MOVE SHIP TOWARDS BACKUP COORD
+            _ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][_ship_id]['coords']
+            _d = MyCommon.calculate_distance(_ship_coords, backup_coord)
+            _thrust, _angle = expanding2.get_thrust_angle_from_Astar(MyMoves, _ship_id, backup_coord, target_distance=_d, target_planet_id=None)
+            _ship_task = MyCommon.ShipTasks.SUPPORTING
+            set_commands_status(MyMoves, _ship_id, _thrust, _angle, backup_coord, _ship_task)
+
+    ## MOVE ORIGINAL SHIP_ID
+    logging.debug("_ship_id (orig): {}".format(ship_id))
+    d = MyCommon.calculate_distance(ship_coords, backup_coord)
+    thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, backup_coord,target_distance=d, target_planet_id=None)
+    ship_task = MyCommon.ShipTasks.EVADING
+    set_commands_status(MyMoves, ship_id, thrust, angle, backup_coord, ship_task)
 
 
 def set_section_in_battle(MyMoves, ship_section, enemy_section_point):

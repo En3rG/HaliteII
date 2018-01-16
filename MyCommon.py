@@ -364,7 +364,7 @@ def add_padding(a, center_coord, square_radius, pad_values):
 
 
 
-def get_circle_in_square(array, center_coord, circle_radius, square_radius, pad_values):
+def get_circle_in_square(array, center_coord, circle_radius, square_radius, pad_values, pad_outside_circle=False):
     """
     RETURNS A SQUARE MATRIX
     GET VALUES FROM THE MATRIX PROVIDED, WITHIN THE CIRCLE SPECIFIED
@@ -378,6 +378,9 @@ def get_circle_in_square(array, center_coord, circle_radius, square_radius, pad_
 
     ## VALUES OUTSIDE THE CIRCLE WILL BE ZEROES
     temp_matrix = np.zeros((height, width), dtype=np.float16)
+
+    if pad_outside_circle: ## NORMALLY OUTSIDE CIRCLE IS 0, THIS IS TO OVERRIDE THAT
+        temp_matrix.fill(pad_values)
 
     ## y IS JUST AN ARRAY OF 1xY (ROWS)
     ## x IS JUST AN ARRAY OF 1xX (COLS)
@@ -438,10 +441,11 @@ def get_coord_closest_seek_value(seek_val, values, distances):
         return None, None, None
 
 
-def get_ship_ids_in_array(seek_val, values, distances):
+def get_ship_ids_in_array(values, distances):
     """
     GET COORDS OF ALL VALUES FOUND, ORDER BY DISTANCE
     """
+    seek_val = 0
     return values[np.where(values >= seek_val)][np.argsort(distances[np.where(values >= seek_val)])]
 
 
@@ -558,4 +562,5 @@ def isInside_map(coord, MyMoves):
 # np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
 # print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
 # np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
+
 

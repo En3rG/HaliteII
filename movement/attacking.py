@@ -206,7 +206,7 @@ def move_battle_heap(MyMoves, battle_heap):
                             logging.debug("docked enemy_val: {} ".format(enemy_val))
                             if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
                                 thrust = max(0, thrust - 1)
-                                logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
+                                logging.debug("updated thrust for docked enemy: {} angle: {}".format(thrust, angle))
 
                         ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
                         set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
@@ -284,7 +284,14 @@ def move_battle_heap(MyMoves, battle_heap):
                     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=over_thrust, target_planet_id=None)
                     logging.debug("thrust: {} angle: {}".format(thrust, angle))
                     ship_task = MyCommon.ShipTasks.ATTACKING
-                    set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+
+                    if enemy_distance < 14:
+                        ## PREVENTS COLLIDING TO ENEMY
+                        thrust = int(max(1, enemy_distance - 8))
+                        logging.debug("updated thrust to prevent collision: {} angle: {}".format(thrust, angle))
+                        set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+                    else:
+                        set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
 
             else:

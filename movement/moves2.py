@@ -11,6 +11,7 @@ import movement.expanding as expanding
 import movement.expanding2 as expanding2
 import movement.attacking as attacking
 import movement.running as running
+import movement.sniping as sniping
 import copy
 from models.data import Matrix_val
 import numpy as np
@@ -126,6 +127,9 @@ class MyMoves():
                 target_type = MyCommon.Target.PLANET
                 ship_task = MyCommon.ShipTasks.MINING
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
+
+            ## MOVE ASSASSIN SHIPS
+            sniping.move_sniping_ships(self)
 
             ## MOVE RUNNING SHIPS
             running.move_running_ships(self)

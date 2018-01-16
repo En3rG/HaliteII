@@ -73,6 +73,7 @@ class ShipTasks(Enum):
     SUPPORTING = 5
     EVADING = 6
     RUNNING = 7
+    SNIPING = 8
 
 
 def disable_log(disable,log):

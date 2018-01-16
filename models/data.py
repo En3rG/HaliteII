@@ -64,6 +64,7 @@ class MyMap():
         self.ships_defending = set()        ## THESE ARE CURRENTLY NOT USED
         self.ships_expanding = set()
         self.ships_running = set()          ## THESE ARE CURRENTLY NOT USED
+        self.ships_sniping = set()  ## THESE ARE CURRENTLY NOT USED
         self.ships_battling = {1:set(),\
                                2:set(),\
                                3:set(),\

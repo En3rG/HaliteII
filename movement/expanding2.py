@@ -109,7 +109,7 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
 
 
 
-def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id):
+def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id, override_section_matrix=None):
     """
     RETURN THRUST AND ANGLE BASED SHIP ID AND TARGET COORD ONLY
 
@@ -132,14 +132,17 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     ## GET SECTION (FOR A* 2nd Version)
     ## GETTING SECTIONS FROM 7 POSITION MATRIXES
-    pad_values = -1
-    section_matrixes = {}
-    for step in range(1,8):
-        section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step],
-                                                               ship_coord,
-                                                               circle_radius,
-                                                               square_radius,
-                                                               pad_values)
+    if override_section_matrix:
+        section_matrixes = override_section_matrix
+    else:
+        pad_values = -1
+        section_matrixes = {}
+        for step in range(1,8):
+            section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step],
+                                                                   ship_coord,
+                                                                   circle_radius,
+                                                                   square_radius,
+                                                                   pad_values)
 
 
     logging.debug("get_thrust_angle_from_Astar:: angle_towards_target {}".format(angle_towards_target))

@@ -6,32 +6,34 @@ import logging
 from models.data import Matrix_val
 
 
-# def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, mining):
-#     """
-#     FILL IN INTERMEDIATE POSITION MATRIXES
-#     """
-#     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-#     dx = thrust/7
-#
-#     for x in range(1, 7):  ## 7 WILL BE FILLED BY ANOTHER FUNCTION
-#         intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
-#         intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
-#
-#         # logging.debug("About to fill intermediate step: {}".format(x))
-#         fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=True)
-#         # if thrust == 0:
-#         #     ## IF THRUST IS 0, DOCKING
-#         #     ## NEED TO FILL DIAGONALS
-#         #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=False)
-#         # else:
-#         #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
-#
-#     ## LAST TURN
-#     x = 7
-#     intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx * x)))
-#     intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
-#
-#     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=False)
+def fill_matrix_intermediate_steps(center, r, c, section_matrixes):
+    """
+    FILL IN INTERMEDIATE POSITION MATRIXES
+    """
+    center_coord = MyCommon.Coordinates(center, center)
+    mining = False
+
+    for r, c in zip(r, c):
+        enemy_coord = MyCommon.Coordinates(r, c)
+        angle = MyCommon.get_angle(enemy_coord, center_coord)
+        distance = MyCommon.calculate_distance(enemy_coord, center_coord,rounding=True)
+        thrust = 7 if distance > 7 else distance
+        dx = thrust/7
+
+        for x in range(1, 7):
+            intermediate_coord = MyCommon.get_destination_coord(enemy_coord, angle, int(round(dx*x)))
+            intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
+
+            expanding2.fill_position_matrix(section_matrixes[x], intermediate_point, mining, intermediate=True)
+
+        ## LAST TURN
+        x = 7
+        intermediate_coord = MyCommon.get_destination_coord(enemy_coord, angle, int(round(dx * x)))
+        intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
+
+        expanding2.fill_position_matrix(section_matrixes[x], intermediate_point, mining, intermediate=False)
+
+    return section_matrixes
 
 
 def set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task):
@@ -52,8 +54,9 @@ def move_sniping_ships(MyMoves):
     """
     MOVE SHIP TOWARDS ASSASSINATING ENEMY DOCKED SHIPS
     """
-    for ship_id in MyMoves.myMap.myMap_prev.ships_sniping:
-    #for ship_id in [0]:
+    #for ship_id in MyMoves.myMap.myMap_prev.ships_sniping:
+
+    for ship_id in [2]:
         try:
             thrust, angle = find_enemy(MyMoves, ship_id)
 
@@ -92,8 +95,10 @@ def find_enemy(MyMoves, ship_id):
     value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
     v_enemy = MyCommon.get_section_with_padding(value, ship_coord, square_radius, 0)
 
-    r, c = np.where(v_enemy >= 1)
+    r, c = np.where(v_enemy == 1)
 
+    center = square_radius
+    section_matrixes = fill_matrix_intermediate_steps(center, r, c, section_matrixes)
 
     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, enemy_target_coord, target_distance=thrust, target_planet_id=None, override_section_matrix=section_matrixes)
 

@@ -8,7 +8,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = True
+    DISABLE_LOG = False
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -48,7 +48,7 @@ class Constants():
 
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
-    CIRCLE_RADIUS_EXTRA_EDGES = 1.2 ## 0.47 or 0.80 MULTIPLIED TO RADIUS. 1.2 Better??
+    CIRCLE_RADIUS_EXTRA_EDGES = 0.8 ## 0.47 or 0.80 MULTIPLIED TO RADIUS. 1.2 Better??
 
 class Target():
     """

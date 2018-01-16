@@ -285,13 +285,16 @@ def move_battle_heap(MyMoves, battle_heap):
                     logging.debug("thrust: {} angle: {}".format(thrust, angle))
                     ship_task = MyCommon.ShipTasks.ATTACKING
 
-                    if enemy_distance < 14:
-                        ## PREVENTS COLLIDING TO ENEMY
-                        thrust = int(max(1, enemy_distance - 8))
-                        logging.debug("updated thrust to prevent collision: {} angle: {}".format(thrust, angle))
-                        set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
-                    else:
-                        set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+                    set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+
+                    ## DOING THIS GENERATED A LOWER RANK (BOT 52)
+                    # if enemy_distance < 14:
+                    #     ## PREVENTS COLLIDING TO ENEMY
+                    #     thrust = int(max(1, enemy_distance - 8))
+                    #     logging.debug("updated thrust to prevent collision: {} angle: {}".format(thrust, angle))
+                    #     set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+                    # else:
+                    #     set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
 
             else:

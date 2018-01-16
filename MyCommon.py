@@ -30,6 +30,7 @@ class Constants():
     ASTAR_CIRCLE_RADIUS = 7 ## 7. 14 TIMES OUT
     FILL_PLANET_PAD = 1
     MOVE_BACK = 1
+    NON_OBSTRUCTION = 0
 
     ## FOR DIVIDING WHOLE MAP INTO SECTIONS
     NUM_SECTIONS = 7  ## DIVIDES THE MAP INTO THESE SIZE SECTIONS
@@ -412,7 +413,7 @@ def get_coord_closest_seek_value(seek_val, values, distances):
     """
     GET CLOSESTS AND MOST ENEMIES FROM THE SECTION PROVIDED
 
-    RETURNS COORD BASED ON VALUES/DISTANCES PASSED
+    RETURNS COORD BASED ON VALUES/DISTANCES PASSED, MIN DISTANCE, VALUE WITH MINIMUM DISTANCE
     """
     # Get row, col indices for the condition
     if seek_val == 1:

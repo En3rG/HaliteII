@@ -28,6 +28,7 @@ class LaunchPads():
     def __str__(self):
         return "fly_off: {} land_on: {}".format(self.fly_off, self.land_on)
 
+
 class Exploration():
     """
     GATHERS ALL PLANETS INFORMATION
@@ -178,6 +179,7 @@ class Exploration():
 
         return table
 
+
     def calculate_distance_sections(self, curr_section, row_length, col_length):
         """
         GENERATES A TABLE WITH ACTUAL DISTANCES BETWEEN SECTIONS
@@ -247,6 +249,7 @@ class Exploration():
 
         return table
 
+
     def calculate_distance_to_planets(self, curr_section):
         """
         GET FROM CURRENT SECTION TO EACH PLANETS
@@ -261,6 +264,7 @@ class Exploration():
             dict[planet_id] = distance
 
         return dict
+
 
     def get_scores_section_to_planet(self):
         """
@@ -280,6 +284,7 @@ class Exploration():
 
         return table
 
+
     def calculate_scores_to_planets(self, curr_section):
         """
         GET FROM CURRENT SECTION TO EACH PLANETS
@@ -296,7 +301,6 @@ class Exploration():
             dict[planet_id] = score
 
         return dict
-
 
 
     def get_start_coords(self):
@@ -347,8 +351,6 @@ class Exploration():
                     matrix[id][id2] = score
 
         return matrix
-
-
 
 
     def get_best_planet(self):

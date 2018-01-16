@@ -202,11 +202,11 @@ def move_battle_heap(MyMoves, battle_heap):
 
                         ## IF TARGET IS REACHABLE, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
                         ## COMMENTING THIS OUT GIVES A HIGHER RANKING
-                        # if int(round(enemy_distance)) == thrust:
-                        #     logging.debug("enemy_val: {} ".format(enemy_val))
-                        #     if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
-                        #         thrust = max(0, thrust - 1)
-                        #         logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
+                        if int(round(enemy_distance)) == thrust:
+                            logging.debug("enemy_val: {} ".format(enemy_val))
+                            if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
+                                thrust = max(0, thrust - 1)
+                                logging.debug("updated thrust: {} angle: {}".format(thrust, angle))
 
                         ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
                         set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
@@ -291,11 +291,14 @@ def move_battle_heap(MyMoves, battle_heap):
                 logging.debug("ship_id: {} from handled_ships no enemy found around it".format(ship_id))
                 ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
                 closest_section_with_enemy(MyMoves, ship_id, move_now=True)
+                #closest_section_with_enemy(MyMoves, ship_id, move_now=True, docked_only=True)
 
 
 def get_backup_ships(MyMoves, ship_id, ship_task, backup_coord):
     """
     GET BACKUP SHIPS AROUND THIS AREA
+
+    MOVE SHIPS CLOSEST TO THE BACK UP POINT FIRST
     """
     ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
 
@@ -375,7 +378,7 @@ def closest_section_in_battle(MyMoves, ship_id):
         closest_section_with_enemy(MyMoves, ship_id)
 
 
-def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
+def closest_section_with_enemy(MyMoves, ship_id, docked_only=False, move_now=False):
     """
     GET CLOSEST SECTION WITH ENEMY
     """
@@ -385,15 +388,25 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
     least_distance = MyCommon.Constants.BIG_DISTANCE
     closest_section = None
 
+    ## CAN UPDATE THIS LATER TO USE JUST NUMPY (A BIT HARD SINCE DISTANCE TABLE CHANGES BASED ON LOCATION OF SHIP
     ## GET CLOSEST SECTION WITH ENEMY
-    for section in MyMoves.myMap.sections_with_enemy:
-        distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
+    if docked_only:
+        for section in MyMoves.myMap.sections_with_enemy_docked:
+            distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
 
-        if distance < least_distance:
-            closest_section = section
-            least_distance = distance
+            if distance < least_distance:
+                closest_section = section
+                least_distance = distance
+    else:
+        for section in MyMoves.myMap.sections_with_enemy:
+            distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
+
+            if distance < least_distance:
+                closest_section = section
+                least_distance = distance
 
     target_coord = MyCommon.get_coord_from_section(closest_section)
+
 
     ## INSTEAD OF DOING FINAL DISTANCE AS SECTION TO SECTION, LETS GET ACTUAL DISTANCE OF SHIP COORD TO THAT SECTION
     # final_distance = (min_distance + 1) * 7
@@ -405,6 +418,9 @@ def closest_section_with_enemy(MyMoves, ship_id, move_now=False):
         set_commands_status(MyMoves, ship_id, thrust=thrust, angle=angle, target_coord=target_coord, ship_task=ship_task)
     else:
         return final_distance, target_coord
+
+
+
 
 
 

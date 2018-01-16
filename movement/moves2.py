@@ -170,6 +170,7 @@ class MyMoves():
                         if new_target_planet_id is None:
                             planet_distance = MyCommon.Constants.BIG_DISTANCE
                             enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
+                            #enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id,move_now=False,docked_only=True)
                             heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
                             continue
 
@@ -196,6 +197,7 @@ class MyMoves():
                         ## ADD BACK TO HEAP
                         planet_distance = MyCommon.Constants.BIG_DISTANCE
                         enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
+                        #enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id,move_now=False, docked_only=True)
                         heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
                         continue
@@ -265,6 +267,7 @@ class MyMoves():
                     #attacking.closest_section_in_war(self, ship_id)
                     planet_distance = MyCommon.Constants.BIG_DISTANCE
                     enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
+                    #enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id,move_now=False,docked_only=True)
                     heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
                 else:

@@ -1,13 +1,7 @@
 
-import numpy
 from heapq import *
 import logging
 import MyCommon
-import datetime
-import time
-
-
-NON_OBSTRUCTION = 0
 
 
 def heuristic(a, b):
@@ -15,6 +9,7 @@ def heuristic(a, b):
     IS THE DISTANCE, IF TAKEN THE SQRT
     """
     return (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+
 
 def isBadNeighbor(array,neighbor):
     """
@@ -24,8 +19,9 @@ def isBadNeighbor(array,neighbor):
     if 0 <= neighbor[0] < array.shape[0]:
         if 0 <= neighbor[1] < array.shape[1]:
             ## NEIGHBOR COORDINATE IS WITHIN THE ARRAY
-            if array[neighbor[0]][neighbor[1]] == NON_OBSTRUCTION:
-                return False ## VALID NEIGHBOR
+            if array[neighbor[0]][neighbor[1]] == MyCommon.Constants.NON_OBSTRUCTION:
+                ## VALID NEIGHBOR
+                return False
             else:
                 ## ITS AN OBSTRUCTION (BAD/SKIP)
                 return True
@@ -35,6 +31,7 @@ def isBadNeighbor(array,neighbor):
     else:
         # OUTSIDE ARRAY X WALLS (BAD/SKIP)
         return True
+
 
 def a_star(array, start_point, goal_point):
     """
@@ -174,6 +171,8 @@ def simplify_paths(path_points):
     """
     SIMPLIFY PATH.  COMBINE MOVEMENT WITH THE SAME SLOPES
     NEED TO MAXIMIZE THRUST OF 7 (MAX)
+
+    NO LONGER USED?
     """
     if path_points != []:
         simplified_path = [path_points[-1]]
@@ -226,6 +225,8 @@ def get_start_target_table(simplified_path):
     """
     TAKES SIMPLIFIED PATH AND GENERATE A HASH TABLE
     KEY AS CURRENT COORD AND VALUE AS TARGET (DESTINATION) COORD
+
+    NO LONGER USED?
     """
     hash_table = {}
 
@@ -235,9 +236,12 @@ def get_start_target_table(simplified_path):
 
     return hash_table
 
+
 def get_Astar_table(matrix, starting_point, target_point):
     """
     GET PATH TABLE USING A* ALGO
+
+    NO LONGER USED?
     """
     path_points = a_star(matrix, starting_point, target_point)
     simplified_paths = simplify_paths(path_points)

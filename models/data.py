@@ -71,7 +71,9 @@ class MyMap():
                                5:set()}
 
         self.section_in_battle = set()      ## WILL CONTAIN SECTIONS IN WAR
+
         self.sections_with_enemy = set()     ## WILL CONTAIN SECTIONS WITH ENEMY
+        self.sections_with_enemy_docked = set()     ## WILL CONTAIN SECTIONS WITH ENEMY DOCKED
 
         self.ships_moved_already = set()    ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
 
@@ -84,6 +86,8 @@ class MyMap():
                                               dtype=np.float16)
 
         self.data_ships = self.get_ship_data()
+
+
         self.data_planets = {}
         self.set_planet_status()
         self.set_ships_status()
@@ -109,6 +113,7 @@ class MyMap():
             ## DELETE OLD NODES
             self.myMap_prev.myMap_prev.myMap_prev = None
             MyMap.NUM_NODES -= 1
+
 
     def get_ship_data(self):
         """
@@ -158,6 +163,7 @@ class MyMap():
                                              ## from_planet IS ONLY SET ON NEW SHIPS
 
                 docked = not(ship.docking_status.value == 0)
+                coord = data[player_id][ship_id]['coords']
 
                 ## GATHER SHIPS I OWN
                 if mine:
@@ -167,14 +173,19 @@ class MyMap():
                         self.ships_mining_ally.add(ship_id)
                         data[player_id][ship_id]['target_id'] = (MyCommon.Target.PLANET, ship.planet.id)
 
-                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=False)  ## SET SECTION FOR ALLY
+                    self.set_section_summary(coord, enemy=False)  ## SET SECTION FOR ALLY
                 else:
                     self.ships_enemy.add(ship_id)
+
                     ## GATHER ENEMY DOCKED SHIPS
                     if docked:
                         self.ships_mining_enemy.add(ship_id)
 
-                    self.set_section_summary(data[player_id][ship_id]['coords'], enemy=True)  ## SET SECTION FOR ENEMY
+                        ## ADD THIS SECTION TO SECTION WITH ENEMY DOCKED
+                        section_point = MyCommon.get_section_num(coord)
+                        self.sections_with_enemy_docked.add(section_point)
+
+                    self.set_section_summary(coord, enemy=True)  ## SET SECTION FOR ENEMY
 
         return data
 
@@ -219,6 +230,7 @@ class MyMap():
             else:
                 ## PLANET ENEMY OWNED
                 self.planets_enemy.add(planet.id)
+
 
     def update_ship_task_mining(self,ships):
         """

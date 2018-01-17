@@ -8,7 +8,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = True
+    DISABLE_LOG = False
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -431,7 +431,7 @@ def get_coord_closest_seek_value(seek_val, values, distances):
         # Get indices (indexable into r,c) corresponding to lowest distance
         ld_indx = np.flatnonzero(di == min_di)
 
-        ## GETTING CLOSEST MOST ENEMY
+        ## GETTING CLOSEST MOST ENEMY (ORIG)
         ## Get max index (based off v) out of the selected indices
         max_idx = values[r[ld_indx], c[ld_indx]].argmax()
 

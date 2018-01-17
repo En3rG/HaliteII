@@ -56,8 +56,6 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
     ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     ship_section = MyCommon.get_section_num(ship_coords)
     ship_section_coord = MyCommon.Coordinates(ship_section[0], ship_section[1])
-    distances = MyMoves.EXP.sections_distance_table[ship_section]
-    values = MyMoves.myMap.section_enemy_summary
 
     ## CHECK IF ENEMIES WITHIN A PERIMETER
     enemy_matrix = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
@@ -69,6 +67,9 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         return
 
     logging.debug("ship_id:: {} ship_coords: {} ship_section: {}".format(ship_id,ship_coords,ship_section))
+
+    distances = MyMoves.EXP.sections_distance_table[ship_section]
+    values = MyMoves.myMap.section_enemy_summary
 
     ## GET SECTIONED MATRIX
     ## NEED TO MASK WHEN SECTION IS OUT OF BOUNDS
@@ -90,50 +91,26 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         #if section_distance == 0 or section_distance == 1:
         if section_distance <= 1.5:
             ## ENEMY WITHIN THE SAME SECTION
-            ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
-            value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
-            v_enemy = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
 
-            value = MyMoves.myMatrix.ally_matrix
-            v_ally = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
+            slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS, enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
+            actual_enemy_section_point = (ship_section[0] + slope[0], ship_section[1] + slope[1])
+            enemy_section_coord = MyCommon.get_coord_from_section(actual_enemy_section_point)
 
-            d_section = MyMoves.EXP.distance_matrix_RxR
+            ## USING SECTIONED FOUND ABOVE
+            # strong_enough, v_enemy = check_if_strong_enough(MyMoves, enemy_section_coord)
+            # angle = MyCommon.get_angle(ship_coords, enemy_section_coord)
+            # enemy_distance = MyCommon.calculate_distance(ship_coords, enemy_section_coord, rounding=False)
 
-            ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
+            ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY (ORIG LIKE BOT50)
+            strong_enough, v_enemy = check_if_strong_enough(MyMoves, ship_coords)
             seek_val = -0.75
+            d_section = MyMoves.EXP.distance_matrix_RxR
             enemy_point, enemy_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
-            ## HERE ENEMY_POINT IS IN REFERENCE TO JUST THE SECTION MATRIX, HERE IT IS OKAY SINCE ANGLE AND DISTANCE IS THE SAME
-
-
-            #logging.debug("v_enemy {}".format(v_enemy))
-
-            ## GET NUMBER OF ENEMIES IN THIS SECTION
-            # num_enemy_in_section = v_sectioned[enemy_section_point[0], enemy_section_point[1]]
-            # num_ally_in_section = MyMoves.myMap.section_ally_summary[ship_section[0],ship_section[1]]
 
             ## GET ANGLE FROM MIDDLE OF MATRIX (7,7) TO ENEMY POINT
             mid_point = (MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS)
             angle = MyCommon.get_angle(MyCommon.Coordinates(mid_point[0], mid_point[1]),
                                        MyCommon.Coordinates(enemy_point[0], enemy_point[1]))
-
-            ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
-            ## ONLY GRAB A SECTION (STRONG ENOUGH RADIUS) OF THE SECTION (ATTACKING RADIUS)
-            ## INCLUDE DOCKED SHIPS WHEN CALCULATING ALLY POWER
-            ## TO PREVENT ONE SHIP FROM BACKING OUT WHEN PROTECTING DOCKED SHIPS AGAINST 1 ENEMY SHIP
-            # num_enemy_in_section = (v_enemy==-1).sum()
-            # num_ally_in_section = (v_ally==1).sum()
-            num_enemy_in_section = (v_enemy[MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
-                                    MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == -1).sum()  ## JUST GET A 7x7 matrix
-            # num_ally_in_section = (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
-            #                        MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 1).sum() \
-            #                       + (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
-            #                          MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 0.75).sum()
-            ## MATRIX ALLY CONTAINS SHIP ID NOW
-            num_ally_in_section = (v_ally[MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1,
-                                          MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1] != -1).sum()
-
-
-            strong_enough = num_ally_in_section > num_enemy_in_section
 
             ## ACTUAL COORDINATE OF ENEMY (MINUS SOME TO AVOID COLLIDING)
             target_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust=enemy_distance)
@@ -176,6 +153,42 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         heapq.heappush(battle_heap, (section_distance,enemy_distance, ship_id, target_coord, over_thrust, strong_enough, enemy_val))
 
 
+def check_if_strong_enough(MyMoves, middle_coord):
+    """
+    CHECK A SECTION, BASED ON COORDS PROVIDED, IF ITS STRONG ENOUGH
+    """
+
+    ## GET ACTUAL COORDS/DISTANCE OF THE ENEMY
+    value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
+    # v_enemy = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
+    v_enemy = MyCommon.get_section_with_padding(value, middle_coord, MyCommon.Constants.ATTACKING_RADIUS, 0)
+
+    value = MyMoves.myMatrix.ally_matrix
+    # v_ally = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
+    v_ally = MyCommon.get_section_with_padding(value, middle_coord, MyCommon.Constants.ATTACKING_RADIUS, 0)
+
+    ## INSTEAD OF USING ABOVE, COUNT -1 AND 1 ONLY. SINCE ABOVE INCLUDES ENEMY MINING
+    ## ONLY GRAB A SECTION (STRONG ENOUGH RADIUS) OF THE SECTION (ATTACKING RADIUS)
+    ## INCLUDE DOCKED SHIPS WHEN CALCULATING ALLY POWER
+    ## TO PREVENT ONE SHIP FROM BACKING OUT WHEN PROTECTING DOCKED SHIPS AGAINST 1 ENEMY SHIP
+    # num_enemy_in_section = (v_enemy==-1).sum()
+    # num_ally_in_section = (v_ally==1).sum()
+    num_enemy_in_section = (v_enemy[
+                            MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1,
+                            MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1] == -1).sum()  ## JUST GET A 7x7 matrix
+    # num_ally_in_section = (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+    #                        MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 1).sum() \
+    #                       + (v_ally[MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1,
+    #                          MyCommon.Constants.ATTACKING_RADIUS-MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS+MyCommon.Constants.STRONG_ENOUGH_RADIUS+1] == 0.75).sum()
+    ## MATRIX ALLY CONTAINS SHIP ID NOW
+    num_ally_in_section = (v_ally[
+                           MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1,
+                           MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1] != -1).sum()
+
+    strong_enough = num_ally_in_section > num_enemy_in_section
+
+    return strong_enough, v_enemy
+
 
 def move_battle_heap(MyMoves, battle_heap):
     """
@@ -211,6 +224,9 @@ def move_battle_heap(MyMoves, battle_heap):
                         ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
                         set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
+                        ## SET COMAND STATUS LATER (MOVE OTHERS FIRST)
+                        # ship_task2 = MyCommon.ShipTasks.SUPPORTING
+                        # move_ships_towards_this_coord(MyMoves, ship_id, ship_task, ship_task2, target_coord)
 
                     else:
                         ## NOT STRONG ENOUGH (FLIP ANGLE)
@@ -238,7 +254,8 @@ def move_battle_heap(MyMoves, battle_heap):
                             backup_coord = MyCommon.get_destination_coord(ship_coords, angle, thrust, rounding=True)
                             MyMoves.myMatrix.backup_matrix[backup_coord.y, backup_coord.x] = 1
 
-                        get_backup_ships(MyMoves, ship_id, ship_task, backup_coord)
+                        ship_task2 = MyCommon.ShipTasks.SUPPORTING
+                        move_ships_towards_this_coord(MyMoves, ship_id, ship_task, ship_task2, backup_coord)
 
                 else:
                     ## MOVE THIS SHIP NOW, FROM DIFFERENT SECTION
@@ -304,7 +321,7 @@ def move_battle_heap(MyMoves, battle_heap):
                 #closest_section_with_enemy(MyMoves, ship_id, move_now=True, docked_only=True)
 
 
-def get_backup_ships(MyMoves, ship_id, ship_task, backup_coord):
+def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, _ship_task, backup_coord):
     """
     GET BACKUP SHIPS AROUND THIS AREA
 
@@ -333,14 +350,12 @@ def get_backup_ships(MyMoves, ship_id, ship_task, backup_coord):
             _ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][_ship_id]['coords']
             _d = MyCommon.calculate_distance(_ship_coords, backup_coord)
             _thrust, _angle = expanding2.get_thrust_angle_from_Astar(MyMoves, _ship_id, backup_coord, target_distance=_d, target_planet_id=None)
-            _ship_task = MyCommon.ShipTasks.SUPPORTING
             set_commands_status(MyMoves, _ship_id, _thrust, _angle, backup_coord, _ship_task)
 
     ## MOVE ORIGINAL SHIP_ID
     logging.debug("_ship_id (orig): {}".format(ship_id))
     d = MyCommon.calculate_distance(ship_coords, backup_coord)
     thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, backup_coord,target_distance=d, target_planet_id=None)
-    ship_task = MyCommon.ShipTasks.EVADING
     set_commands_status(MyMoves, ship_id, thrust, angle, backup_coord, ship_task)
 
 

@@ -17,7 +17,6 @@ def get_next_target_planet(MyMoves, ship_id):
     """
     from_planet_id = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['from_planet']
 
-
     ## BASED ON DISTANCE ONLY
     if from_planet_id:
         distances_to_other_planets = MyMoves.EXP.planets_distance_matrix[from_planet_id]
@@ -38,6 +37,7 @@ def get_next_target_planet(MyMoves, ship_id):
         least_distance_order = heapq.nsmallest(length, ((distance, id) for id, distance in distance_table.items()))
 
     for distance, planet_id in least_distance_order:
+        logging.debug("get next planet: ship_id: {} from_planet_id {} planet_id {}".format(ship_id, from_planet_id, planet_id))
         ## NOT OWNED BY ANYBODY YET
         if planet_id in MyMoves.myMap.planets_unowned:
             if has_room_to_dock(MyMoves, planet_id):
@@ -50,7 +50,7 @@ def get_next_target_planet(MyMoves, ship_id):
                 return planet_id
 
             ## NOW ONLY IF ITS CLOSE ENOUGH
-            # if has_room_to_dock(MyMoves, planet_id) and distance <= 2:
+            # if has_room_to_dock(MyMoves, planet_id) and planet_id == from_planet_id:
             #     return planet_id
 
 

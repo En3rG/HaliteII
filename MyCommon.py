@@ -40,7 +40,7 @@ class Constants():
 
     ## ATTACKING
     MOVE_BACK_OFFENSE = 0       ## NO LONGER USED
-    PERIMETER_CHECK_RADIUS = 14 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK, IF FOUND GET SECTIONS
+    PERIMETER_CHECK_RADIUS = 28 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK, IF FOUND GET SECTIONS
     ATTACKING_RADIUS = 14       ## CONSIDERED IN IMMINENT BATTLE
     BACKUP_CIRCLE_RADIUS = 14   ## RADIUS TO CHECK FOR BACKUP NEEDED
     BACKUP_SQUARE_RADIUS = 14
@@ -433,19 +433,19 @@ def get_coord_closest_seek_value(seek_val, values, distances):
 
         ## GETTING CLOSEST MOST ENEMY
         ## Get max index (based off v) out of the selected indices
-        # max_idx = values[r[ld_indx], c[ld_indx]].argmax()
-        #
-        # ## Index into r,c with the lowest dist indices and
-        # ## from those select maxed one based off v
-        # return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
-
-        ## GETTING THE CLOSEST LEAST ENEMY
-        ## Get max index (based off v) out of the selected indices
-        min_idx = values[r[ld_indx], c[ld_indx]].argmin()
+        max_idx = values[r[ld_indx], c[ld_indx]].argmax()
 
         ## Index into r,c with the lowest dist indices and
         ## from those select maxed one based off v
-        return (r[ld_indx][min_idx], c[ld_indx][min_idx]), min_di, values[r[ld_indx][min_idx], c[ld_indx][min_idx]]
+        return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
+
+        ## GETTING THE CLOSEST LEAST ENEMY
+        ## Get max index (based off v) out of the selected indices
+        # min_idx = values[r[ld_indx], c[ld_indx]].argmin()
+        #
+        # ## Index into r,c with the lowest dist indices and
+        # ## from those select maxed one based off v
+        # return (r[ld_indx][min_idx], c[ld_indx][min_idx]), min_di, values[r[ld_indx][min_idx], c[ld_indx][min_idx]]
 
     else:
         ## NO ENEMIES FOUND

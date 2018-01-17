@@ -46,12 +46,12 @@ def get_next_target_planet(MyMoves, ship_id):
         ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
         elif planet_id in MyMoves.myMap.planets_owned:
             ## BEFORE
-            # if has_room_to_dock(MyMoves, planet_id):
-            #     return planet_id
+            if has_room_to_dock(MyMoves, planet_id):
+                return planet_id
 
             ## NOW ONLY IF ITS CLOSE ENOUGH
-            if has_room_to_dock(MyMoves, planet_id) and distance <= 2:
-                return planet_id
+            # if has_room_to_dock(MyMoves, planet_id) and distance <= 2:
+            #     return planet_id
 
 
 

@@ -366,7 +366,7 @@ class MyMoves():
         logging.debug("check_intermediate_collisions thrust: {}".format(thrust))
 
         for step_num in range(1, 8):
-            curr_thrust = int(round(dx * step_num))
+            curr_thrust = dx * step_num
 
             logging.debug("curr_thrust {}".format(curr_thrust))
 

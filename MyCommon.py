@@ -8,7 +8,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -574,5 +574,4 @@ def isInside_map(coord, MyMoves):
 # np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
 # print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
 # np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-
 

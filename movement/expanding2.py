@@ -225,7 +225,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         # logging.debug("section_matrixes[4]: {}".format(section_matrixes[7]))
         # logging.debug("section_matrixes[5]: {}".format(section_matrixes[7]))
         # logging.debug("section_matrixes[6]: {}".format(section_matrixes[7]))
-        #logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
 
         logging.debug("A* path_points: {}".format(path_points))
 
@@ -283,7 +283,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             ## UPDATE ANGLE TO USE angle_towards_target
             ## ANGLE TOWARDS TARGET IS MORE ACCURATE SINCE ITS WITHOUT ROUNDING
             ## ONLY IF ANGLE IS CLOSE ENOUGH
-            if temp_thrust == thrust and (angle - 5 <= angle_towards_target <= angle + 5):
+            if temp_thrust == thrust and (angle - 4 <= angle_towards_target <= angle + 4):
                 angle = angle_towards_target
 
             logging.debug("angle {} thrust {}".format(angle, thrust))

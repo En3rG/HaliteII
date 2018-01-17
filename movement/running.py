@@ -37,6 +37,8 @@ def move_running_ships(MyMoves):
             ship_task = MyCommon.ShipTasks.RUNNING
             set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
+            ## ADD IT BACK TO RUNNING SHIPS
+            MyMoves.myMap.ships_running.add(ship_id)
         except:
             pass
 

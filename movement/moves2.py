@@ -16,6 +16,7 @@ import copy
 from models.data import Matrix_val
 import numpy as np
 import datetime
+import random
 
 
 """
@@ -263,6 +264,12 @@ class MyMoves():
                     ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
                     ## OR
                     ## SHIP HAS NO TARGET SET
+                    # if self.myMap.my_id == 0 or self.myMap.my_id == 3:
+                    # #if random.randint(1,10) == random.randint(1,10):
+                    #     #self.myMap.ships_sniping.add(ship_id)
+                    #     self.myMap.ships_running.add(ship_id)
+                    #     continue
+                    # else:
                     target_planet_id = expanding.get_next_target_planet(self, ship_id)
 
                 if target_planet_id is None:

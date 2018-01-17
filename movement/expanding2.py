@@ -109,7 +109,7 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
 
 
 
-def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id, override_section_matrix=None):
+def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id):
     """
     RETURN THRUST AND ANGLE BASED SHIP ID AND TARGET COORD ONLY
 
@@ -132,17 +132,14 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     ## GET SECTION (FOR A* 2nd Version)
     ## GETTING SECTIONS FROM 7 POSITION MATRIXES
-    if override_section_matrix:
-        section_matrixes = override_section_matrix
-    else:
-        pad_values = -1
-        section_matrixes = {}
-        for step in range(1,8):
-            section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step],
-                                                                   ship_coord,
-                                                                   circle_radius,
-                                                                   square_radius,
-                                                                   pad_values)
+    pad_values = -1
+    section_matrixes = {}
+    for step in range(1,8):
+        section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step],
+                                                               ship_coord,
+                                                               circle_radius,
+                                                               square_radius,
+                                                               pad_values)
 
 
     logging.debug("get_thrust_angle_from_Astar:: angle_towards_target {}".format(angle_towards_target))
@@ -264,12 +261,11 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
 
                 ## DOING INTERMEDIATE COLLISION
-                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-                        and theta_clear(MyMoves, ship_id, current_coord):
-
+                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) and theta_clear(MyMoves, ship_id, current_coord):
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                     break
+
             # if astar_destination_point is None:
             #     ## THIS SHIP HAS COLLISION EVERYWHERE FROM A*
             #     ## EVEN STAYING AT THIS LOCATION HAS COLLISION

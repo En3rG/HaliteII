@@ -8,7 +8,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -431,12 +431,21 @@ def get_coord_closest_seek_value(seek_val, values, distances):
         # Get indices (indexable into r,c) corresponding to lowest distance
         ld_indx = np.flatnonzero(di == min_di)
 
-        # Get max index (based off v) out of the selected indices
-        max_idx = values[r[ld_indx], c[ld_indx]].argmax()
+        ## GETTING CLOSEST MOST ENEMY
+        ## Get max index (based off v) out of the selected indices
+        # max_idx = values[r[ld_indx], c[ld_indx]].argmax()
+        #
+        # ## Index into r,c with the lowest dist indices and
+        # ## from those select maxed one based off v
+        # return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
 
-        # Index into r,c with the lowest dist indices and
-        # from those select maxed one based off v
-        return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
+        ## GETTING THE CLOSEST LEAST ENEMY
+        ## Get max index (based off v) out of the selected indices
+        min_idx = values[r[ld_indx], c[ld_indx]].argmin()
+
+        ## Index into r,c with the lowest dist indices and
+        ## from those select maxed one based off v
+        return (r[ld_indx][min_idx], c[ld_indx][min_idx]), min_di, values[r[ld_indx][min_idx], c[ld_indx][min_idx]]
 
     else:
         ## NO ENEMIES FOUND
@@ -565,4 +574,5 @@ def isInside_map(coord, MyMoves):
 # np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
 # print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
 # np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
+
 

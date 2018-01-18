@@ -407,6 +407,26 @@ def closest_section_with_enemy(MyMoves, ship_id, docked_only=False, move_now=Fal
     """
     GET CLOSEST SECTION WITH ENEMY
     """
+    def get_closest_section_enemy(MyMoves, least_distance, closest_section):
+        for section in MyMoves.myMap.sections_with_enemy:
+            distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
+
+            if distance < least_distance:
+                closest_section = section
+                least_distance = distance
+
+        return closest_section
+
+    def get_closest_section_docked(MyMoves, least_distance, closest_section):
+        for section in MyMoves.myMap.sections_with_enemy_docked:
+            distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
+
+            if distance < least_distance:
+                closest_section = section
+                least_distance = distance
+
+        return closest_section
+
     ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     ship_section = MyCommon.get_section_num(ship_coords)
 
@@ -416,19 +436,13 @@ def closest_section_with_enemy(MyMoves, ship_id, docked_only=False, move_now=Fal
     ## CAN UPDATE THIS LATER TO USE JUST NUMPY (A BIT HARD SINCE DISTANCE TABLE CHANGES BASED ON LOCATION OF SHIP
     ## GET CLOSEST SECTION WITH ENEMY
     if docked_only:
-        for section in MyMoves.myMap.sections_with_enemy_docked:
-            distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
+        closest_section = get_closest_section_docked(MyMoves, least_distance, closest_section)
 
-            if distance < least_distance:
-                closest_section = section
-                least_distance = distance
+        if closest_section is None:
+            ## NO MORE DOCKED ENEMY SHIPS IN THE MAP
+            closest_section = get_closest_section_enemy(MyMoves, least_distance, closest_section)
     else:
-        for section in MyMoves.myMap.sections_with_enemy:
-            distance = MyMoves.EXP.sections_distance_table[ship_section][section[0]][section[1]]
-
-            if distance < least_distance:
-                closest_section = section
-                least_distance = distance
+        closest_section = get_closest_section_enemy(MyMoves, least_distance, closest_section)
 
     target_coord = MyCommon.get_coord_from_section(closest_section)
 

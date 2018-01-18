@@ -41,8 +41,8 @@ class Exploration():
 
     def __init__(self,game):
         self.game_map = game.map
-        self.height = self.game_map.height
-        self.width = self.game_map.width
+        self.height = self.game_map.height + 1
+        self.width = self.game_map.width + 1
 
         logging.debug("Map height: {}".format(self.height))
         logging.debug("Map width: {}".format(self.width))

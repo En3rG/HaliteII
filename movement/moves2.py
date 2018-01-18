@@ -236,6 +236,7 @@ class MyMoves():
                         safe_thrust = thrust  ## NOT LOOKING FOR INTERMEDIATE COLLLISIONS
 
                         if thrust == 0:
+                            logging.debug("Docking but not suppose to dock yet??? ship_id: {}".format(ship_id))
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
 
                         else:
@@ -347,6 +348,7 @@ class MyMoves():
 
         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
         ship_point = MyCommon.get_rounded_point(ship_coord)
+        collision_value = None
 
         if thrust == 0: ## SHIP STAYING ITS IN CURRENT LOCATION
             ##
@@ -358,16 +360,16 @@ class MyMoves():
                     self.no_intermediate_collision(6, ship_point),
                     self.no_intermediate_collision(7, ship_point)]):
                 logging.debug("Thurst is 0 with no collision")
-                return thrust ## NO COLLISION
+                return thrust, collision_value ## NO COLLISION
             else:
                 logging.debug("Thurst is 0 BUT has collision")
-                return -1
+                return -1, collision_value
 
 
         dx = thrust / 7
         prev_thrust = 0
 
-        logging.debug("check_intermediate_collisions thrust: {}".format(thrust))
+        logging.debug("check_intermediate_collisions2 thrust: {}".format(thrust))
 
         for step_num in range(1, 8):
             curr_thrust = dx * step_num
@@ -377,16 +379,16 @@ class MyMoves():
             intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
             intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
 
-            no_collision = self.no_intermediate_collision(step_num, intermediate_point)
+            no_collision, collision_value = self.no_intermediate_collision(step_num, intermediate_point)
             if no_collision:
                 prev_thrust = curr_thrust
             else:
                 logging.debug(
-                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} . Will return prev_thrust: {}".format(
-                        ship_id, intermediate_point, step_num, prev_thrust))
-                return prev_thrust  ## CURRENT THRUST HAS COLLISION
+                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} collision_value {}. Will return prev_thrust: {}".format(
+                        ship_id, intermediate_point, step_num, collision_value, prev_thrust))
+                return prev_thrust, collision_value  ## CURRENT THRUST HAS COLLISION
 
-        return thrust  ## RETURN ORIGINAL THRUST
+        return thrust, collision_value  ## RETURN ORIGINAL THRUST
 
 
     def no_intermediate_collision(self, step_num, point):
@@ -400,7 +402,8 @@ class MyMoves():
             return True
         else:
             #return self.position_matrix[step_num][point[0]][point[1]] == 0
-            return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value)
+            collision_value = self.position_matrix[step_num][point[0]][point[1]]
+            return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value), collision_value
 
 
 

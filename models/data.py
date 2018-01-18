@@ -14,6 +14,8 @@ class Matrix_val(Enum):
     VALUES PLACED ON THE MATRIX
     REPRESENTING ITS STATUS
     """
+    ALLY_SHIP_CORNER = -8
+
     ALLY_SHIP = 1
     ALLY_SHIP_DOCKED = 0.75
     ALLY_PLANET = 0.50

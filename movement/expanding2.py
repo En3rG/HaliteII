@@ -62,19 +62,19 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
 
 
     # HERE ALWAYS FILLING DIAGONALS (EVEN ON INTERMEDIATE STEPS)
-    try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP_CORNER.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
     except: pass
 
-    try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP_CORNER.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
     except: pass
 
-    try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
+    try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP_CORNER.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
     except: pass
 
-    try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
+    try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP_CORNER.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
     except: pass
 
@@ -254,14 +254,21 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
             ## GOING FROM END POINT TO START POINT
             ## MAKING FIRST STEP (-2) AS DEFAULT (PREVENT JUST SITTING)
-            astar_destination_point = path_points[-2]
-            for current_point in path_points[:-2]:
+            # astar_destination_point = path_points[-2]
+            # for current_point in path_points[:-2]:
+
+            ## MAKING LAST STEP (OR ORIGIN) AS DEFAULT
+            ## PREVENTS KNOWN COLLISIONS TO HAPPEN (MIGHT KEEP UNITS NOT MOVING THOUGH)
+            step1_point = path_points[-2]
+            astar_destination_point = path_points[-1]
+            for current_point in path_points[:-1]:
                 logging.debug("current_point: {} ".format(current_point))
 
                 current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
 
                 ## DOING INTERMEDIATE COLLISION
-                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) and theta_clear(MyMoves, ship_id, current_coord):
+                isClear, collision_value = theta_clear(MyMoves, ship_id, current_coord)
+                if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) and isClear:
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                     break
@@ -273,8 +280,14 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             #     logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
             #     astar_destination_point = mid_point
 
-            astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
-            angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
+            ## IF ITS THE SAME AS FIRST COORD, AND COLLISION VALUE IS NOT OUR SHIP (1), THEN GO TO STEP 1
+            ## WILL SKIP, PLANETS OR CORNER IN FILL MATRIX
+            if astar_destination_point == path_points[-1] and collision_value is not None and int(collision_value) != 1:
+                astar_destination_coord = MyCommon.Coordinates(step1_point[0], step1_point[1])
+                angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
+            else:
+                astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
+                angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
 
             logging.debug("A* angle {}".format(angle))
 
@@ -352,9 +365,9 @@ def theta_clear(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLIS
     thrust = MyCommon.calculate_distance(ship_coord, target_coord)
 
     #safe_thrust = MyMoves.check_intermediate_collisions(ship_id, angle, thrust)
-    safe_thrust = MyMoves.check_intermediate_collisions2(ship_id, angle, thrust)
+    safe_thrust, collision_value = MyMoves.check_intermediate_collisions2(ship_id, angle, thrust)
 
-    return thrust == safe_thrust
+    return thrust == safe_thrust, collision_value
 
     # ## NOT DOING INTERMEDIATE COLLISION
     # angle = MyCommon.get_angle(start_coord, target_coord)

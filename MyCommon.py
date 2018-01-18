@@ -7,7 +7,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = True
+    DISABLE_LOG = False
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -56,7 +56,9 @@ class Constants():
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
     CIRCLE_RADIUS_EXTRA_EDGES = 0.8 ## 0.47 or 0.80 MULTIPLIED TO RADIUS. 1.2 Better??
 
-
+    ## PLANET
+    PLANET_AREA_RADIUS_CHECK = 5 ## MULTIPLIED BY PLANETS RADIUS
+    PLANET_DOCK_MIN_MULTIPLIER = 3
 
 class Target():
     """
@@ -415,7 +417,7 @@ def get_section_with_padding(a, center_coord, square_radius, pad_values):
     point = get_rounded_point(center_coord)
     center_coord = Coordinates(point[0], point[1])
 
-    return add_padding(a, center_coord, square_radius, 0)
+    return add_padding(a, center_coord, square_radius, pad_values)
 
 
 def get_coord_closest_seek_value(seek_val, values, distances):

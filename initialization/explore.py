@@ -109,6 +109,7 @@ class Exploration():
 
         for planet in self.game_map.all_planets():
             planets[planet.id] = {'coords':MyCommon.Coordinates(planet.y,planet.x), \
+                                  'point':(int(round(planet.y)), int(round(planet.x))), \
                                   'docks':planet.num_docking_spots, \
                                   'radius':planet.radius}
                               ##  planet.id OF TARGET PLANETS WILL ALSO BE FILLED IN LATER WITH LAUNCHPAD DATA

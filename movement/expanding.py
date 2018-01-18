@@ -4,6 +4,8 @@ import MyCommon
 import initialization.astar as astar
 import math
 import logging
+from models.data import Matrix_val
+import numpy as np
 import sys
 import traceback
 
@@ -40,16 +42,25 @@ def get_next_target_planet(MyMoves, ship_id):
         logging.debug("get next planet: ship_id: {} from_planet_id {} planet_id {}".format(ship_id, from_planet_id, planet_id))
         ## NOT OWNED BY ANYBODY YET
         if planet_id in MyMoves.myMap.planets_unowned:
-            if has_room_to_dock(MyMoves, planet_id):
+            ## ORIGINAL
+            # if has_room_to_dock(MyMoves, planet_id):
+            #     return planet_id
+
+            ## CHECK IF WE HAVE MULTIPLE SHIPS NEARBY (GOOD! DONT FORGET TO UNCOMMENT)
+            num_ally_nearby = get_num_ally_ships_nearby(MyMoves, planet_id)
+            planet_docks = MyMoves.EXP.planets[planet_id]['docks']
+            if has_room_to_dock(MyMoves, planet_id) and num_ally_nearby < planet_docks*MyCommon.Constants.PLANET_DOCK_MIN_MULTIPLIER:
                 return planet_id
+
+
 
         ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
         elif planet_id in MyMoves.myMap.planets_owned:
-            ## BEFORE
+            ## ORIGINAL
             if has_room_to_dock(MyMoves, planet_id):
                 return planet_id
 
-            ## NOW ONLY IF ITS CLOSE ENOUGH
+            ## NOW ONLY IF ITS FROM THERE AND HAS ROOM
             # if has_room_to_dock(MyMoves, planet_id) and planet_id == from_planet_id:
             #     return planet_id
 
@@ -91,6 +102,22 @@ def get_next_target_planet(MyMoves, ship_id):
     # return None ## NO MORE PLANETS
 
 
+def get_num_ally_ships_nearby(MyMoves, planet_id):
+    """
+    GET NUMBER OF ALLY SHIPS IN THE AREA
+    """
+    planet_coord = MyMoves.EXP.planets[planet_id]['coords']
+    planet_radius = MyMoves.EXP.planets[planet_id]['radius']
+
+    value = MyMoves.myMatrix.ally_matrix
+    total_radius = int(MyCommon.Constants.PLANET_AREA_RADIUS_CHECK * planet_radius)
+    v_ally = MyCommon.get_section_with_padding(value, planet_coord, total_radius, pad_values=-1)
+
+    num_ally_nearby = (v_ally>=0).sum()  ## ALLY MATRIX CONTAINS -1 OR SHIP IDS
+
+    logging.debug("planet_id {} num_ally_nearby {}".format(planet_id, num_ally_nearby))
+
+    return num_ally_nearby
 
 
 def has_room_to_dock(MyMoves, planet_id):

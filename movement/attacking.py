@@ -202,24 +202,27 @@ def move_battle_heap(MyMoves, battle_heap):
 
             ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
             ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
+            ship_health = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['health']
+            ship_dying = ship_health <= MyCommon.Constants.DYING_HP
 
             if target_coord: ## HAS TARGET
                 if over_thrust is None:
                     ## MOVE THIS SHIP, IN THE SAME SECTION
 
                     ## IF NOT STRONG ENOUGH, GO BACK 7 UNITS, BUT ALSO KEEP TRACK OF BACKUP MATRIX
-                    if strong_enough:
+                    if strong_enough or ship_dying:
                         ## STRONG ENOUGH, CAN JUST ATTACK TOWARDS ENEMY
+                        ## IF DYING, ATTACK TOWARDS ENEMY
                         logging.debug("ship_id: {} from handled_ships in same section (strong enough)".format(ship_id))
                         thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance=enemy_distance, target_planet_id=None)
                         logging.debug("thrust: {} angle: {} enemy_distance: {}".format(thrust, angle, enemy_distance))
 
                         ## IF TARGET IS REACHABLE, MOVE BACK BY 2 TO PREVENT COLLIDING WITH ENEMY
                         ## COMMENTING THIS OUT GIVES A HIGHER RANKING
-                        if int(round(enemy_distance)) == thrust:
+                        if int(round(enemy_distance)) - 1 <= thrust:
                             logging.debug("docked enemy_val: {} ".format(enemy_val))
-                            if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value: ## ONLY MOVE BACK IF ENEMY IS DOCKED
-                                thrust = max(0, thrust - 1)
+                            if enemy_val == Matrix_val.ENEMY_SHIP_DOCKED.value and not(ship_dying): ## ONLY MOVE BACK IF ENEMY IS DOCKED
+                                thrust = max(0, thrust - 2)
                                 logging.debug("updated thrust for docked enemy: {} angle: {}".format(thrust, angle))
 
                         ship_task = MyCommon.ShipTasks.ATTACKING_FRONTLINE
@@ -318,8 +321,8 @@ def move_battle_heap(MyMoves, battle_heap):
             else:
                 logging.debug("ship_id: {} from handled_ships no enemy found around it".format(ship_id))
                 ## NO ENEMY FOUND AROUND ANY OF OUR SHIPS
-                closest_section_with_enemy(MyMoves, ship_id, move_now=True)
-                #closest_section_with_enemy(MyMoves, ship_id, move_now=True, docked_only=True)
+                #closest_section_with_enemy(MyMoves, ship_id, move_now=True)
+                closest_section_with_enemy(MyMoves, ship_id, move_now=True, docked_only=True)
 
 
 def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, _ship_task, backup_coord):

@@ -5,7 +5,6 @@ import math
 from enum import Enum
 import heapq
 
-
 class Constants():
 
     DISABLE_LOG = True
@@ -46,6 +45,8 @@ class Constants():
     BACKUP_SQUARE_RADIUS = 14
     STRONG_ENOUGH_RADIUS = 14    ## RADIUS WHEN DETERMINING STRONG ENOUGH ATTACK POWER
 
+    DYING_HP = 130
+
     ## DEFENDING MINERS
     DEFENDING_PERIMETER_CHECK = 8
     DEFENDING_BACKUP_CIRCLE_RADIUS = 8
@@ -54,6 +55,8 @@ class Constants():
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
     CIRCLE_RADIUS_EXTRA_EDGES = 0.8 ## 0.47 or 0.80 MULTIPLIED TO RADIUS. 1.2 Better??
+
+
 
 class Target():
     """

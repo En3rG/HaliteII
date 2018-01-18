@@ -130,8 +130,8 @@ class MyMoves():
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
 
             ## DEFEND MINING SHIPS IN DANGER
-            ## SEEMS WORST WHEN DOING THIS
-            defending.move_defending_ships(self)
+            ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
+            #defending.move_defending_ships(self)
 
             ## MOVE ASSASSIN SHIPS
             sniping.move_sniping_ships(self)

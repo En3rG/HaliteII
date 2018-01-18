@@ -12,6 +12,7 @@ import movement.expanding2 as expanding2
 import movement.attacking as attacking
 import movement.running as running
 import movement.sniping as sniping
+import movement.defending as defending
 import copy
 from models.data import Matrix_val
 import numpy as np
@@ -122,12 +123,15 @@ class MyMoves():
 
             ## MOVE ALREADY MINING SHIPS FIRST
             for ship_id in self.myMap.ships_mining_ally:
-                #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                 target_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
                 target_type = MyCommon.Target.PLANET
                 ship_task = MyCommon.ShipTasks.MINING
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
+
+            ## DEFEND MINING SHIPS IN DANGER
+            ## SEEMS WORST WHEN DOING THIS
+            defending.move_defending_ships(self)
 
             ## MOVE ASSASSIN SHIPS
             sniping.move_sniping_ships(self)
@@ -490,6 +494,8 @@ class MyMoves():
         elif ship_task == MyCommon.ShipTasks.EVADING:
             self.myMap.ships_evading.add(ship_id)
 
+        elif ship_task == MyCommon.ShipTasks.DEFENDING:
+            self.myMap.ships_defending.add(ship_id)
 
 
     def set_planet_myminer(self, planet_id, ship_id):

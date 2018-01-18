@@ -92,11 +92,12 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
         if section_distance <= 1.5:
             ## ENEMY WITHIN THE SAME SECTION
 
-            slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS, enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
-            actual_enemy_section_point = (ship_section[0] + slope[0], ship_section[1] + slope[1])
-            enemy_section_coord = MyCommon.get_coord_from_section(actual_enemy_section_point)
 
             ## USING SECTIONED FOUND ABOVE
+            # slope = (enemy_section_point[0] - MyCommon.Constants.SIZE_SECTIONS_RADIUS,
+            #          enemy_section_point[1] - MyCommon.Constants.SIZE_SECTIONS_RADIUS)
+            # actual_enemy_section_point = (ship_section[0] + slope[0], ship_section[1] + slope[1])
+            # enemy_section_coord = MyCommon.get_coord_from_section(actual_enemy_section_point)
             # strong_enough, v_enemy = check_if_strong_enough(MyMoves, enemy_section_coord)
             # angle = MyCommon.get_angle(ship_coords, enemy_section_coord)
             # enemy_distance = MyCommon.calculate_distance(ship_coords, enemy_section_coord, rounding=False)
@@ -104,7 +105,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
             ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY (ORIG LIKE BOT50)
             strong_enough, v_enemy = check_if_strong_enough(MyMoves, ship_coords)
             seek_val = -0.75
-            d_section = MyMoves.EXP.distance_matrix_RxR
+            d_section = MyMoves.EXP.distance_matrix_AxA
             enemy_point, enemy_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
 
             ## GET ANGLE FROM MIDDLE OF MATRIX (7,7) TO ENEMY POINT

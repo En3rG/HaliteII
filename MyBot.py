@@ -231,6 +231,7 @@ if __name__ == "__main__":
 
 
 ## OLD MAP USED
+## .\halite -d "264 176" -s "3443692086" "python Bot50/MyBot.py" "python Bot50/MyBot.py" "python MyBot.py" "python Bot50/MyBot.py" ## GOOD SMALL MAP
 ## .\halite -d "384 224" -s "4253798476" "python MyBot.py" "python Bot50/MyBot.py" "python Bot50/MyBot.py" "python Bot50/MyBot.py" ## COLLIDING HERE (EVEN ON BOT 57)
 ## .\halite -d "240 160" -s "326461518" "python MyBot.py" "python StarterBot.py" "python MyBot.py" "python StarterBot.py"
 ## .\halite -d "240 160" -s "4160918419" "python MyBot.py" "python StarterBot.py" "python MyBot.py" "python StarterBot.py"

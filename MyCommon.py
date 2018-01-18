@@ -46,6 +46,11 @@ class Constants():
     BACKUP_SQUARE_RADIUS = 14
     STRONG_ENOUGH_RADIUS = 14    ## RADIUS WHEN DETERMINING STRONG ENOUGH ATTACK POWER
 
+    ## DEFENDING MINERS
+    DEFENDING_PERIMETER_CHECK = 8
+    DEFENDING_BACKUP_CIRCLE_RADIUS = 8
+    DEFENDING_BACKUP_SQUARE_RADIUS = 8
+
     ## ADDED TO WITHIN CIRCLE
     ## TO INCLUDE 7.2 WITHIN 7 RADIUS
     CIRCLE_RADIUS_EXTRA_EDGES = 0.8 ## 0.47 or 0.80 MULTIPLIED TO RADIUS. 1.2 Better??
@@ -486,6 +491,10 @@ def isInside_map(coord, MyMoves):
     CHECK IF COORD IS OUTSIDE THE MAP
     """
     return 0 <= coord.y <= MyMoves.EXP.height and 0 <= coord.x <= MyMoves.EXP.width
+
+
+
+
 
 # array = [
 #     [1, 2, 3, 4, 5, 6, 7, 8, 9],

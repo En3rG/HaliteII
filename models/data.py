@@ -44,8 +44,8 @@ class MyMap():
     def __init__(self,game_map, myMap_prev):
         self.game_map = game_map
         self.my_id = game_map.my_id
-        self.height = game_map.height
-        self.width = game_map.width
+        self.height = game_map.height + 1
+        self.width = game_map.width + 1
         self.myMap_prev = myMap_prev
 
         self.planets_owned = set()          ## PLANETS I OWN
@@ -471,6 +471,9 @@ class MyMatrix():
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
             #matrix[ship['point'][0]][ship['point'][1]] = value
+
+            logging.debug("ship_id: {} ship_point {}".format(ship_id, ship['point']))
+
             matrix[ship['point'][0]][ship['point'][1]] = ship_id
             matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 

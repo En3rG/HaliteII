@@ -402,9 +402,11 @@ class MyMoves():
             return True
         else:
             #return self.position_matrix[step_num][point[0]][point[1]] == 0
-            collision_value = self.position_matrix[step_num][point[0]][point[1]]
-            return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value), collision_value
-
+            try:
+                collision_value = self.position_matrix[step_num][point[0]][point[1]]
+                return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value), collision_value
+            except:
+                return None, None ## IF OUT OF THE MAP, CAN CAUSE ERROR
 
 
     def set_ship_statuses(self,ship_id, target_type, target_id, ship_coord, ship_task, angle, thrust, target_coord):

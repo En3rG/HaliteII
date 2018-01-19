@@ -67,6 +67,24 @@ def save_json(filename, data):
     with open(filename, 'w') as outfile:
         json.dump(data, outfile, indent=4)
 
+def generate_run_game_bat(data):
+    """
+    GENERATE run_game.bat
+
+    .\halite -d "264 176" -s "2781037135" "python MyBot.py" "python simulate_p1.py"
+    """
+    width = data['width']
+    height = data['height']
+    seed = data['seed']
+    num_players = data['num_players']
+
+    if num_players == 2:
+        command = ".\halite -d \"{} {}\" -s \"{}\" \"python simulate_p0.py\" \"python simulate_p1.py\"".format(width, height, seed)
+    elif num_players == 4:
+        command = ".\halite -d \"{} {}\" -s \"{}\" \"python simulate_p0.py\" \"python simulate_p1.py\" \"python simulate_p2.py\" \"python simulate_p3.py\"".format(width,height, seed)
+
+    with open('run_game.bat', 'w') as outfile:
+        outfile.write(command)
 
 def get_moves_per_player(data):
     """
@@ -120,9 +138,10 @@ def get_moves_per_player(data):
     save_moves_json("p2.txt", command_moves_p2)
     save_moves_json("p3.txt", command_moves_p3)
 
-filename = "8316071.hlt"
+filename = "8366205.hlt"
 data = load_hlt(filename)
 get_moves_per_player(data)
+generate_run_game_bat(data)
 save_json("test.txt",data)
 
 

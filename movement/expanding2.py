@@ -230,6 +230,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
 
         logging.debug("A* path_points: {}".format(path_points))
+        logging.debug("A* path_points length: {}".format(len(path_points)))
+
+
 
         if path_points:
             ## GOING FROM START POINT TO END POINT
@@ -284,9 +287,17 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
             ## IF ITS THE SAME AS FIRST COORD, AND COLLISION VALUE IS NOT OUR SHIP (1), THEN GO TO STEP 1
             ## WILL SKIP, PLANETS OR CORNER IN FILL MATRIX
-            if astar_destination_point == path_points[-1] and collision_value is not None and int(collision_value) != 1:
+            if astar_destination_point == path_points[-1] and collision_value is not None and int(collision_value) != Matrix_val.ALLY_SHIP.value:
+                logging.debug("Everything is bad, but will go step 1")
                 astar_destination_coord = MyCommon.Coordinates(step1_point[0], step1_point[1])
                 angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
+
+                new_point = MyCommon.get_destination_coord(ship_coord,angle,thrust,rounding=True)
+                if MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value:
+                    ## WILL DEFINITELY COLLIDE TO ONE OF OUR SHIPS
+                    ## GET NEW ANGLE
+                    logging.debug("Colliding to ally ship, do prevention")
+                    angle, thrust = get_new_angle_step1(MyMoves, ship_coord, angle)
             else:
                 astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
                 angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
@@ -300,7 +311,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             ## ONLY IF ANGLE IS CLOSE ENOUGH
             ## THIS ACTUALLY CAUSES COLLISIONS!! CHANGED FROM 5 to 4 TO FIX A COLLISION
             ## BUT THEN A COLLISION WAS STILL HAPPENING AT 4 WITH ANOTHER GAME, SO COMMENTING OUT
-            # if temp_thrust == thrust and (angle - 4 <= angle_towards_target <= angle + 4):
+            ## COMMENTING THIS OUT MADE BEST BOT SO FAR (BOT 68, GETTING AS LOW AS RANK 63)
+            ## BUT CAUSES DOCKING ISSUE, LEAVING TO 2 CAN STILL CAUSE COLLISION THOUGH (STILL HAS DOCKING ISSUES)
+            # if temp_thrust == thrust and (angle - 2 <= angle_towards_target <= angle + 2):
             #     angle = angle_towards_target
 
             logging.debug("angle {} thrust {}".format(angle, thrust))
@@ -310,19 +323,39 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             ## TARGET POINT MAY NOT BE REACHABLE (DUE TO OTHER SHIPS IN ITS IN POSITION MATRIX)
             ## ACTUAL TARGET POINT IS AVAILABLE SINCE IT WAS DETERMINED BY get_target_coord_towards_planet ?
             ## WHICH LOOKS FOR OTHER TARGET COORDS IF ITS ALREADY TAKEN
-
             astar_destination_coord = mid_coord  ## NEED TO UPDATE THIS LATER, GET A NEW TARGET!!
             angle, thrust = 0, 0
             logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
     ## WAS FILLING POSITION TO EARLY?? COMMENTING THIS OUT MAKES IT BETTER!!
-    # slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
-    #                         astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
-    # taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
-    # fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
+    slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
+                            astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
+    taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
+    fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
 
     return thrust, angle
+
+def get_new_angle_step1(MyMoves, ship_coord, angle):
+    """
+    COLLIDING WITH ALLY SHIPS
+    GET NEW COORD THATS FREE
+    """
+    thrust = 1
+
+    for _ in range(7):
+        new_angle = angle + 45
+        new_angle = new_angle - 360 if new_angle > 360 else new_angle ## LIMIT TO 360
+        new_point = MyCommon.get_destination_coord(ship_coord, new_angle, thrust, rounding=True)
+
+        if not(MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value \
+                or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP_CORNER.value):
+            return new_angle, thrust
+
+        angle = new_angle
+
+    logging.debug("THIS SHIP IS COMPLETELY SURROUNDED!!!")
+    return 0, 0 ## NO FREE ANGLE
 
 
 def get_angle_target_if_outside_map(temp_target_coord, angle_towards_target, MyMoves, ship_coord, fake_target_thrust):

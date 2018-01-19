@@ -14,8 +14,6 @@ class Matrix_val(Enum):
     VALUES PLACED ON THE MATRIX
     REPRESENTING ITS STATUS
     """
-    ALLY_SHIP_CORNER = -8
-
     ALLY_SHIP = 1
     ALLY_SHIP_DOCKED = 0.75
     ALLY_PLANET = 0.50
@@ -26,11 +24,11 @@ class Matrix_val(Enum):
     ENEMY_SHIP = -1
     MAX_SHIP_HP = 255
 
+    ALLY_SHIP_CORNER = -8
+
     ## FOR MATRIX PREDICTIONS
     PREDICTION_PLANET = 100
     PREDICTION_ENEMY_SHIP_DOCKED = 0.5
-
-
 
 
 class MyMap():
@@ -38,7 +36,7 @@ class MyMap():
     CONVERT GAME_MAP TO DICTIONARY
     ACCESS WITH PLAYER IDs AND SHIP IDs
     """
-    MAX_NODES = 2       ## USED FOR LIMITING NUMBER OF NODES IN MEMORY
+    MAX_NODES = 2  ## USED FOR LIMITING NUMBER OF NODES IN MEMORY
     NUM_NODES = 0
 
     def __init__(self,game_map, myMap_prev):
@@ -63,23 +61,20 @@ class MyMap():
         self.ships_attacking = set()
         self.ships_supporting = set()
         self.ships_evading = set()
-        self.ships_defending = set()        ## THESE ARE CURRENTLY NOT USED
+        self.ships_defending = set()
         self.ships_expanding = set()
-        self.ships_running = set()          ## THESE ARE CURRENTLY NOT USED
-        self.ships_sniping = set()  ## THESE ARE CURRENTLY NOT USED
+        self.ships_running = set()
+        self.ships_sniping = set()
         self.ships_battling = {1:set(),\
                                2:set(),\
                                3:set(),\
                                4:set(),\
                                5:set()}
 
-        self.section_in_battle = set()      ## WILL CONTAIN SECTIONS IN WAR
-
-        self.sections_with_enemy = set()     ## WILL CONTAIN SECTIONS WITH ENEMY
-        self.sections_with_enemy_docked = set()     ## WILL CONTAIN SECTIONS WITH ENEMY DOCKED
-
-        self.ships_moved_already = set()    ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
-
+        self.section_in_battle = set()          ## WILL CONTAIN SECTIONS IN WAR
+        self.sections_with_enemy = set()        ## WILL CONTAIN SECTIONS WITH ENEMY
+        self.sections_with_enemy_docked = set() ## WILL CONTAIN SECTIONS WITH ENEMY DOCKED
+        self.ships_moved_already = set()        ## WILL CONTAIN SHIP IDS THAT ALREADY MOVED
 
         self.section_enemy_summary = np.zeros(((self.height // MyCommon.Constants.NUM_SECTIONS) + 1,
                                                (self.width // MyCommon.Constants.NUM_SECTIONS) + 1),
@@ -90,14 +85,12 @@ class MyMap():
 
         self.data_ships = self.get_ship_data()
 
-
         self.data_planets = {}
         self.set_planet_status()
         self.set_ships_status()
-        self.set_from_planet()               ## ASSOCIATE NEW SHIPS TO A PLANET
+        self.set_from_planet()                  ## ASSOCIATE NEW SHIPS TO A PLANET
 
-        self.check_limit()  ## KEEP A LIMIT OF NODES IN MEMORY
-
+        self.check_limit()                      ## KEEP A LIMIT OF NODES IN MEMORY
 
         # self.taken_coords = set()          ## NO LONGER USED
 
@@ -110,6 +103,8 @@ class MyMap():
     def check_limit(self):
         """
         DELETE NODES THAT ARE OVER THE MAX LIMIT
+
+        MINIMIZE/LIMIT NUMBER OF NODES IN MEMORY
         """
         MyMap.NUM_NODES += 1
         if MyMap.NUM_NODES > MyMap.MAX_NODES:
@@ -138,6 +133,7 @@ class MyMap():
             data[player_id] = {}
             for ship in player.all_ships():
                 ship_id = ship.id
+                ## CHANGE THIS LATER TO A CLASS, INSTEAD OF JUST A DICTIONARY
                 data[player_id][ship_id] = {'x': ship.x, \
                                             'y': ship.y, \
                                             'coords': MyCommon.Coordinates(ship.y, ship.x), \
@@ -229,7 +225,7 @@ class MyMap():
                 self.planets_owned.add(planet.id)
                 self.data_planets[planet.id]['docked_ships'].update(planet._docked_ship_ids)
                 self.data_planets[planet.id]['my_miners'].update(planet._docked_ship_ids)
-                self.update_ship_task_mining(planet._docked_ship_ids)
+                #self.update_ship_task_mining(planet._docked_ship_ids)
             else:
                 ## PLANET ENEMY OWNED
                 self.planets_enemy.add(planet.id)
@@ -240,6 +236,8 @@ class MyMap():
         UPDATE TASKS OF SHIPS PROVIDED
 
         SHIPS ARE MINE ONLY
+
+        NO LONGER USED
         """
         for ship_id in ships:
             self.data_ships[self.game_map.my_id][ship_id]['task'] = MyCommon.ShipTasks.MINING
@@ -330,13 +328,12 @@ class MyMatrix():
         self.ally_matrix.fill(-1)
         self.matrix = self.get_matrix()  ## A DICTIONARY CONTAINING (MATRIX, MATRIX HP) (PER PLAYER ID)
 
-        self.add_new_ships_to_position_matrix()
-
         ## WILL CONTAIN LOCATION OF BACKUPS NEEDED
         self.backup_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
 
         ## KEEP A LIMIT OF NODES IN MEMORY
         self.check_limit()
+
 
     def check_limit(self):
         """
@@ -347,6 +344,7 @@ class MyMatrix():
             ## DELETE OLD NODES
             self.matrix_prev.matrix_prev.matrix_prev = None
             MyMatrix.NUM_NODES -= 1
+
 
     def get_matrix(self):
         """
@@ -392,13 +390,6 @@ class MyMatrix():
 
         return final_matrix
 
-
-    def add_new_ships_to_position_matrix(self):
-        """
-        FILL POSITION MATRIX WHERE NEW SHIPS ARE, TO PREVENT NEW SHIPS FROM HAVING NO PLACE TO GO
-        """
-        ## IF WE FILL A BOX HERE, THE NEW SHIP WILL NOT GET AN A* PATH...
-        pass
 
     def fill_planets_predictions(self,matrix):
         """

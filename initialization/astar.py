@@ -16,22 +16,16 @@ def isBadNeighbor(array,neighbor):
     CHECKS IF THE NEIGHBOR IS WITHIN THE ARRAY
     OR IF THE NEIGHBOR IS AN OBSTRUCTION
     """
-    if 0 <= neighbor[0] < array.shape[0]:
-        if 0 <= neighbor[1] < array.shape[1]:
-            ## NEIGHBOR COORDINATE IS WITHIN THE ARRAY
-            if array[neighbor[0]][neighbor[1]] == MyCommon.Constants.NON_OBSTRUCTION:
-                ## VALID NEIGHBOR
-                return False
-            else:
-                ## ITS AN OBSTRUCTION (BAD/SKIP)
-                return True
-        else:
-            # OUTSIDE ARRAY Y WALLS (BAD/SKIP)
-            return True
-    else:
-        # OUTSIDE ARRAY X WALLS (BAD/SKIP)
-        return True
-
+    if 0 <= neighbor[0] < array.shape[0] and 0 <= neighbor[1] < array.shape[1] \
+            and array[neighbor[0]][neighbor[1]] == MyCommon.Constants.NON_OBSTRUCTION:
+        ## NEIGHBOR COORDINATE IS WITHIN THE ARRAY BOUNDARIES
+        ## AND VALID NEIGHBOR
+        return False
+                
+    ## OUTSIDE ARRAY Y OR X BOUNDARY
+    ## OR ITS AN OBSTRUCTION (BAD/SKIP)
+    return True
+        
 
 def a_star(array, start_point, goal_point):
     """
@@ -39,6 +33,8 @@ def a_star(array, start_point, goal_point):
 
     SAW THIS A* ALGO ONLINE FROM Christian Careaga (christian.careaga7@gmail.com)
     UPDATED FOR CLARITY
+    
+    NO LONGER USED.  USING VERSION 2 BELOW
     """
     ## MAKE SURE COORDS ARE ROUNDED AS INTS
     start = (int(round(start_point[0])),int(round(start_point[1])))
@@ -100,6 +96,7 @@ def a_star2(arrays, start_point, goal_point):
 
     ARRAY WILL BE A DICTIONARY OF STEPS
     """
+    
     ## MAKE SURE COORDS ARE ROUNDED AS INTS
     start = (int(round(start_point[0])),int(round(start_point[1])))
     goal = (int(round(goal_point[0])),int(round(goal_point[1])))
@@ -107,16 +104,18 @@ def a_star2(arrays, start_point, goal_point):
     ## HOW FAR AWAY IS THE GOAL DISTANCE
     goal_distance = MyCommon.calculate_distance(MyCommon.Coordinates(start_point[0], start_point[1]),
                                                 MyCommon.Coordinates(goal_point[0], goal_point[1]))
-    goal_distance = min(7, goal_distance)  ## SOMETIMES GOAL CAN BE VERY FAR, BUT LIMIT TO 7 ONLY
+    ## SOMETIMES GOAL CAN BE VERY FAR, BUT LIMIT TO 7 ONLY
+    goal_distance = min(7, goal_distance)
 
-    index_per_step = 7/goal_distance  ## THIS WILL BE THE INCREASE IN INDEX (POSITION MATRIX) PER STEP
+    ## THIS WILL BE THE INCREASE IN INDEX (POSITION MATRIX) PER STEP
+    index_per_step = 7/goal_distance  
 
     logging.debug("a_star: start: {} goal: {}".format(start, goal))
 
     ## NEIGHBORS IN NORTH, EAST, SOUTH, WEST DIRECTIONS, PLUS DIAGONALS
     neighbors = [(-1,0),(0,1),(1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]
 
-    visited_points = set()
+    visited_pts = set()
     came_from = {}
     gscore = {start:0}                      ## ACTUAL DISTANCE FROM START
     fscore = {start:heuristic(start, goal)} ## GSCORE PLUS DISTANCE TO GOAL
@@ -126,43 +125,42 @@ def a_star2(arrays, start_point, goal_point):
     heappush(myheap, (fscore[start], start))
 
     while myheap:
+        curr_pt = heappop(myheap)[1]
 
-        current_point = heappop(myheap)[1]
+        if curr_pt == goal: ## GOAL REACHED
+            data_pts = []
+            while curr_pt in came_from:
+                data_pts.append(curr_pt)
+                curr_pt = came_from[curr_pt]
+            data_pts.append(start) ## APPEND STARTING LOCATION
+            return data_pts ## FIRST COORD WILL BE AT THE END!
 
-        if current_point == goal: ## GOAL REACHED
-            data_points = []
-            while current_point in came_from:
-                data_points.append(current_point)
-                current_point = came_from[current_point]
-            data_points.append(start) ## APPEND STARTING LOCATION
-            return data_points ## FIRST COORD WILL BE AT THE END!
-
-        visited_points.add(current_point)
+        visited_pts.add(curr_pt)
         for r, c in neighbors:
-            neighbor_point = (current_point[0] + r, current_point[1] + c)
+            neighbor_pt = (curr_pt[0] + r, curr_pt[1] + c)
             ## tentative_g_score IS BASICALLY THE DISTANCE/STEPS AWAY FROM START
-            tentative_g_score = gscore[current_point] + heuristic(current_point, neighbor_point)
+            tentative_g_score = gscore[curr_pt] + heuristic(curr_pt, neighbor_pt)
 
             ## HIGHEST INDEX CAN ONLY BE 7 STEPS (WE ONLY HAVE 7 POSITION MATRIX)
             index_value = min(7, int(round(tentative_g_score * index_per_step)))
 
             ## BASE ON INDEX IN POSITION MATRIX
             ## THIS IS TO TAKE INTO ACCOUNT INTERMEDIATE STEPS
-            if isBadNeighbor(arrays[index_value], neighbor_point):
-                if neighbor_point == goal:
+            if isBadNeighbor(arrays[index_value], neighbor_pt):
+                if neighbor_pt == goal:
                     pass
                 else:
                     continue
 
-            if neighbor_point in visited_points and tentative_g_score >= gscore.get(neighbor_point, 0): ## 0 DEFAULT VALUE
+            if neighbor_pt in visited_pts and tentative_g_score >= gscore.get(neighbor_pt, 0): ## 0 DEFAULT VALUE
                 continue
 
             ## IF A BETTER GSCORE IS FOUND FOR THAT NEIGHBOR COORD OR NEIGHBOR COORD NOT IN HEAP
-            if  tentative_g_score < gscore.get(neighbor_point, 0) or neighbor_point not in (i[1] for i in myheap):
-                came_from[neighbor_point] = current_point   ## NEIGHBOR COORD CAME FROM CURRENT COORD
-                gscore[neighbor_point] = tentative_g_score  ## NEIGHBOR DISTANCE FROM START
-                fscore[neighbor_point] = tentative_g_score + heuristic(neighbor_point, goal)  ## GSCORE PLUS DISTANCE TO GOAL
-                heappush(myheap, (fscore[neighbor_point], neighbor_point))  ## PUSH NEIGHBOR TO HEAP
+            if  tentative_g_score < gscore.get(neighbor_pt, 0) or neighbor_pt not in (i[1] for i in myheap):
+                came_from[neighbor_pt] = curr_pt   ## NEIGHBOR COORD CAME FROM CURRENT COORD
+                gscore[neighbor_pt] = tentative_g_score  ## NEIGHBOR DISTANCE FROM START
+                fscore[neighbor_pt] = tentative_g_score + heuristic(neighbor_pt, goal)  ## GSCORE PLUS DISTANCE TO GOAL
+                heappush(myheap, (fscore[neighbor_pt], neighbor_pt))  ## PUSH NEIGHBOR TO HEAP
 
     return []
 

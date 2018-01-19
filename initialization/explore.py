@@ -36,7 +36,7 @@ class Exploration():
     GATHERS BEST PLANET TO CONQUER FIRST
     GATHERS PATHS, EACH PLANET TO EACH PLANET
     """
-    LAUNCH_OFF_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS
+    LAUNCH_OFF_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS, NO LONGER USED
     LAUNCH_ON_DISTANCE = 4
 
     def __init__(self,game):
@@ -69,8 +69,7 @@ class Exploration():
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix, self.all_planet_hp_matrix = self.fill_planets_for_paths()
 
-
-        self.get_launch_coords()
+        self.get_launch_coords() ## NO LONGER USED
 
         self.distance_matrix_AxA = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS * 2 + 1)
         self.distance_matrix_DxD = self.get_distance_matrix(MyCommon.Constants.DEFENDING_PERIMETER_CHECK, MyCommon.Constants.DEFENDING_PERIMETER_CHECK * 2 + 1)
@@ -223,7 +222,7 @@ class Exploration():
         # return matrix
 
 
-        ## USING NUMPY (VECTORIZED)
+        ## USING NUMPY (VECTORIZED), MUCH FASTER
         matrix = np.zeros((row_length, col_length), dtype=np.float16)
         indexes = [(y, x) for y, row in enumerate(matrix) for x, val in enumerate(row)]
         to_points = np.array(indexes)

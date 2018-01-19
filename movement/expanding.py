@@ -156,6 +156,8 @@ def get_mining_spot(MyMoves, ship_id, target_planet_id):
 
                         (-2,-1)      (2,1)
        (-1,-4)   (-1,-2)       (-1,0)     (-1,2)     (-1,4)
+
+    NO LONGER USED??
     """
     # print(get_destination_coord(start, 58, 3))
     # print(get_destination_coord(start, 90, 3))

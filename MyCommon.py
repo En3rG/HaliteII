@@ -615,3 +615,4 @@ def isInside_map(coord, MyMoves):
 # center = Coordinates(11,11)
 # section = get_circle_in_square(test,center,7, 8, pad_values=-1)
 # print(section)
+

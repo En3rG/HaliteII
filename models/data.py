@@ -30,6 +30,8 @@ class Matrix_val(Enum):
     PREDICTION_PLANET = 100
     PREDICTION_ENEMY_SHIP_DOCKED = 0.5
 
+    DOCKABLE_AREA = 777
+
 
 class MyMap():
     """
@@ -462,8 +464,6 @@ class MyMatrix():
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
             #matrix[ship['point'][0]][ship['point'][1]] = value
-
-            logging.debug("ship_id: {} ship_point {}".format(ship_id, ship['point']))
 
             matrix[ship['point'][0]][ship['point'][1]] = ship_id
             matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value

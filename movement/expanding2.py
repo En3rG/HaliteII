@@ -316,10 +316,11 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
-    slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
-                            astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
-    taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
-    fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
+    ## WAS FILLING POSITION TO EARLY?? COMMENTING THIS OUT MAKES IT BETTER!!
+    # slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
+    #                         astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
+    # taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
+    # fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
 
     return thrust, angle
 
@@ -402,6 +403,59 @@ def theta_clear(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLIS
     #         return False
     #
     # return True
+
+def get_closest_docking_coord(MyMoves, target_planet_id, ship_id):
+    """
+    GET CLOSEST DOCKING COORD FROM DOCKABLE MATRIX
+
+    NOT USED.  NOT COMPLETELY WORKING YET (NUMPY NO POP)
+    """
+    def get_coord_closest_dock_value(values, distances):
+        """
+        GET COORDS OF CLOSEST DOCK VALUES (BASED ON CLOSEST DISTANCE FIRST)
+        """
+        v_indx = np.where(values == Matrix_val.DOCKABLE_AREA.value)
+        return values[v_indx][np.argsort(distances[v_indx])]
+
+
+    ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+    ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
+    circle_radius = 7
+    square_radius = 8
+
+    dockable_matrix = MyCommon.get_circle_in_square(MyMoves.EXP.dockable_matrix,
+                                                           ship_coord,
+                                                    circle_radius,
+                                                    square_radius,
+                                                           pad_values = -1)
+
+    position_matrix = MyCommon.get_circle_in_square(MyMoves.position_matrix[7],
+                                                    ship_coord,
+                                                    circle_radius,
+                                                    square_radius,
+                                                    pad_values=-1)
+
+    section_matrix = np.add(dockable_matrix,position_matrix)
+
+
+    distances = MyMoves.EXP.distance_matrix_DxD
+
+    closest_points = get_coord_closest_dock_value(section_matrix, distances)
+
+    logging.debug(closest_points)
+
+    while len(closest_points) > 0:
+        closest_point = closest_points.pop()
+        slope = (closest_point[0] - square_radius, closest_point[1] - square_radius)
+        target_coord = MyCommon.Coordinates(ship_point[0] + slope[0], ship_point[1] + slope[1])
+
+        if target_coord:
+            thrust, angle = get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, distance, target_planet_id)
+            if thrust != 0:
+                return thrust, angle
+
+    return None, None
+
 
 def get_docking_coord(MyMoves, target_planet_id, ship_id):
     """

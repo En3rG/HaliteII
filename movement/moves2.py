@@ -238,7 +238,12 @@ class MyMoves():
 
                         if thrust == 0:
                             logging.debug("Docking but not suppose to dock yet??? ship_id: {}".format(ship_id))
+                            ## BEFORE
                             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
+
+                            ## GET ANOTHER DOCKING COORD (NOT COMPLETELY WORKING YET)
+                            # safe_thrust, angle = expanding2.get_closest_docking_coord(self, target_planet_id, ship_id)
+                            # self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
 
                         else:
                             ## ADD TO COMMAND QUEUE

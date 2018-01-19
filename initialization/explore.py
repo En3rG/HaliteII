@@ -76,7 +76,8 @@ class Exploration():
         self.distance_matrix_backup = self.get_distance_matrix(MyCommon.Constants.BACKUP_SQUARE_RADIUS,
                                                                MyCommon.Constants.BACKUP_SQUARE_RADIUS * 2 + 1)
 
-        #self.dockable_matrix = self.fill_dockable_matrix()   ## NO LONGER USED??
+        self.dockable_matrix = self.fill_dockable_matrix()
+
 
         #self.A_paths = self.get_paths() ## NO LONGER USED??
 
@@ -416,19 +417,25 @@ class Exploration():
         FILL MATRIX WITH DOCKABLE VALUE
         WILL BE USED TO DETERMINE IF CURRENT POINT IS DOCKABLE
 
-        NO LONGER USED
         """
 
-        matrix = np.zeros((self.height , self.width), dtype=np.int8)
+        matrix = np.zeros((self.height , self.width), dtype=np.float16)
 
         for planet in self.game_map.all_planets():
-            value = 1
+            value = Matrix_val.DOCKABLE_AREA.value
             matrix = MyCommon.fill_circle(matrix, \
                                           MyCommon.Coordinates(planet.y, planet.x), \
                                           ## -1 TO MAKE SURE ITS DOCKABLE, DUE TO POSSIBLE ROUNDING ISSUE
-                                          planet.radius + MyCommon.Constants.DOCK_RADIUS - 1, \
+                                          planet.radius, \
                                           value, \
-                                          cummulative=False)
+                                          cummulative=True, override_edges=0)
+
+            matrix = MyCommon.fill_circle(matrix, \
+                                          MyCommon.Coordinates(planet.y, planet.x), \
+                                          ## -1 TO MAKE SURE ITS DOCKABLE, DUE TO POSSIBLE ROUNDING ISSUE
+                                          planet.radius + MyCommon.Constants.DOCK_RADIUS, \
+                                          value, \
+                                          cummulative=True, override_edges=0)
         return matrix
 
 

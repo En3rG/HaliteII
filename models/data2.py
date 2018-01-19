@@ -77,3 +77,39 @@ df = pd.DataFrame({1:[1,2,3,4],
 
 
 
+import numpy as np
+
+a = """
+0000000000000000000000000000
+0000000000000000000000000X00
+0000000000000000000000000000
+1110000000000000000000000000
+1111100000000000000000000000
+1111110000000000000000000000
+1111111000000000000000000000
+1111111110000000000000000000
+1111111111100000000000000000
+"""
+
+a = np.array([[int(i) for i in row] for row in a.strip().replace('X', '2').split()], dtype=np.uint8)
+
+x = np.argwhere(a==2)[0]
+print("x",x)
+y = np.argwhere(a==1)
+print("y",y)
+d = y-x
+print("d",d)
+
+phi = 195 # 255 has no solutions
+
+on_ray = np.abs(d@(np.sin(np.radians(-phi-90)), np.cos(np.radians(-phi-90))))<np.sqrt(0.5)
+
+show_ray = np.zeros_like(a)
+show_ray[tuple(y[on_ray].T)] = 1
+print(show_ray)
+
+ymin=y[on_ray][np.argmin(np.einsum('ij,ij->i', d[on_ray], d[on_ray]))]
+print(ymin)
+
+
+

@@ -1,0 +1,5438 @@
+{
+    "height": 208,
+    "player_names": [
+        "En3rG v72",
+        "dmahan93 v55"
+    ],
+    "seed": 217070242,
+    "num_players": 2,
+    "stats": {
+        "0": {
+            "last_frame_alive": 18,
+            "init_response_time": 11281,
+            "max_frame_response_time": 13,
+            "average_frame_response_time": 3.9,
+            "rank": 2,
+            "damage_dealt": 0,
+            "total_ship_count": 0
+        },
+        "1": {
+            "last_frame_alive": 19,
+            "init_response_time": 9,
+            "max_frame_response_time": 0,
+            "average_frame_response_time": 0.0,
+            "rank": 1,
+            "damage_dealt": 832,
+            "total_ship_count": 0
+        }
+    },
+    "width": 312,
+    "moves": [
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "2": {
+                        "angle": 106,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 2
+                    },
+                    "0": {
+                        "angle": 106,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 0
+                    },
+                    "1": {
+                        "angle": 82,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 1
+                    }
+                }
+            ],
+            "1": [
+                {}
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "2": {
+                        "angle": 106,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 2
+                    },
+                    "0": {
+                        "angle": 106,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 0
+                    },
+                    "1": {
+                        "angle": 82,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 1
+                    }
+                }
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 204,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 206,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 201,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "2": {
+                        "angle": 106,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 2
+                    },
+                    "0": {
+                        "angle": 98,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 0
+                    },
+                    "1": {
+                        "angle": 82,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 1
+                    }
+                }
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 204,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 206,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 201,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "2": {
+                        "angle": 98,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 2
+                    },
+                    "0": {
+                        "angle": 98,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 0
+                    },
+                    "1": {
+                        "angle": 74,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 1
+                    }
+                }
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 204,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 206,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 238,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "2": {
+                        "angle": 101,
+                        "queue_number": 0,
+                        "magnitude": 5,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 2
+                    },
+                    "0": {
+                        "angle": 90,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 0
+                    },
+                    "1": {
+                        "angle": 74,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 1
+                    }
+                }
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 273,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 317,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 270,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "2": {
+                        "owner": 0,
+                        "type": "dock",
+                        "queue_number": 0,
+                        "shipId": 2,
+                        "planet_id": 2
+                    },
+                    "0": {
+                        "owner": 0,
+                        "type": "dock",
+                        "queue_number": 0,
+                        "shipId": 0,
+                        "planet_id": 2
+                    },
+                    "1": {
+                        "angle": 76,
+                        "queue_number": 0,
+                        "magnitude": 4,
+                        "owner": 0,
+                        "type": "thrust",
+                        "shipId": 1
+                    }
+                }
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 273,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 265,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 271,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {
+                    "1": {
+                        "owner": 0,
+                        "type": "dock",
+                        "queue_number": 0,
+                        "shipId": 1,
+                        "planet_id": 3
+                    }
+                }
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 273,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 266,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 270,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 272,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 266,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 271,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 270,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 228,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 272,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 274,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 277,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 272,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 271,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 274,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 275,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 276,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 271,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 284,
+                        "queue_number": 0,
+                        "magnitude": 6,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 333,
+                        "queue_number": 0,
+                        "magnitude": 6,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 274,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 358,
+                        "queue_number": 0,
+                        "magnitude": 2,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 332,
+                        "queue_number": 0,
+                        "magnitude": 0,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 295,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 358,
+                        "queue_number": 0,
+                        "magnitude": 0,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 332,
+                        "queue_number": 0,
+                        "magnitude": 0,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 330,
+                        "queue_number": 0,
+                        "magnitude": 4,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 358,
+                        "queue_number": 0,
+                        "magnitude": 0,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 335,
+                        "queue_number": 0,
+                        "magnitude": 2,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 2,
+                        "queue_number": 0,
+                        "magnitude": 3,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 339,
+                        "queue_number": 0,
+                        "magnitude": 2,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 357,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 325,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 338,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 357,
+                        "queue_number": 0,
+                        "magnitude": 6,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 30,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 356,
+                        "queue_number": 0,
+                        "magnitude": 7,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        },
+        {
+            "3": [
+                {}
+            ],
+            "2": [
+                {}
+            ],
+            "0": [
+                {}
+            ],
+            "1": [
+                {
+                    "3": {
+                        "angle": 358,
+                        "queue_number": 0,
+                        "magnitude": 0,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 3
+                    },
+                    "5": {
+                        "angle": 341,
+                        "queue_number": 0,
+                        "magnitude": 3,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 5
+                    },
+                    "4": {
+                        "angle": 13,
+                        "queue_number": 0,
+                        "magnitude": 2,
+                        "owner": 1,
+                        "type": "thrust",
+                        "shipId": 4
+                    }
+                }
+            ]
+        }
+    ],
+    "num_frames": 20,
+    "map_generator": "SolarSystem",
+    "frames": [
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 55.0
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 52.0
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 49.0
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 156.0
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 159.0
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 153.0
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 154.070538509281,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 61.72883187156823
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 154.070538509281,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 58.72883187156823
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.97421170672047,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 55.93187648119099
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 156.0
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 159.0
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 156.0,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 153.0
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 152.14107701856202,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 68.45766374313646
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 152.14107701856202,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 65.45766374313646
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 157.9484234134409,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 62.86375296238198
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 149.6051817965018,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 153.1528434984694
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 149.70844167590582,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 155.93140197247646
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 149.4649370145196,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 150.4914243531829
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 150.211615527843,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 75.1864956147047
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 151.16686531184155,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 72.38954022432746
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 158.92263512016137,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 69.79562944357298
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 143.2103635930036,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 150.3056869969388
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 143.41688335181166,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 152.86280394495293
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 142.92987402903918,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 147.9828487063658
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 149.23740382112257,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 82.1183720958957
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 79.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 160.85209661088038,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 76.52446131514121
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 136.8155453895054,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 147.4585304954082
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.12532502771748,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 149.7942059174294
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.22043917940675,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 142.0465120332708
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 162.78155810159936,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 83.25329318670944
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.181897083206,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 140.4681237521262
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 142.2448009390517,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 145.02021739699188
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.22043917940675,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 135.0465120332708
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 5
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 5
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.5482487769066,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 133.47771700884417
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 141.63471073981808,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 138.04685451034968
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.34260602446773,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 128.04757816717608
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 4
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 4
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docking",
+                            "turns_left": 5
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.9146004706072,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 126.48731026556216
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 141.1464154236092,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 131.0639061585309
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.34260602446773,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 121.04757816717607
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 3
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 3
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docking",
+                            "turns_left": 4
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 138.1588969475247,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 119.49157447642848
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 140.65812010740032,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 124.08095780671214
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.4647728695287,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 114.04864430108134
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 2
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 2
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docking",
+                            "turns_left": 3
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 138.1588969475247,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 112.49157447642848
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 135.9742058628883,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 118.87894402837038
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.7090693464462,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 107.05290851194766
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 1
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docking",
+                            "turns_left": 1
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docking",
+                            "turns_left": 2
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 138.6471922637336,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 105.50862612460972
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 136.82729126672436,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 111.93112096688112
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.95336582336373,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 100.057172722814
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 12,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docking",
+                            "turns_left": 1
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 138.76935910879456,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 98.50969225851497
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.3155865829332,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 104.94817261506236
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 140.56345602259734,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 93.08380983617178
+                    }
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "target_locations": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 142.01498739619532,
+                    "time": 0.1364,
+                    "entity": {
+                        "id": 4,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 87.2620354785158
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 139.50105835166815,
+                    "time": 0.6463,
+                    "entity": {
+                        "id": 3,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 91.54803899093706
+                }
+            ],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 6,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 24,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 148.28335884423984,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 139.50105835166815,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 91.54803899093706
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.4377534279942,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 97.94923874896762
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 142.01498739619532,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 87.2620354785158
+                    }
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "target_locations": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        },
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.84709749679834,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 3,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        },
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 88.82409599249978
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.01376905023352,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 4,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 87.1922364851108
+                }
+            ],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 12,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 36,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 148.28335884423984,
+                        "health": 127,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.84709749679834,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 88.82409599249978
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 137.9260487442031,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 90.96629039714885
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.01376905023352,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 87.1922364851108
+                    }
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "target_locations": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        },
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.84709749679834,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 3,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        },
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 88.82409599249978
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.01376905023352,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 4,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 2,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 87.1922364851108
+                },
+                {
+                    "radius": 0.5,
+                    "event": "destroyed",
+                    "x": 148.28335884423984,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 2,
+                        "type": "ship",
+                        "owner": 0
+                    },
+                    "y": 87.026508013134
+                }
+            ],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 18,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        2,
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 48,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "2": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 148.28335884423984,
+                        "health": 31,
+                        "owner": 0,
+                        "id": 2,
+                        "cooldown": 0,
+                        "y": 87.026508013134
+                    },
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 223,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.84709749679834,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 88.82409599249978
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 140.88437657638798,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 84.6221358878923
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.01376905023352,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 87.1922364851108
+                    }
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "target_locations": [
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.84709749679834,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 3,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 88.82409599249978
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.01376905023352,
+                    "time": 0.1232,
+                    "entity": {
+                        "id": 4,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 87.1922364851108
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 144.34847819152574,
+                    "time": 0.3638,
+                    "entity": {
+                        "id": 5,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 0,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 82.6221358878923
+                },
+                {
+                    "radius": 0.5,
+                    "event": "destroyed",
+                    "x": 150.1926536051211,
+                    "time": 0.3638,
+                    "entity": {
+                        "id": 0,
+                        "type": "ship",
+                        "owner": 0
+                    },
+                    "y": 86.32141670551844
+                }
+            ],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 24,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [
+                        0
+                    ],
+                    "health": 1496,
+                    "current_production": 54,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": 0
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "0": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 2,
+                            "status": "docked"
+                        },
+                        "x": 150.1926536051211,
+                        "health": 191,
+                        "owner": 0,
+                        "id": 0,
+                        "cooldown": 0,
+                        "y": 86.32141670551844
+                    },
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.84709749679834,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 88.82409599249978
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.34847819152574,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 82.6221358878923
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 144.01376905023352,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 87.1922364851108
+                    }
+                }
+            }
+        },
+        {
+            "events": [],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 30,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 54,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 146.65971307087165,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 87.97885946901837
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 147.34665067258302,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 82.7268343779998
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 145.88092990322792,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 86.47550058602019
+                    }
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "target_locations": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 153.65011981415367,
+                    "time": 0.6851,
+                    "entity": {
+                        "id": 3,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 87.61250777531777
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 152.37121688519542,
+                    "time": 0.9586,
+                    "entity": {
+                        "id": 4,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 83.85325443210881
+                }
+            ],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 36,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 54,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 255,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 153.65011981415367,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 87.61250777531777
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 153.08071498260597,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 78.71179932354248
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 152.37121688519542,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 83.85325443210881
+                    }
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "target_locations": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 159.6418970226811,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 3,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 87.2984920378601
+                },
+                {
+                    "target_locations": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "event": "attack",
+                    "x": 159.3541652370142,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 4,
+                        "type": "ship",
+                        "owner": 1
+                    },
+                    "targets": [
+                        {
+                            "id": 1,
+                            "type": "ship",
+                            "owner": 0
+                        }
+                    ],
+                    "y": 83.36495911589994
+                },
+                {
+                    "radius": 0.5,
+                    "event": "destroyed",
+                    "x": 163.74924568399803,
+                    "time": 0.0,
+                    "entity": {
+                        "id": 1,
+                        "type": "ship",
+                        "owner": 0
+                    },
+                    "y": 87.13447609181343
+                }
+            ],
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [
+                        1
+                    ],
+                    "health": 1496,
+                    "current_production": 42,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": 0
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 54,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {
+                    "1": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "planet_id": 3,
+                            "status": "docked"
+                        },
+                        "x": 163.74924568399803,
+                        "health": 127,
+                        "owner": 0,
+                        "id": 1,
+                        "cooldown": 0,
+                        "y": 87.13447609181343
+                    }
+                },
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 159.6418970226811,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 87.2984920378601
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 159.14289280909702,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 82.21179932354248
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 159.3541652370142,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 83.36495911589994
+                    }
+                }
+            }
+        },
+        {
+            "planets": {
+                "0": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 0,
+                    "owner": null
+                },
+                "13": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 13,
+                    "owner": null
+                },
+                "4": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 4,
+                    "owner": null
+                },
+                "1": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 0,
+                    "remaining_production": 845,
+                    "id": 1,
+                    "owner": null
+                },
+                "12": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 12,
+                    "owner": null
+                },
+                "3": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 42,
+                    "remaining_production": 845,
+                    "id": 3,
+                    "owner": null
+                },
+                "7": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 7,
+                    "owner": null
+                },
+                "2": {
+                    "docked_ships": [],
+                    "health": 1496,
+                    "current_production": 54,
+                    "remaining_production": 845,
+                    "id": 2,
+                    "owner": null
+                },
+                "9": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 9,
+                    "owner": null
+                },
+                "10": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 10,
+                    "owner": null
+                },
+                "5": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 5,
+                    "owner": null
+                },
+                "6": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 6,
+                    "owner": null
+                },
+                "8": {
+                    "docked_ships": [],
+                    "health": 1438,
+                    "current_production": 0,
+                    "remaining_production": 812,
+                    "id": 8,
+                    "owner": null
+                },
+                "11": {
+                    "docked_ships": [],
+                    "health": 3187,
+                    "current_production": 0,
+                    "remaining_production": 1800,
+                    "id": 11,
+                    "owner": null
+                }
+            },
+            "ships": {
+                "0": {},
+                "1": {
+                    "3": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 159.6418970226811,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 3,
+                        "cooldown": 0,
+                        "y": 87.2984920378601
+                    },
+                    "5": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 161.979448535895,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 5,
+                        "cooldown": 0,
+                        "y": 81.235094860171
+                    },
+                    "4": {
+                        "vel_x": 0.0,
+                        "vel_y": 0.0,
+                        "docking": {
+                            "status": "undocked"
+                        },
+                        "x": 161.30290536658467,
+                        "health": 255,
+                        "owner": 1,
+                        "id": 4,
+                        "cooldown": 0,
+                        "y": 83.81486122458766
+                    }
+                }
+            }
+        }
+    ],
+    "planets": [
+        {
+            "x": 165.00837813689768,
+            "r": 5.869885268092979,
+            "health": 1496,
+            "id": 0,
+            "docking_spots": 2,
+            "production": 845,
+            "y": 113.00837813689768
+        },
+        {
+            "x": 146.99162186310232,
+            "r": 5.869885268092979,
+            "health": 1496,
+            "id": 1,
+            "docking_spots": 2,
+            "production": 845,
+            "y": 113.00837813689768
+        },
+        {
+            "x": 146.99162186310232,
+            "r": 5.869885268092979,
+            "health": 1496,
+            "id": 2,
+            "docking_spots": 2,
+            "production": 845,
+            "y": 94.99162186310232
+        },
+        {
+            "x": 165.00837813689768,
+            "r": 5.869885268092979,
+            "health": 1496,
+            "id": 3,
+            "docking_spots": 2,
+            "production": 845,
+            "y": 94.99162186310232
+        },
+        {
+            "x": 78.70478314987479,
+            "r": 5.640094319573952,
+            "health": 1438,
+            "id": 4,
+            "docking_spots": 2,
+            "production": 812,
+            "y": 177.6081639680896
+        },
+        {
+            "x": 11.10815837111079,
+            "r": 5.640094319573952,
+            "health": 1438,
+            "id": 5,
+            "docking_spots": 2,
+            "production": 812,
+            "y": 100.64030915410353
+        },
+        {
+            "x": 88.40337522123598,
+            "r": 5.640094319573952,
+            "health": 1438,
+            "id": 6,
+            "docking_spots": 2,
+            "production": 812,
+            "y": 27.032145186013963
+        },
+        {
+            "x": 233.29521685012514,
+            "r": 5.640094319573952,
+            "health": 1438,
+            "id": 7,
+            "docking_spots": 2,
+            "production": 812,
+            "y": 30.391836031910373
+        },
+        {
+            "x": 300.8918416288892,
+            "r": 5.640094319573952,
+            "health": 1438,
+            "id": 8,
+            "docking_spots": 2,
+            "production": 812,
+            "y": 107.35969084589645
+        },
+        {
+            "x": 223.59662477876415,
+            "r": 5.640094319573952,
+            "health": 1438,
+            "id": 9,
+            "docking_spots": 2,
+            "production": 812,
+            "y": 180.967854813986
+        },
+        {
+            "x": 216.42467448675353,
+            "r": 12.501683830046387,
+            "health": 3187,
+            "id": 10,
+            "docking_spots": 5,
+            "production": 1800,
+            "y": 78.64934176471769
+        },
+        {
+            "x": 251.4874793528967,
+            "r": 12.501683830046387,
+            "health": 3187,
+            "id": 11,
+            "docking_spots": 5,
+            "production": 1800,
+            "y": 120.04194897878412
+        },
+        {
+            "x": 95.57532551324655,
+            "r": 12.501683830046387,
+            "health": 3187,
+            "id": 12,
+            "docking_spots": 5,
+            "production": 1800,
+            "y": 129.3506582352823
+        },
+        {
+            "x": 60.512520647103344,
+            "r": 12.501683830046387,
+            "health": 3187,
+            "id": 13,
+            "docking_spots": 5,
+            "production": 1800,
+            "y": 87.95805102121585
+        }
+    ],
+    "version": 31,
+    "constants": {
+        "PLANETS_PER_PLAYER": 6,
+        "SPAWN_RADIUS": 2,
+        "EXTRA_PLANETS": 4,
+        "DRAG": 10.0,
+        "MAX_SPEED": 7.0,
+        "EXPLOSION_RADIUS": 10.0,
+        "ADDITIONAL_PRODUCTIVITY": 6,
+        "PRODUCTION_PER_SHIP": 72,
+        "SHIP_RADIUS": 0.5,
+        "DOCKED_SHIP_REGENERATION": 0,
+        "DOCK_RADIUS": 4.0,
+        "MAX_TURNS": 300,
+        "DOCK_TURNS": 5,
+        "WEAPON_RADIUS": 5.0,
+        "WEAPON_DAMAGE": 64,
+        "MAX_SHIP_HEALTH": 255,
+        "BASE_PRODUCTIVITY": 6,
+        "SHIPS_PER_PLAYER": 3,
+        "RESOURCES_PER_RADIUS": 144,
+        "BASE_SHIP_HEALTH": 255,
+        "INFINITE_RESOURCES": true,
+        "WEAPON_COOLDOWN": 1,
+        "MAX_ACCELERATION": 7.0
+    },
+    "poi": [],
+    "engine_version": "1.2.516.gc277"
+}

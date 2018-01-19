@@ -142,6 +142,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                                                                pad_values)
 
 
+
     logging.debug("get_thrust_angle_from_Astar:: angle_towards_target {}".format(angle_towards_target))
 
     if  target_distance <= circle_radius:
@@ -218,14 +219,15 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
         path_points = astar.a_star2(section_matrixes, mid_point, section_target_point)
 
-        # logging.debug("section_matrixes[0]: {}".format(section_matrixes[7]))
-        # logging.debug("section_matrixes[1]: {}".format(section_matrixes[7]))
-        # logging.debug("section_matrixes[2]: {}".format(section_matrixes[7]))
-        # logging.debug("section_matrixes[3]: {}".format(section_matrixes[7]))
-        # logging.debug("section_matrixes[4]: {}".format(section_matrixes[7]))
-        # logging.debug("section_matrixes[5]: {}".format(section_matrixes[7]))
-        # logging.debug("section_matrixes[6]: {}".format(section_matrixes[7]))
+
+        # logging.debug("section_matrixes[1]: {}".format(section_matrixes[1]))
+        # logging.debug("section_matrixes[2]: {}".format(section_matrixes[2]))
+        # logging.debug("section_matrixes[3]: {}".format(section_matrixes[3]))
+        # logging.debug("section_matrixes[4]: {}".format(section_matrixes[4]))
+        # logging.debug("section_matrixes[5]: {}".format(section_matrixes[5]))
+        # logging.debug("section_matrixes[6]: {}".format(section_matrixes[6]))
         # logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+
 
         logging.debug("A* path_points: {}".format(path_points))
 
@@ -296,8 +298,10 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             ## UPDATE ANGLE TO USE angle_towards_target
             ## ANGLE TOWARDS TARGET IS MORE ACCURATE SINCE ITS WITHOUT ROUNDING
             ## ONLY IF ANGLE IS CLOSE ENOUGH
-            if temp_thrust == thrust and (angle - 4 <= angle_towards_target <= angle + 4):
-                angle = angle_towards_target
+            ## THIS ACTUALLY CAUSES COLLISIONS!! CHANGED FROM 5 to 4 TO FIX A COLLISION
+            ## BUT THEN A COLLISION WAS STILL HAPPENING AT 4 WITH ANOTHER GAME, SO COMMENTING OUT
+            # if temp_thrust == thrust and (angle - 4 <= angle_towards_target <= angle + 4):
+            #     angle = angle_towards_target
 
             logging.debug("angle {} thrust {}".format(angle, thrust))
 

@@ -186,13 +186,6 @@ def check_if_strong_enough(MyMoves, middle_coord):
                            MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1,
                            MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1] != -1).sum()
 
-    logging.debug("v_enemy: {}".format(v_enemy[
-                            MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1,
-                            MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1]))
-    logging.debug("v_ally: {}".format(v_ally[
-                           MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1,
-                           MyCommon.Constants.ATTACKING_RADIUS - MyCommon.Constants.STRONG_ENOUGH_RADIUS:MyCommon.Constants.ATTACKING_RADIUS + MyCommon.Constants.STRONG_ENOUGH_RADIUS + 1]))
-
     strong_enough = num_ally_in_section > num_enemy_in_section
 
     return strong_enough, v_enemy

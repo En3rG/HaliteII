@@ -162,6 +162,7 @@ if __name__ == "__main__":
             logging.info("myMoves completed in <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
 
+
             ## SAVE OLD DATA FOR NEXT TURN
             ## WHEN USING DEEPCOPY SEEMS TO TIME OUT AFTER 7 TURNS
             myMap_prev = myMap

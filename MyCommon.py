@@ -39,7 +39,7 @@ class Constants():
 
     ## ATTACKING
     MOVE_BACK_OFFENSE = 0       ## NO LONGER USED
-    PERIMETER_CHECK_RADIUS = 28 ## CHECK ENEMY WITHIN PERIMETER TO ATTACK, IF FOUND GET SECTIONS
+    PERIMETER_CHECK_RADIUS = 28 ## 28 CHECK ENEMY WITHIN PERIMETER TO ATTACK, IF FOUND GET SECTIONS
     ATTACKING_RADIUS = 14       ## CONSIDERED IN IMMINENT BATTLE
     BACKUP_CIRCLE_RADIUS = 14   ## RADIUS TO CHECK FOR BACKUP NEEDED
     BACKUP_SQUARE_RADIUS = 14
@@ -59,6 +59,13 @@ class Constants():
     ## PLANET
     PLANET_AREA_RADIUS_CHECK = 5 ## MULTIPLIED BY PLANETS RADIUS
     PLANET_DOCK_MIN_MULTIPLIER = 3
+
+    ## RUSH TURNS
+    ANTI_RUSH_TURNS = 10
+
+    ## RETREAT PERCENTAGE AGAINST ALL ENEMY
+    RETREAT_PERCENTAGE = 0.15
+
 
 class Target():
     """
@@ -84,6 +91,7 @@ class ShipTasks(Enum):
     EVADING = 6
     RUNNING = 7
     SNIPING = 8
+    RETREATING = 9
 
 
 def disable_log(disable,log):
@@ -305,7 +313,9 @@ def get_angle_thrust(start_coord, target_coord):
 
 
 def convert_for_command_queue(*args):
-    if len(args) == 2:
+    if len(args) == 1:
+        return "u {}".format(args[0])
+    elif len(args) == 2:
         if args[1] is None:
             default_planet_id = 0
             return "d {} {}".format(args[0], default_planet_id)

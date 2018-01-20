@@ -65,6 +65,7 @@ class MyMap():
         self.ships_evading = set()
         self.ships_defending = set()
         self.ships_expanding = set()
+        self.ships_retreating = set()
         self.ships_running = set()
         self.ships_sniping = set()
         self.ships_battling = {1:set(),\

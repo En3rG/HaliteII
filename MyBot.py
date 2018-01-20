@@ -157,7 +157,7 @@ if __name__ == "__main__":
             #moves.starter_bot_moves(game_map,command_queue)
             ## MY MOVES
             #myMoves = moves.MyMoves(myMap, myMatrix, EXP)
-            myMoves = moves2.MyMoves(myMap, myMatrix, EXP)
+            myMoves = moves2.MyMoves(myMap, myMatrix, EXP, turn)
             command_queue = myMoves.command_queue
             logging.info("myMoves completed in <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()

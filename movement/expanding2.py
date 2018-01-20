@@ -135,13 +135,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     pad_values = -1
     section_matrixes = {}
     for step in range(1,8):
-        section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step],
-                                                               ship_coord,
-                                                               circle_radius,
-                                                               square_radius,
-                                                               pad_values)
-
-
+        section_matrixes[step] = MyCommon.get_circle_in_square(MyMoves.position_matrix[step], ship_coord, circle_radius, square_radius, pad_values)
 
     logging.debug("get_thrust_angle_from_Astar:: angle_towards_target {}".format(angle_towards_target))
 
@@ -185,6 +179,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     #logging.debug("At ship_id: {} section_target_point: {} temp_target_coord: {} target_coord: {} temp_target_point: {}".format(ship_id, section_target_point, temp_target_coord, target_coord, temp_target_point))
 
     if mid_point == section_target_point:
+
         ## REACHED ITS TARGET
         logging.debug("target reached!")
 

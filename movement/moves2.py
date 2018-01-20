@@ -36,11 +36,12 @@ class MyMoves():
     'd 0 2'      ## DOCKING SHIP ID 0 TO PLANET 2
     't 1 3 353'  ## MOVE SHIP ID 1 WITH SPEED 3 AND ANGLE 353
     """
-    def __init__(self, myMap, myMatrix, EXP):
+    def __init__(self, myMap, myMatrix, EXP, turn):
         self.command_queue = []
         self.EXP = EXP
         self.myMap = myMap
         self.myMatrix = myMatrix
+        self.turn = turn
 
         # self.position_matrix = {1: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
         #                         2: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
@@ -72,25 +73,26 @@ class MyMoves():
 
         else:
             ## EVERY OTHER TURN (EXCEPT FIRST TURN)
+            if self.turn < MyCommon.Constants.ANTI_RUSH_TURNS:
+                MyCommon.Constants.PERIMETER_CHECK_RADIUS = 56
+            else:
+                MyCommon.Constants.PERIMETER_CHECK_RADIUS = 28
 
-            ## MOVE ALREADY MINING SHIPS FIRST
-            for ship_id in self.myMap.ships_mining_ally:
-                ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
-                target_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
-                target_type = MyCommon.Target.PLANET
-                ship_task = MyCommon.ShipTasks.MINING
-                self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
-
-
-            ## DEFEND MINING SHIPS IN DANGER
-            ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
-            #defending.move_defending_ships(self)
 
             ## MOVE ALL SHIPS TO RETREAT
             retreating.move_all_ships(self)
 
             ## MOVE ALL SHIPS TO RUSH
             rushing.move_all_ships(self)
+
+            ## MOVE ALREADY MINING SHIPS FIRST
+            self.move_mining_ships()
+
+
+            ## DEFEND MINING SHIPS IN DANGER
+            ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
+            #defending.move_defending_ships(self)
+
 
             ## MOVE ASSASSIN SHIPS
             sniping.move_sniping_ships(self)
@@ -110,8 +112,16 @@ class MyMoves():
             heap = self.get_target_and_distances()
 
             ## MOVE OTHERS REMAINING
-            self.move_heap(heap)
+            self.move_other_turns(heap)
 
+    def move_mining_ships(self):
+        for ship_id in self.myMap.ships_mining_ally:
+            if ship_id not in self.myMap.ships_moved_already:
+                ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
+                target_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
+                target_type = MyCommon.Target.PLANET
+                ship_task = MyCommon.ShipTasks.MINING
+                self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
 
     def get_target_and_distances(self):
         """
@@ -229,7 +239,7 @@ class MyMoves():
             ship_task = MyCommon.ShipTasks.EXPANDING
             self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, thrust, target_coord)
 
-    def move_heap(self, heap):
+    def move_other_turns(self, heap):
         """
         MOVING HEAP
         THIS WILL BE RAN EVERY TIME EXCEPT FIRST TURN
@@ -527,6 +537,9 @@ class MyMoves():
 
         elif ship_task == MyCommon.ShipTasks.DEFENDING:
             self.myMap.ships_defending.add(ship_id)
+
+        elif ship_task == MyCommon.ShipTasks.RETREATING:
+            self.myMap.ships_retreating.add(ship_id)
 
 
     def set_planet_myminer(self, planet_id, ship_id):

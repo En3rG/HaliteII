@@ -1,6 +1,8 @@
 import MyCommon
 import logging
 import movement.expanding2 as expanding2
+import movement.attacking as attacking
+import heapq
 
 def move_all_ships(MyMoves):
     num_enemy = len(MyMoves.myMap.ships_enemy)
@@ -8,6 +10,8 @@ def move_all_ships(MyMoves):
 
     if num_enemy * MyCommon.Constants.RETREAT_PERCENTAGE > num_ships:
         logging.debug("RETREATING")
+        MyMoves.retreating = True
+
         ## RETREAT ALL SHIPS
 
         ## UNDOCKED DOCKED SHIPS
@@ -27,25 +31,34 @@ def undock_ships(MyMoves):
         MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id))
 
 def move_other_ships(MyMoves):
+    heap = []
     for ship_id, ship in MyMoves.myMap.data_ships[MyMoves.myMap.my_id].items():
         if ship_id not in MyMoves.myMap.ships_moved_already:
-            ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-            target_planet_id = None
-            target_type = MyCommon.Target.NOTHING
-            ship_task = MyCommon.ShipTasks.RETREATING
+            enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(MyMoves, ship_id, move_now=False, docked_only=False)
+            logging.debug("ship_id: {} heap enemy distance: {}".format(ship_id, enemy_distance))
+            heapq.heappush(heap, (-enemy_distance, ship_id)) ## WILL GO FROM FURTHEST TO CLOSEST FROM ENEMY
 
-            angle, thrust = get_to_closest_corner(MyMoves, ship_id, ship_coord)
 
-            MyMoves.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, thrust, target_coord=None)
-            MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
+    while heap:
+        enemy_distance, ship_id = heapq.heappop(heap)
+
+        ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+        target_planet_id = None
+        target_type = MyCommon.Target.NOTHING
+        ship_task = MyCommon.ShipTasks.RETREATING
+
+        angle, thrust = get_to_closest_corner(MyMoves, ship_id, ship_coord)
+
+        MyMoves.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, thrust, target_coord=None)
+        MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
 
 def get_to_closest_corner(MyMoves, ship_id, ship_coord):
-    h = MyMoves.myMap.height - 1 ## SINCE WE ADDED BEFORE
-    w = MyMoves.myMap.width - 1
+    h = MyMoves.myMap.height - 2 ## SINCE WE ADDED BEFORE
+    w = MyMoves.myMap.width - 2
 
-    tl = MyCommon.Coordinates(0, 0)
-    tr = MyCommon.Coordinates(0, w)
-    bl = MyCommon.Coordinates(h, 0)
+    tl = MyCommon.Coordinates(1, 1)
+    tr = MyCommon.Coordinates(1, w)
+    bl = MyCommon.Coordinates(h, 1)
     br = MyCommon.Coordinates(h, w)
     corners = [tl, tr, bl, br]
 

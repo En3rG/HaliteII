@@ -109,12 +109,16 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
 
 
 
-def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id):
+def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance, target_planet_id, second_call=False):
     """
     RETURN THRUST AND ANGLE BASED SHIP ID AND TARGET COORD ONLY
 
     WE"LL USE LOCAL/SECTIONED A*
     """
+    logging.debug("get_thrust_angle_from_Astar: ship_id {}, target_coord {}, target_distance {}, target_planet_id {}".format(
+       ship_id, target_coord, target_distance, target_planet_id
+    ))
+
     square_radius = MyCommon.Constants.ASTAR_SQUARE_RADIUS
     circle_radius = MyCommon.Constants.ASTAR_CIRCLE_RADIUS
     max_travel_distance = MyCommon.Constants.MAX_TRAVEL_DISTANCE
@@ -183,18 +187,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         ## REACHED ITS TARGET
         logging.debug("target reached!")
 
-        ## CHECK IF STILL AVAILABLE IN POSITION MATRIX
-        ## POSSIBLE THAT ANOTHER SHIP NOW WENT TO THIS POSITION THAT MOVED BEFORE THIS SHIP
-        if not (isPositionMatrix_free(MyMoves.position_matrix[7], ship_coord)):
-            logging.debug("CANNOT MOVE DUE TO ANOTHER SHIP GOING HERE FIRST??? ship_id: {}".format(ship_id))
-
-            ## NEED TO UPDATE THIS LATER!!
-            astar_destination_coord = mid_coord
-            angle, thrust = 0, 0
-
         ## POSSIBLE THAT DUE TO ROUNDING, IT STIL CANNOT DOCK
-        elif not(ship_can_dock(MyMoves, ship_coord, target_planet_id)):
-            logging.debug("CANNOT DOCK DUE TO ROUNDING!!!!!! ship_id: {}".format(ship_id))
+        if not(ship_can_dock(MyMoves, ship_coord, target_planet_id)) and not(MyMoves.retreating):
+            logging.debug("Cannot dock due to rounding, move 1 forward still. ship_id: {}".format(ship_id))
 
             ## FOR NOW JUST MOVE 1 TOWARDS TARGET
             angle, thrust = angle_towards_target, 1
@@ -321,6 +316,20 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             astar_destination_coord = mid_coord  ## NEED TO UPDATE THIS LATER, GET A NEW TARGET!!
             angle, thrust = 0, 0
             logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
+
+            if not(second_call): ## PREVENT FOREVER RECURSION
+                seek_value = Matrix_val.ALLY_SHIP_CORNER.value
+                value_coord = MyCommon.get_coord_of_value_in_angle(MyMoves.position_matrix[7], ship_coord, seek_value, angle_towards_target, move_back=1)
+
+                if not(value_coord):
+                    seek_value = Matrix_val.ALLY_SHIP.value
+                    value_coord = MyCommon.get_coord_of_value_in_angle(MyMoves.position_matrix[7], ship_coord, seek_value, angle_towards_target, move_back=1)
+
+                if value_coord:
+                    logging.debug("new target coord: {}".format(value_coord))
+                    distance = MyCommon.calculate_distance(ship_coord, value_coord)
+                    thrust, angle = get_thrust_angle_from_Astar(MyMoves, ship_id, value_coord, distance, target_planet_id=None, second_call=True)
+
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
     ## WAS FILLING POSITION TO EARLY?? COMMENTING THIS OUT MAKES IT BETTER!!

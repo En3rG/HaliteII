@@ -42,6 +42,7 @@ class MyMoves():
         self.myMap = myMap
         self.myMatrix = myMatrix
         self.turn = turn
+        self.retreating = False
 
         # self.position_matrix = {1: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
         #                         2: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
@@ -73,14 +74,14 @@ class MyMoves():
 
         else:
             ## EVERY OTHER TURN (EXCEPT FIRST TURN)
-            if self.turn < MyCommon.Constants.ANTI_RUSH_TURNS:
-                MyCommon.Constants.PERIMETER_CHECK_RADIUS = 56
-            else:
-                MyCommon.Constants.PERIMETER_CHECK_RADIUS = 28
+            # if self.turn < MyCommon.Constants.ANTI_RUSH_TURNS:
+            #     MyCommon.Constants.PERIMETER_CHECK_RADIUS = 56
+            # else:
+            #     MyCommon.Constants.PERIMETER_CHECK_RADIUS = 28
 
 
             ## MOVE ALL SHIPS TO RETREAT
-            retreating.move_all_ships(self)
+            #retreating.move_all_ships(self)
 
             ## MOVE ALL SHIPS TO RUSH
             rushing.move_all_ships(self)
@@ -473,7 +474,7 @@ class MyMoves():
 
         FILL POSITION MATRIX OF THIS SHIPS POSITION
         """
-        logging.debug('Moved! ship_id: {}'.format(ship_id))
+        logging.debug('Moved! ship_id: {} angle: {} thrust: {}'.format(ship_id, angle, thrust))
 
         self.myMap.ships_moved_already.add(ship_id)
         ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']

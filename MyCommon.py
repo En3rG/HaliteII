@@ -7,7 +7,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = True
+    DISABLE_LOG = False
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -328,7 +328,7 @@ def convert_for_command_queue(*args):
         logging.ERROR("Command Error Length")
 
 
-def get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle):
+def get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle, move_back=None):
     """
     GIVEN THE ANGLE, FIND THE CLOSEST VALUE
     FOLLOWING THE PATH OF THE UNIT VECTOR
@@ -352,12 +352,20 @@ def get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle):
             ## GET VALUE
             val = matrix[round_new_coord[0]][round_new_coord[1]]
 
+            logging.debug("round_new_coord {} val {}, looking_for_val {}".format(round_new_coord, val, looking_for_val))
+
             ## INCREASE MULTIPLIER
             multiplier += 1
 
             if val == looking_for_val:
                 found_coord = Coordinates(round_new_coord[0], round_new_coord[1])
-                return found_coord
+
+                if move_back: ## MOVE BACK CERTAIN UNITS
+                    reverse_angle = get_reversed_angle(angle)
+                    next_coord = get_destination_coord(found_coord, reverse_angle, move_back, rounding=True)
+                    return next_coord
+                else:
+                    return found_coord
 
     except Exception as e:
         logging.warning("{}".format(e))

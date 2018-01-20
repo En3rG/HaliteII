@@ -448,12 +448,29 @@ def closest_section_with_enemy(MyMoves, ship_id, docked_only=False, move_now=Fal
     else:
         closest_section = get_closest_section_enemy(MyMoves, least_distance, closest_section)
 
-    target_coord = MyCommon.get_coord_from_section(closest_section)
 
+    if closest_section == ship_section:
+        ## DISTANCE IS NOT ACCURATE IF 2 SHIPS ARE IN THE SAME SECTION AND TARGET IN SAME SECTION
+        value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
+        v_enemy = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
 
-    ## INSTEAD OF DOING FINAL DISTANCE AS SECTION TO SECTION, LETS GET ACTUAL DISTANCE OF SHIP COORD TO THAT SECTION
-    # final_distance = (min_distance + 1) * 7
-    final_distance = MyCommon.calculate_distance(ship_coords, target_coord)
+        seek_val = -0.75
+        d_section = MyMoves.EXP.distance_matrix_AxA
+        enemy_point, enemy_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
+
+        slope = (enemy_point[0] - MyCommon.Constants.ATTACKING_RADIUS, enemy_point[1] - MyCommon.Constants.ATTACKING_RADIUS)
+        target_coord = MyCommon.Coordinates(ship_coords.y + slope[0], ship_coords.x + slope[1])
+
+        final_distance = enemy_distance
+
+    else:
+        target_coord = MyCommon.get_coord_from_section(closest_section)
+
+        ## INSTEAD OF DOING FINAL DISTANCE AS SECTION TO SECTION, LETS GET ACTUAL DISTANCE OF SHIP COORD TO THAT SECTION
+        # final_distance = (min_distance + 1) * 7
+        final_distance = MyCommon.calculate_distance(ship_coords, target_coord)
+
+    logging.debug("closest_section_with_enemy final_distance {} ship_coords {} target_coord {}".format(final_distance, ship_coords, target_coord))
 
     if move_now:
         thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, final_distance, target_planet_id=None)

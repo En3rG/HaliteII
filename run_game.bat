@@ -1,0 +1,1 @@
+.\halite -d "240 160" -s "565862824" "python MyBot.py" "python simulate_p1.py"

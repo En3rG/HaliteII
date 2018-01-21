@@ -21,7 +21,7 @@ def set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task
 
 def move_defending_ships(MyMoves):
     """
-    MOVE MINING SHIPS
+    GO THROUGH MINING SHIPS
     """
     for ship_id in MyMoves.myMap.ships_mining_ally:
         ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
@@ -44,11 +44,17 @@ def defend_if_enemy_near(MyMoves, ship_id, ship_coord):
         enemy_coord = MyCommon.Coordinates(enemy_point[0], enemy_point[1])
         mid_coord = MyCommon.Coordinates(MyCommon.Constants.DEFENDING_PERIMETER_CHECK, MyCommon.Constants.DEFENDING_PERIMETER_CHECK)
         angle = MyCommon.get_angle(mid_coord, enemy_coord)
-        thrust = 7  ## AWAY FROM MINER
-        defend_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
+
+        ## BEFORE: GETS A DEFEND COORD, THEN MOVE BACKUP TO THIS COORD
+        # thrust = 7  ## AWAY FROM MINER
+        # defend_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
+
+        ## GET BACKUP TO GO TO CLOSEST ENEMY
+        target_coord = MyCommon.get_destination_coord(ship_coord, angle, distance, rounding=False)
 
         ship_task = MyCommon.ShipTasks.DEFENDING
-        move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord)
+        move_ships_towards_this_coord(MyMoves, ship_id, ship_task, target_coord)
+
 
 def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord):
     """
@@ -65,6 +71,8 @@ def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord):
                                                 pad_outside_circle=True)
 
     ships = MyCommon.get_ship_ids_in_array(area_matrix, MyMoves.EXP.distance_matrix_backup)
+
+    logging.debug("ships {}".format(ships))
 
     for _ship_id in ships:
         _ship_id = int(_ship_id)

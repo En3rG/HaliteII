@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02cba0c9-f6b0-4114-b540-93cb9b5b278a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MyCommon.py" afterPath="$PROJECT_DIR$/MyCommon.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/attacking.py" afterPath="$PROJECT_DIR$/movement/attacking.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/expanding2.py" afterPath="$PROJECT_DIR$/movement/expanding2.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/defending.py" afterPath="$PROJECT_DIR$/movement/defending.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/moves2.py" afterPath="$PROJECT_DIR$/movement/moves2.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/running.py" afterPath="$PROJECT_DIR$/movement/running.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/movement/rushing.py" afterPath="$PROJECT_DIR$/movement/rushing.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run_game.bat" afterPath="$PROJECT_DIR$/run_game.bat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulate_p0.py" afterPath="$PROJECT_DIR$/simulate_p0.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulate_p1.py" afterPath="$PROJECT_DIR$/simulate_p1.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulate_p2.py" afterPath="$PROJECT_DIR$/simulate_p2.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/simulate_p3.py" afterPath="$PROJECT_DIR$/simulate_p3.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/training/train.py" afterPath="$PROJECT_DIR$/training/train.py" />
     </list>
     <ignored path="MYBOT.iws" />
@@ -35,6 +26,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/training/train.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="299">
+              <caret line="134" column="0" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="MyBot.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MyBot.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -48,8 +49,8 @@
       <file leaf-file-name="moves2.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/movement/moves2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="464">
-              <caret line="101" column="0" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="0" />
+            <state relative-caret-position="401">
+              <caret line="435" column="102" selection-start-line="435" selection-start-column="102" selection-end-line="435" selection-end-column="102" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -57,80 +58,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/training/train.py">
+      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MyCommon.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="140" column="24" selection-start-line="140" selection-start-column="24" selection-end-line="140" selection-end-column="24" />
+            <state relative-caret-position="510">
+              <caret line="51" column="39" selection-start-line="51" selection-start-column="39" selection-end-line="51" selection-end-column="39" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="defending.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/movement/defending.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="433">
+              <caret line="73" column="0" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="simulate_p0.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/simulate_p0.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="46" column="74" selection-start-line="0" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
-              <folding>
-                <element signature="e#1#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/models/data.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="355">
-              <caret line="533" column="8" selection-start-line="533" selection-start-column="8" selection-end-line="535" selection-end-column="75" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="explore.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/initialization/explore.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
-              <caret line="196" column="35" selection-start-line="196" selection-start-column="33" selection-end-line="196" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="simulate_p1.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/simulate_p1.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-              <folding>
-                <element signature="e#1#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="simulate_p2.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/simulate_p2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-              <folding>
-                <element signature="e#1#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="simulate_p3.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/simulate_p3.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-              <folding>
-                <element signature="e#1#11#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -155,7 +100,6 @@
         <option value="$PROJECT_DIR$/Bot50/movement/moves2.py" />
         <option value="$PROJECT_DIR$/movement/mining.py" />
         <option value="$PROJECT_DIR$/p1.py" />
-        <option value="$PROJECT_DIR$/movement/defending.py" />
         <option value="$PROJECT_DIR$/testingONLY.py" />
         <option value="$PROJECT_DIR$/initialization/astar.py" />
         <option value="$PROJECT_DIR$/models/data2.py" />
@@ -167,14 +111,15 @@
         <option value="$PROJECT_DIR$/movement/retreating.py" />
         <option value="$PROJECT_DIR$/movement/rushing.py" />
         <option value="$PROJECT_DIR$/movement/running.py" />
-        <option value="$PROJECT_DIR$/MyCommon.py" />
         <option value="$PROJECT_DIR$/movement/expanding2.py" />
         <option value="$PROJECT_DIR$/movement/attacking.py" />
-        <option value="$PROJECT_DIR$/training/train.py" />
         <option value="$PROJECT_DIR$/simulate_p0.py" />
         <option value="$PROJECT_DIR$/simulate_p1.py" />
         <option value="$PROJECT_DIR$/simulate_p2.py" />
         <option value="$PROJECT_DIR$/simulate_p3.py" />
+        <option value="$PROJECT_DIR$/training/train.py" />
+        <option value="$PROJECT_DIR$/MyCommon.py" />
+        <option value="$PROJECT_DIR$/movement/defending.py" />
         <option value="$PROJECT_DIR$/movement/moves2.py" />
       </list>
     </option>
@@ -301,7 +246,7 @@
       <recent name="C:\Users\Gio\Desktop\Gio's Folder\Python\HALITE\HALITE II\MYBOT\models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.simulate_p0">
+  <component name="RunManager" selected="Python.train">
     <configuration default="false" name="MyCommon" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -530,8 +475,8 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.simulate_p0" />
-        <item index="1" class="java.lang.String" itemvalue="Python.train" />
+        <item index="0" class="java.lang.String" itemvalue="Python.train" />
+        <item index="1" class="java.lang.String" itemvalue="Python.simulate_p0" />
         <item index="2" class="java.lang.String" itemvalue="Python.MyCommon" />
         <item index="3" class="java.lang.String" itemvalue="Python.data2" />
         <item index="4" class="java.lang.String" itemvalue="Python.p1" />
@@ -609,16 +554,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/MyCommon.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3298">
-          <caret line="197" column="37" selection-start-line="197" selection-start-column="37" selection-end-line="197" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/initialization/astar.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
@@ -760,13 +695,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/movement/defending.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="451">
-          <caret line="77" column="27" selection-start-line="77" selection-start-column="27" selection-end-line="77" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/movement/expanding.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="61">
@@ -782,13 +710,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Bot74/movement/expanding2.py" />
-    <entry file="file://$PROJECT_DIR$/hlt/entity.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="264" column="22" selection-start-line="264" selection-start-column="19" selection-end-line="264" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hlt/collision.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -845,16 +766,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MyCommon.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="352" column="64" selection-start-line="352" selection-start-column="64" selection-end-line="352" selection-end-column="64" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/movement/expanding2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
@@ -867,14 +778,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="740">
           <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="140" column="24" selection-start-line="140" selection-start-column="24" selection-end-line="140" selection-end-column="24" />
           <folding />
         </state>
       </provider>
@@ -943,10 +846,52 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/hlt/entity.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-99">
+          <caret line="271" column="8" selection-start-line="271" selection-start-column="8" selection-end-line="271" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/StarterBot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="57" column="48" selection-start-line="57" selection-start-column="40" selection-end-line="57" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="134" column="0" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MyCommon.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="51" column="39" selection-start-line="51" selection-start-column="39" selection-end-line="51" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/movement/defending.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="73" column="0" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/movement/moves2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
-          <caret line="101" column="0" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="0" />
+        <state relative-caret-position="401">
+          <caret line="435" column="102" selection-start-line="435" selection-start-column="102" selection-end-line="435" selection-end-column="102" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

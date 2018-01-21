@@ -84,7 +84,7 @@ class MyMoves():
 
             ## DEFEND MINING SHIPS IN DANGER
             ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
-            #defending.move_defending_ships(self)
+            defending.move_defending_ships(self)
 
             ## MOVE ASSASSIN SHIPS
             #sniping.move_sniping_ships(self)
@@ -431,7 +431,9 @@ class MyMoves():
             #return self.position_matrix[step_num][point[0]][point[1]] == 0
             try:
                 collision_value = self.position_matrix[step_num][point[0]][point[1]]
-                return (self.position_matrix[step_num][point[0]][point[1]] == 0 or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value), collision_value
+                return (self.position_matrix[step_num][point[0]][point[1]] == 0 \
+                        or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.PREDICTION_PLANET.value \
+                        or self.position_matrix[step_num][point[0]][point[1]] == Matrix_val.ENEMY_SHIP.value ), collision_value
             except:
                 return None, None ## IF OUT OF THE MAP, CAN CAUSE ERROR
 

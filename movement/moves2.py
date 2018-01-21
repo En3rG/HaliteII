@@ -73,33 +73,24 @@ class MyMoves():
             self.move_first_turn()
 
         else:
-            ## EVERY OTHER TURN (EXCEPT FIRST TURN)
-            # if self.turn < MyCommon.Constants.ANTI_RUSH_TURNS:
-            #     MyCommon.Constants.PERIMETER_CHECK_RADIUS = 56
-            # else:
-            #     MyCommon.Constants.PERIMETER_CHECK_RADIUS = 28
-
-
             ## MOVE ALL SHIPS TO RETREAT
-            #retreating.move_all_ships(self)
+            retreating.move_all_ships(self)
 
             ## MOVE ALL SHIPS TO RUSH
-            rushing.move_all_ships(self)
+            #rushing.move_all_ships(self)
 
             ## MOVE ALREADY MINING SHIPS FIRST
             self.move_mining_ships()
-
 
             ## DEFEND MINING SHIPS IN DANGER
             ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
             #defending.move_defending_ships(self)
 
-
             ## MOVE ASSASSIN SHIPS
-            sniping.move_sniping_ships(self)
+            #sniping.move_sniping_ships(self)
 
             ## MOVE RUNNING SHIPS
-            running.move_running_ships(self)
+            #running.move_running_ships(self)
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
@@ -110,9 +101,8 @@ class MyMoves():
             ## TURNS OUT A* IS RUNNING LONGER SINCE PATH IS UNREACHABLE, DUE TO ANOTHER SHIP BLOCKING ITS DESTINATION
 
             ## GET TARGET AND DISTANCES FOR THE SHIPS THAT HASNT MOVED YET
-            heap = self.get_target_and_distances()
-
             ## MOVE OTHERS REMAINING
+            heap = self.get_target_and_distances()
             self.move_other_turns(heap)
 
     def move_mining_ships(self):

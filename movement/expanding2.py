@@ -216,7 +216,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         # logging.debug("section_matrixes[4]: {}".format(section_matrixes[4]))
         # logging.debug("section_matrixes[5]: {}".format(section_matrixes[5]))
         # logging.debug("section_matrixes[6]: {}".format(section_matrixes[6]))
-        # logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+        logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
 
 
         logging.debug("A* path_points: {}".format(path_points))
@@ -275,9 +275,12 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             #     logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
             #     astar_destination_point = mid_point
 
+            logging.debug("astar_destination_point {} collision_value {}".format(astar_destination_point, collision_value))
+
             ## IF ITS THE SAME AS FIRST COORD, AND COLLISION VALUE IS NOT OUR SHIP (1), THEN GO TO STEP 1
             ## WILL SKIP, PLANETS OR CORNER IN FILL MATRIX
-            if astar_destination_point == path_points[-1] and collision_value is not None and int(collision_value) != Matrix_val.ALLY_SHIP.value:
+            if astar_destination_point == path_points[-1] and collision_value is not None \
+                    and (int(collision_value) == Matrix_val.ALLY_SHIP.value or int(collision_value) == Matrix_val.ALLY_SHIP_CORNER.value) :
                 logging.debug("Everything is bad, but will go step 1")
                 astar_destination_coord = MyCommon.Coordinates(step1_point[0], step1_point[1])
                 angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
@@ -317,6 +320,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             angle, thrust = 0, 0
             logging.debug("No A* PATH FOUND!!!!!!!! ship_id: {} ship_coord: {} target_coord: {} target_distance: {} target_planet_id: {}".format(ship_id, ship_coord, target_coord, target_distance, target_planet_id))
 
+            ## GET CLOSER TO TARGET
             if not(second_call): ## PREVENT FOREVER RECURSION
                 seek_value = Matrix_val.ALLY_SHIP_CORNER.value
                 value_coord = MyCommon.get_coord_of_value_in_angle(MyMoves.position_matrix[7], ship_coord, seek_value, angle_towards_target, move_back=1)
@@ -333,10 +337,10 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     ## UPDATE POSITION MATRIX FOR THIS POINT WILL NOW BE TAKEN
     ## WAS FILLING POSITION TO EARLY?? COMMENTING THIS OUT MAKES IT BETTER!!
-    slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
-                            astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
-    taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
-    fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
+    # slope_from_mid_point = (astar_destination_coord.y - MyCommon.Constants.ASTAR_SQUARE_RADIUS, \
+    #                         astar_destination_coord.x - MyCommon.Constants.ASTAR_SQUARE_RADIUS)
+    # taken_point = (ship_point[0] + slope_from_mid_point[0] , ship_point[1] + slope_from_mid_point[1])
+    # fill_position_matrix(MyMoves.position_matrix[7], taken_point, mining=False)
 
     return thrust, angle
 

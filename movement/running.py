@@ -23,9 +23,7 @@ def move_running_ships(MyMoves):
     """
     MOVE RUNNING/DISTRACTION SHIPS
     """
-
     for ship_id in MyMoves.myMap.myMap_prev.ships_running:
-    #for ship_id in [0]:
         try:
             ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
             thrust, angle = find_enemy(MyMoves, ship_id)

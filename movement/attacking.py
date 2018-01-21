@@ -449,6 +449,11 @@ def closest_section_with_enemy(MyMoves, ship_id, docked_only=False, move_now=Fal
         closest_section = get_closest_section_enemy(MyMoves, least_distance, closest_section)
 
 
+    ## BEFORE
+    # target_coord = MyCommon.get_coord_from_section(closest_section)
+    # final_distance = MyCommon.calculate_distance(ship_coords, target_coord)
+
+    ## HANDLING IF IN THE SAME SECTION
     if closest_section == ship_section:
         ## DISTANCE IS NOT ACCURATE IF 2 SHIPS ARE IN THE SAME SECTION AND TARGET IN SAME SECTION
         value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX

@@ -64,7 +64,7 @@ class Constants():
     ANTI_RUSH_TURNS = 10
 
     ## RETREAT PERCENTAGE AGAINST ALL ENEMY
-    RETREAT_PERCENTAGE = 0.15
+    RETREAT_PERCENTAGE = 0.085
 
 
 class Target():
@@ -351,8 +351,6 @@ def get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle, 
 
             ## GET VALUE
             val = matrix[round_new_coord[0]][round_new_coord[1]]
-
-            logging.debug("round_new_coord {} val {}, looking_for_val {}".format(round_new_coord, val, looking_for_val))
 
             ## INCREASE MULTIPLIER
             multiplier += 1

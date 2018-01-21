@@ -5,6 +5,7 @@ import logging
 import traceback
 import sys
 from models.data import Matrix_val
+import initialization.astar as astar
 
 def set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task):
     """
@@ -29,7 +30,7 @@ def move_running_ships(MyMoves):
             thrust, angle = find_enemy(MyMoves, ship_id)
             enemy_target_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
             thrust = 10 if thrust >= 7 else thrust
-            thrust, angle = expanding2.get_thrust_angle_from_Astar(MyMoves, ship_id, enemy_target_coord, target_distance=thrust, target_planet_id=None)
+            thrust, angle = astar.get_thrust_angle_from_Astar(MyMoves, ship_id, enemy_target_coord, target_distance=thrust, target_planet_id=None)
 
             target_coord = None
             ship_task = MyCommon.ShipTasks.RUNNING

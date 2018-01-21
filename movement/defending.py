@@ -83,7 +83,7 @@ def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord):
             ## MOVE SHIP TOWARDS MINER
             _ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][_ship_id]['coords']
             _d = MyCommon.calculate_distance(_ship_coords, defend_coord)
-            _thrust, _angle = expanding2.get_thrust_angle_from_Astar(MyMoves, _ship_id, defend_coord, target_distance=_d, target_planet_id=None)
+            _thrust, _angle = astar.get_thrust_angle_from_Astar(MyMoves, _ship_id, defend_coord, target_distance=_d, target_planet_id=None)
             set_commands_status(MyMoves, _ship_id, _thrust, _angle, defend_coord, ship_task)
 
 

@@ -206,6 +206,8 @@ class MyMoves():
         GET ANGLE AND THRUST FROM PATH KEY PROVIDED
 
         ONLY USED IN FIRST TURN? SINCE COULD BE A LITTLE OFF DUE TO ROUNDING SOMETIMES
+
+        NO LONGER USED?
         """
         if path_key is None:
             return None, None
@@ -225,6 +227,8 @@ class MyMoves():
         ADD COMMAND TO COMMAND QUEUE
 
         SET ALL STATUS
+
+        NO LONGER USED?
         """
         old_target_coord = None
         #old_target_coord = expanding.check_duplicate_target(self, ship_id,target_planet_id)
@@ -326,6 +330,9 @@ class MyMoves():
 
 
     def set_ship_statuses(self,ship_id, target_planet_id, ship_coord, angle, thrust, new_target_coord):
+        """
+        NO LONGER USED?
+        """
         ## SET SHIP'S TARGET
         self.set_ship_target_id(ship_id, Target.PLANET, target_planet_id)
 
@@ -343,6 +350,8 @@ class MyMoves():
         SET SHIP DESTINATION IN MYMAP DATA SHIPS
         BOTH TENTATIVE DESTINATION AND FINAL DESTINATION
         WITH SHIP ID, ANGLE AND THRUST PROVIDED
+
+        NO LONGER USED
         """
         tentative_coord = MyCommon.get_destination_coord(coords, angle, thrust)
         self.myMap.data_ships[self.myMap.my_id][ship_id]['tentative_coord'] = tentative_coord

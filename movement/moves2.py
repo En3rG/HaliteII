@@ -84,7 +84,7 @@ class MyMoves():
 
             ## DEFEND MINING SHIPS IN DANGER
             ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
-            defending.move_defending_ships(self)
+            #defending.move_defending_ships(self)
 
             ## MOVE ASSASSIN SHIPS
             #sniping.move_sniping_ships(self)
@@ -105,7 +105,11 @@ class MyMoves():
             heap = self.get_target_and_distances()
             self.move_other_turns(heap)
 
+
     def move_mining_ships(self):
+        """
+        UPDATE STATUS AND FILL POSITION MATRIX OF OUR MINING SHIPS
+        """
         for ship_id in self.myMap.ships_mining_ally:
             if ship_id not in self.myMap.ships_moved_already:
                 ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
@@ -114,11 +118,13 @@ class MyMoves():
                 ship_task = MyCommon.ShipTasks.MINING
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
 
+
     def get_target_and_distances(self):
         """
         GET SHIP'S TARGET AND DISTANCE TO THAT TARGET COORD
-
-        IF NO MORE PLANETS AVAILABLE, GET COORD OF CLOSEST SECTION WITH ENEMY
+        PLACE EVERYTHING ON HEAP SO THAT SHIPS CLOSEST TO TARGET ARE MOVED FIRST
+        THIS IS TO PREVENT COLLISIONS
+        IF NO MORE PLANETS AVAILABLE, GET COORD OF CLOSEST SECTION WITH ENEMY (DOCKED)
         """
         heap = []
 
@@ -176,7 +182,7 @@ class MyMoves():
 
     def move_first_turn(self):
         """
-        MOVE FOR FIRST TURN ONLY
+        MOVE FOR FIRST TURN ONLY (INITIAL 3 SHIPS)
         """
 
         ## GET BEST PLANET
@@ -220,7 +226,7 @@ class MyMoves():
                 distance = MyCommon.calculate_distance(ship_coord, target_coord, rounding=False)
 
             ## GET THRUST AND ANGLE
-            thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
+            thrust, angle = astar.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
 
             ## ADD TO COMMAND QUEUE
             self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
@@ -230,10 +236,11 @@ class MyMoves():
             ship_task = MyCommon.ShipTasks.EXPANDING
             self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, thrust, target_coord)
 
+
     def move_other_turns(self, heap):
         """
-        MOVING HEAP
-        THIS WILL BE RAN EVERY TIME EXCEPT FIRST TURN
+        MOVE EVERY SHIPS FROM THE HEAP, THAT HAS NOT BEEN MOVED YET AT THIS POINT
+        OTHERS COULD HAVE ALREADY MOVE SUCH AS MINING, DEFENDING, ATTACKING, ETC
         """
         while heap:
             planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord = heapq.heappop(heap)
@@ -245,7 +252,7 @@ class MyMoves():
             ## HAS ENEMY TARGET COORD
             ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
             if enemy_target_coord is not None:
-                thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, enemy_target_coord, enemy_distance, target_planet_id=None)
+                thrust, angle = astar.get_thrust_angle_from_Astar(self, ship_id, enemy_target_coord, enemy_distance, target_planet_id=None)
                 ship_task = MyCommon.ShipTasks.ATTACKING
                 attacking.set_commands_status(self, ship_id, thrust=thrust, angle=angle, target_coord=enemy_target_coord, ship_task=ship_task)
                 continue
@@ -313,7 +320,7 @@ class MyMoves():
 
                 else:
                     ## GET THRUST AND ANGLE
-                    thrust, angle = expanding2.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
+                    thrust, angle = astar.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
                     logging.debug("get_thrust_angle_from_Astar thrust: {} angle: {}".format(thrust, angle))
 
                     # safe_thrust = self.check_intermediate_collisions(ship_id, angle, thrust)
@@ -336,10 +343,14 @@ class MyMoves():
                 ship_task = MyCommon.ShipTasks.EXPANDING
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, safe_thrust, target_coord)
 
+
     def check_intermediate_collisions(self, ship_id, angle, thrust):
         """
-        CHECK IF AN INTERMEDIATE COLLISION EXISTS
+        CHECK IF AN INTERMEDIATE COLLISION EXISTS (IN SUB TURNS)
         IF SO, RETURN THE THRUST THAT HAS NO COLLISION
+        BASICALLY IT CHECKS IF THE CURRENT ANGLE/THRUST IS GOOD
+
+        NO LONGER USED?
         """
 
         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
@@ -367,10 +378,12 @@ class MyMoves():
 
         return thrust  ## RETURN ORIGINAL THRUST
 
+
     def check_intermediate_collisions2(self, ship_id, angle, thrust):
         """
-        CHECK IF AN INTERMEDIATE COLLISION EXISTS
+        CHECK IF AN INTERMEDIATE COLLISION EXISTS (IN SUB TURNS)
         IF SO, RETURN THE THRUST THAT HAS NO COLLISION
+        BASICALLY IT CHECKS IF THE CURRENT ANGLE/THRUST IS GOOD
         """
 
         ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
@@ -410,9 +423,7 @@ class MyMoves():
             if no_collision:
                 prev_thrust = curr_thrust
             else:
-                logging.debug(
-                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} collision_value {}. Will return prev_thrust: {}".format(
-                        ship_id, intermediate_point, step_num, collision_value, prev_thrust))
+                logging.debug("Collision detected! ship_id: {} intermediate_point: {} step_num: {} collision_value {}. Will return prev_thrust: {}".format(ship_id, intermediate_point, step_num, collision_value, prev_thrust))
                 return prev_thrust, collision_value  ## CURRENT THRUST HAS COLLISION
 
         return thrust, collision_value  ## RETURN ORIGINAL THRUST
@@ -420,6 +431,7 @@ class MyMoves():
 
     def no_intermediate_collision(self, step_num, point):
         """
+        A HELPER FUNCTION IN DETERMINING INTERMEDIATE COLLISION
         CHECK IF THERE IS A COLLISION
         PROVIDED THE STEP_NUM AND THE POINT (y,x)
         """
@@ -441,6 +453,7 @@ class MyMoves():
     def set_ship_statuses(self,ship_id, target_type, target_id, ship_coord, ship_task, angle, thrust, target_coord):
         """
         SET STATUSES OF THE SPECIFIC SHIP
+        FILL THE TARGET, TASK, DESTINATION, AND POSITION MATRIX
         """
 
         ## SET SHIP'S TARGET
@@ -463,7 +476,6 @@ class MyMoves():
     def set_ship_moved_and_fill_position(self, ship_id, angle, thrust, mining=False):
         """
         ADD SHIP TO MOVED ALREADY
-
         FILL POSITION MATRIX OF THIS SHIPS POSITION
         """
         logging.debug('Moved! ship_id: {} angle: {} thrust: {}'.format(ship_id, angle, thrust))
@@ -539,6 +551,7 @@ class MyMoves():
         """
         SET PLANET MY MINER IN MYMAP DATA PLANETS
         REGARDING MY SHIPS THAT ARE GOING TO MINE THIS PLANET
+        USED TO DETERMINE IF ITS WORTH IT TO SEND SHIPS TO A CERTAIN PLANET
         """
         self.myMap.data_planets[planet_id]['my_miners'].add(ship_id)
 

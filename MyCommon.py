@@ -7,7 +7,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -514,6 +514,29 @@ def isInside_map(coord, MyMoves):
     return 0 <= coord.y <= MyMoves.EXP.height and 0 <= coord.x <= MyMoves.EXP.width
 
 
+def ship_can_dock(MyMoves, coord, target_planet_id):
+    """
+    CHECK IF A SHIP CAN DOCK ON ITS CURRENT COORDINATES
+    FIRST USING DOCKABLE MATRIX
+    THEN IF NOT, DOUBLE CHECK DISTANCE FROM PLANET
+    """
+
+    ## NO TARGET PLANET
+    if target_planet_id is None:
+        return False
+
+    target_planet_coord = MyMoves.myMap.data_planets[target_planet_id]['coords']
+    target_radius = MyMoves.myMap.data_planets[target_planet_id]['radius']
+    d = calculate_distance(coord, target_planet_coord, rounding=False)
+    dock_val = d - target_radius
+
+    ## DOCKING RADIUS NOT REALLY 4??? SUTRACT XXX
+    #if d <= target_radius + MyCommon.Constants.DOCK_RADIUS - 0.22:
+    if dock_val < Constants.DOCK_RADIUS:
+        return True
+
+    ## TOO FAR
+    return False
 
 
 

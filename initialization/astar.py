@@ -436,17 +436,17 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                 new_point = MyCommon.get_destination_coord(ship_coord,angle,thrust,rounding=True)
 
                 ## BEFORE, BASICALLY GOES TO STEP 1 IF ITS A CORNER
-                # if MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value:
-                #     ## WILL DEFINITELY COLLIDE TO ONE OF OUR SHIPS
-                #     ## GET NEW ANGLE
-                #     logging.debug("Colliding to ally ship, do prevention")
-                #     angle, thrust = get_new_angle_step1(MyMoves, ship_coord, angle)
+                if MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value:
+                    ## WILL DEFINITELY COLLIDE TO ONE OF OUR SHIPS
+                    ## GET NEW ANGLE
+                    logging.debug("Colliding to ally ship, do prevention")
+                    angle, thrust = get_new_angle_step1(MyMoves, ship_coord, angle)
 
                 ## NOW GET A NEW ANGLE IF ITS OUR SHIP OR CORNER OF OUR SHIP
                 ## WILL DEFINITELY COLLIDE TO ONE OF OUR SHIPS
                 ## GET NEW ANGLE
-                logging.debug("Colliding to ally ship, do prevention")
-                angle, thrust = get_new_angle_step1(MyMoves, ship_coord, angle)
+                # logging.debug("Colliding to ally ship, do prevention")
+                # angle, thrust = get_new_angle_step1(MyMoves, ship_coord, angle)
 
             else:
                 astar_destination_coord = MyCommon.Coordinates(astar_destination_point[0], astar_destination_point[1])
@@ -524,7 +524,7 @@ def get_new_angle_step1(MyMoves, ship_coord, angle):
                or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP_CORNER.value
                ):
             return new_angle, thrust
-    
+
         angle = new_angle
 
     logging.debug("THIS SHIP IS COMPLETELY SURROUNDED!! COLLIDING!!")

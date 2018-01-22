@@ -35,11 +35,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="astar.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="astar.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/initialization/astar.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="526" column="4" selection-start-line="526" selection-start-column="4" selection-end-line="526" selection-end-column="4" />
+            <state relative-caret-position="346">
+              <caret line="445" column="62" selection-start-line="445" selection-start-column="62" selection-end-line="445" selection-end-column="62" />
               <folding>
                 <element signature="e#1#20#0" expanded="true" />
               </folding>
@@ -47,7 +47,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MyCommon.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MyCommon.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="100">
@@ -854,22 +854,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/initialization/astar.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="346">
+          <caret line="445" column="62" selection-start-line="445" selection-start-column="62" selection-end-line="445" selection-end-column="62" />
+          <folding>
+            <element signature="e#1#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/MyCommon.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="100">
           <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/initialization/astar.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="526" column="4" selection-start-line="526" selection-start-column="4" selection-end-line="526" selection-end-column="4" />
-          <folding>
-            <element signature="e#1#20#0" expanded="true" />
           </folding>
         </state>
       </provider>

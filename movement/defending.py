@@ -46,14 +46,22 @@ def defend_if_enemy_near(MyMoves, ship_id, ship_coord):
         angle = MyCommon.get_angle(mid_coord, enemy_coord)
 
         ## BEFORE: GETS A DEFEND COORD, THEN MOVE BACKUP TO THIS COORD
-        # thrust = 7  ## AWAY FROM MINER
-        # defend_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
+        thrust = 7  ## AWAY FROM MINER
+        defend_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
 
         ## GET BACKUP TO GO TO CLOSEST ENEMY
-        target_coord = MyCommon.get_destination_coord(ship_coord, angle, distance, rounding=False)
+        attack_coord = MyCommon.get_destination_coord(ship_coord, angle, distance, rounding=False)
+
+        strong_enough, v_enemy = attacking.check_if_strong_enough(MyMoves, attack_coord)
 
         ship_task = MyCommon.ShipTasks.DEFENDING
-        move_ships_towards_this_coord(MyMoves, ship_id, ship_task, target_coord)
+
+        ## IF STRONG ENOUGH, GO TOWARDS THE ENEMY
+        ## IF NOT, STAY ON THE DEFENSIVE SIDE
+        if strong_enough:
+            move_ships_towards_this_coord(MyMoves, ship_id, ship_task, attack_coord)
+        else:
+            move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord)
 
 
 def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord):

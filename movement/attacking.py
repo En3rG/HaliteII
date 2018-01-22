@@ -41,17 +41,18 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
     SHIPS VERY CLOSE TO THE ENEMY ARE TREATED DIFFERENTLY
     THAN SHIPS A BIT FURTHER AWAY
     """
-
     ship_coords = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     ship_section = MyCommon.get_section_num(ship_coords)
     ship_section_coord = MyCommon.Coordinates(ship_section[0], ship_section[1])
 
     ## CHECK IF ENEMIES WITHIN A PERIMETER
     enemy_matrix = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 FOR HP MATRIX
-    perimeter = MyCommon.get_section_with_padding(enemy_matrix, ship_coords, MyCommon.Constants.PERIMETER_CHECK_RADIUS, pad_values=0)
+    perimeter = MyCommon.get_section_with_padding(
+                    enemy_matrix, ship_coords, MyCommon.Constants.PERIMETER_CHECK_RADIUS, pad_values=0
+                 )
 
+    ## NO ENEMY FOUND, THEN SKIP
     if Matrix_val.ENEMY_SHIP.value not in perimeter and Matrix_val.ENEMY_SHIP_DOCKED.value not in perimeter:
-        ## NO ENEMY FOUND, SKIP
         logging.debug("ship_id: {} did not find any enemy".format(ship_id))
         return
 
@@ -67,7 +68,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
 
     ## GET CLOSEST/MOST ENEMIES SECTION POINT
     seek_val = 1
-    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned, get_least=True)
+    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned, get_least=False)
 
     if enemy_section_point: ## AN ENEMY WAS FOUND (CLOSEST AND MOST ENEMY)
         ## PLACE THIS SECTION TO BATTLING

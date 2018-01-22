@@ -76,7 +76,7 @@ class MyMoves():
 
             ## DEFEND MINING SHIPS IN DANGER
             ## SEEMS WORST WHEN DOING THIS (SEE BOT 63 vs 64)
-            #defending.move_defending_ships(self)
+            defending.move_defending_ships(self)
 
             ## MOVE ASSASSIN SHIPS
             #sniping.move_sniping_ships(self)

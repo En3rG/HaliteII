@@ -67,7 +67,7 @@ def get_battling_ships_heap(MyMoves, ship_id, battle_heap):
 
     ## GET CLOSEST/MOST ENEMIES SECTION POINT
     seek_val = 1
-    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned)
+    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_sectioned, d_sectioned, get_least=True)
 
     if enemy_section_point: ## AN ENEMY WAS FOUND (CLOSEST AND MOST ENEMY)
         ## PLACE THIS SECTION TO BATTLING

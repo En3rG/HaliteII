@@ -45,6 +45,7 @@ def get_next_target_planet(MyMoves, ship_id):
             if has_room_to_dock(MyMoves, planet_id):
                 return planet_id
 
+
             ## CHECK IF WE HAVE MULTIPLE SHIPS NEARBY
             ## SEEMS TO BE WORST (SEE BOT 65 vs 66)
             # num_ally_nearby = get_num_ally_ships_nearby(MyMoves, planet_id)
@@ -57,12 +58,12 @@ def get_next_target_planet(MyMoves, ship_id):
         ## I OWN THE PLANET, BUT CHECK IF THERE IS DOCKING SPACE AVAILABLE
         elif planet_id in MyMoves.myMap.planets_owned:
             ## ORIGINAL
-            if has_room_to_dock(MyMoves, planet_id):
-                return planet_id
+            # if has_room_to_dock(MyMoves, planet_id):
+            #     return planet_id
 
             ## NOW ONLY IF ITS FROM THERE AND HAS ROOM
-            # if has_room_to_dock(MyMoves, planet_id) and planet_id == from_planet_id:
-            #     return planet_id
+            if has_room_to_dock(MyMoves, planet_id) and planet_id == from_planet_id:
+                return planet_id
 
 
 

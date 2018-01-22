@@ -45,6 +45,7 @@ class Constants():
     BACKUP_SQUARE_RADIUS = 14
     STRONG_ENOUGH_RADIUS = 14    ## RADIUS WHEN DETERMINING STRONG ENOUGH ATTACK POWER
 
+    ## FOR STRONG ENOUGH DETERMINAZTION
     DYING_HP = 130
 
     ## DEFENDING MINERS
@@ -431,7 +432,7 @@ def get_section_with_padding(a, center_coord, square_radius, pad_values):
     return add_padding(a, center_coord, square_radius, pad_values)
 
 
-def get_coord_closest_seek_value(seek_val, values, distances):
+def get_coord_closest_seek_value(seek_val, values, distances, get_least=False):
     """
     GET CLOSESTS AND MOST ENEMIES FROM THE SECTION PROVIDED
 
@@ -452,21 +453,23 @@ def get_coord_closest_seek_value(seek_val, values, distances):
         # Get indices (indexable into r,c) corresponding to lowest distance
         ld_indx = np.flatnonzero(di == min_di)
 
-        ## GETTING CLOSEST MOST ENEMY (ORIG)
-        ## Get max index (based off v) out of the selected indices
-        max_idx = values[r[ld_indx], c[ld_indx]].argmax()
+        if get_least:
+            # GETTING THE CLOSEST LEAST ENEMY
+            # Get max index (based off v) out of the selected indices
+            min_idx = values[r[ld_indx], c[ld_indx]].argmin()
 
-        ## Index into r,c with the lowest dist indices and
-        ## from those select maxed one based off v
-        return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
+            ## Index into r,c with the lowest dist indices and
+            ## from those select maxed one based off v
+            return (r[ld_indx][min_idx], c[ld_indx][min_idx]), min_di, values[r[ld_indx][min_idx], c[ld_indx][min_idx]]
 
-        ## GETTING THE CLOSEST LEAST ENEMY
-        ## Get max index (based off v) out of the selected indices
-        # min_idx = values[r[ld_indx], c[ld_indx]].argmin()
-        #
-        # ## Index into r,c with the lowest dist indices and
-        # ## from those select maxed one based off v
-        # return (r[ld_indx][min_idx], c[ld_indx][min_idx]), min_di, values[r[ld_indx][min_idx], c[ld_indx][min_idx]]
+        else:
+            ## GETTING CLOSEST MOST ENEMY (ORIG)
+            ## Get max index (based off v) out of the selected indices
+            max_idx = values[r[ld_indx], c[ld_indx]].argmax()
+
+            ## Index into r,c with the lowest dist indices and
+            ## from those select maxed one based off v
+            return (r[ld_indx][max_idx], c[ld_indx][max_idx]), min_di, values[r[ld_indx][max_idx], c[ld_indx][max_idx]]
 
     else:
         ## NO ENEMIES FOUND

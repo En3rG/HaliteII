@@ -21,11 +21,12 @@ def isBadNeighbor(array,neighbor):
             and array[neighbor[0]][neighbor[1]] == MyCommon.Constants.NON_OBSTRUCTION:
         ## NEIGHBOR COORDINATE IS WITHIN THE ARRAY BOUNDARIES
         ## AND VALID NEIGHBOR
-        return False
+        neighbor_value = array[neighbor[0]][neighbor[1]]
+        return False, neighbor_value
                 
     ## OUTSIDE ARRAY Y OR X BOUNDARY
     ## OR ITS AN OBSTRUCTION (BAD/SKIP)
-    return True
+    return True, None
         
 
 def a_star2(arrays, start_point, goal_point):
@@ -89,8 +90,10 @@ def a_star2(arrays, start_point, goal_point):
 
             ## BASE ON INDEX IN POSITION MATRIX
             ## THIS IS TO TAKE INTO ACCOUNT INTERMEDIATE STEPS
-            if isBadNeighbor(arrays[index_value], neighbor_pt):
-                if neighbor_pt == goal:
+            bad_neighbor, neigbor_value = isBadNeighbor(arrays[index_value], neighbor_pt)
+            if bad_neighbor:
+                ## PREVENT SHIP FROM GOING INTO A PLANET
+                if neighbor_pt == goal and not(neigbor_value == Matrix_val.PREDICTION_PLANET.value*2):
                     pass
                 else:
                     continue

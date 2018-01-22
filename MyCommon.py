@@ -7,7 +7,7 @@ import heapq
 
 class Constants():
 
-    DISABLE_LOG = False
+    DISABLE_LOG = True
     MAX_TRAVEL_DISTANCE = 7
     ATTACK_RADIUS = 5
     DOCK_RADIUS = 4
@@ -59,7 +59,7 @@ class Constants():
 
     ## PLANET
     PLANET_AREA_RADIUS_CHECK = 5 ## MULTIPLIED BY PLANETS RADIUS
-    PLANET_DOCK_MIN_MULTIPLIER = 3
+    PLANET_DOCK_MIN_MULTIPLIER = 2
 
     ## RUSH TURNS
     ANTI_RUSH_TURNS = 10

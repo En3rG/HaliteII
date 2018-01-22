@@ -207,7 +207,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         # logging.debug("section_matrixes[4]: {}".format(section_matrixes[4]))
         # logging.debug("section_matrixes[5]: {}".format(section_matrixes[5]))
         # logging.debug("section_matrixes[6]: {}".format(section_matrixes[6]))
-        logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+        # logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
 
 
         logging.debug("A* path_points: {}".format(path_points))

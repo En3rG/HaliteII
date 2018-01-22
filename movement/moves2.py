@@ -132,8 +132,7 @@ class MyMoves():
                     ## SHIP DIDNT EXIST BEFORE (NEW SHIP)
                     ## OR
                     ## SHIP HAS NO TARGET SET
-                    # if self.myMap.my_id == 0 or self.myMap.my_id == 3:
-                    # #if random.randint(1,10) == random.randint(1,10):
+                    # if random.randint(1,10) == random.randint(1,10):
                     #     #self.myMap.ships_sniping.add(ship_id)
                     #     self.myMap.ships_running.add(ship_id)
                     #     continue
@@ -404,6 +403,17 @@ class MyMoves():
         ## SET SHIP HAS MOVED AND FILL POSITION MATRIX
         self.set_ship_moved_and_fill_position(ship_id, angle, thrust)
 
+        ## SET THRUST/ANGLE FOR THIS SHIP
+        self.set_angle_thrust(ship_id, angle, thrust)
+
+
+    def set_angle_thrust(self, ship_id, angle, thrust):
+        """
+        SET ANGLE/THRUST FOR THIS SHIP
+        """
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['angle'] = angle
+        self.myMap.data_ships[self.myMap.my_id][ship_id]['thrust'] = thrust
+
 
     def set_ship_moved_and_fill_position(self, ship_id, angle, thrust, mining=False):
         """
@@ -433,9 +443,6 @@ class MyMoves():
 
         ## FINAL TARGET
         self.myMap.data_ships[self.myMap.my_id][ship_id]['target_coord'] = target_coord
-
-        ## SET ANGLE TO TARGET (TENTATIVE ANGLE IS CURRENTLY THE SAME)
-        self.myMap.data_ships[self.myMap.my_id][ship_id]['target_angle'] = angle
 
 
     def set_ship_target_id(self, ship_id, target_type, target_id):

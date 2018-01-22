@@ -23,23 +23,35 @@ def set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task
 def move_running_ships(MyMoves):
     """
     MOVE RUNNING/DISTRACTION SHIPS
+
+    CURRENTLY CAUSING COLLISIONS...
+    NEED TO FIX THAT, THIS HAPPENS DUE TO THE ORDER OF EXECUTION/CALCULATIONS
     """
     for ship_id in MyMoves.myMap.myMap_prev.ships_running:
-        try:
-            ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-            thrust, angle = find_enemy(MyMoves, ship_id)
-            enemy_target_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
-            thrust = 10 if thrust >= 7 else thrust
-            thrust, angle = astar.get_thrust_angle_from_Astar(MyMoves, ship_id, enemy_target_coord, target_distance=thrust, target_planet_id=None)
+        if ship_id not in MyMoves.myMap.ships_moved_already:
+            try:
+                ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
+                thrust, angle = find_enemy(MyMoves, ship_id)
+                enemy_target_coord = MyCommon.get_destination_coord(ship_coord, angle, thrust, rounding=False)
+                thrust = 10 if thrust >= 7 else thrust
+                thrust, angle = astar.get_thrust_angle_from_Astar(MyMoves,
+                                                                  ship_id,
+                                                                  enemy_target_coord,
+                                                                  target_distance=thrust,
+                                                                  target_planet_id=None)
 
-            target_coord = None
-            ship_task = MyCommon.ShipTasks.RUNNING
-            set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
+                target_coord = None
+                ship_task = MyCommon.ShipTasks.RUNNING
+                set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task)
 
-            ## ADD IT BACK TO RUNNING SHIPS
-            MyMoves.myMap.ships_running.add(ship_id)
-        except:
-            pass
+
+            except:
+                pass
+
+        ## ADD IT BACK TO RUNNING SHIPS
+        ## SINCE THIS SHIP SHOULD ALWAYS BE A RUNNER
+        ## EVEN IF SOMETIMES IF MAY ATTACK/DEFEND TEMPORARILY
+        MyMoves.myMap.ships_running.add(ship_id)
 
 
 def find_enemy(MyMoves, ship_id):
@@ -56,7 +68,9 @@ def find_enemy(MyMoves, ship_id):
 
     ## GET CLOSEST/MOST ENEMIES SECTION POINT
     seek_val = 1
-    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, values, distances)
+    enemy_section_point, section_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val,
+                                                                                             values,
+                                                                                             distances)
 
     enemy_section_coord = MyCommon.Coordinates(enemy_section_point[0], enemy_section_point[1])
     angle = MyCommon.get_angle(ship_section_coord, enemy_section_coord)
@@ -68,11 +82,13 @@ def find_enemy(MyMoves, ship_id):
         value = MyMoves.myMatrix.matrix[MyMoves.myMap.my_id][0]  ## 1 IS FOR HP MATRIX
         v_enemy = MyCommon.get_section_with_padding(value, ship_coords, MyCommon.Constants.ATTACKING_RADIUS, 0)
 
-        d_section = MyMoves.EXP.distance_matrix_RxR
+        d_section = MyMoves.EXP.distance_matrix_AxA
 
         ## FIND ACTUAL COORDINATE OF CLOSEST ENEMY
         seek_val = -0.75
-        enemy_point, enemy_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_enemy, d_section)
+        enemy_point, enemy_distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val,
+                                                                                       v_enemy,
+                                                                                       d_section)
 
 
         mid_point = (MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS)

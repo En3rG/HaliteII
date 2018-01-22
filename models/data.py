@@ -134,6 +134,8 @@ class MyMap():
                 ## CHANGE THIS LATER TO A CLASS, INSTEAD OF JUST A DICTIONARY
                 data[player_id][ship_id] = {'x': ship.x, \
                                             'y': ship.y, \
+                                            'angle':None,\
+                                            'thrust':None,\
                                             'coords': MyCommon.Coordinates(ship.y, ship.x), \
                                             'point': (int(round(ship.y)), int(round(ship.x))), \
                                             'health': ship.health, \
@@ -144,7 +146,6 @@ class MyMap():
                                             'from_planet':None, \
                                             ## TARGET IS THE FINAL DESTINATION
                                             'target_id':None, \
-                                            'target_angle':None, \
                                             'target_coord':None, \
                                             ## ITS IMMEDIATE TARGET/DESTINATION
                                             'tentative_coord':None, \

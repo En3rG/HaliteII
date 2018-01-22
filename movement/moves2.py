@@ -44,14 +44,6 @@ class MyMoves():
         self.turn = turn
         self.retreating = False
 
-        # self.position_matrix = {1: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-        #                         2: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-        #                         3: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-        #                         4: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-        #                         5: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-        #                         6: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),
-        #                         7: copy.deepcopy(myMatrix.matrix[myMap.my_id][0]),}  ## SECOND ONE IS HP MATRIX
-
         ## USING NP.COPY (BARELY FASTER)
         self.position_matrix = {1: np.copy(myMatrix.matrix[myMap.my_id][0]),
                                 2: np.copy(myMatrix.matrix[myMap.my_id][0]),
@@ -150,23 +142,11 @@ class MyMoves():
 
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    #self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0, mining=True)
-                    #attacking.closest_section_in_war(self, ship_id)
                     planet_distance = MyCommon.Constants.BIG_DISTANCE
-                    #enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
                     enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id,move_now=False,docked_only=True)
                     heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
                 else:
-                    ## NO NEED TO DETERMINE DOCKING COORD
-                    ## SINCE COORDINATE DETERMINED HERE MAY NO LONGER EXISTS DUE TO OTHER SHIPS GETTING HERE FIRST
-                    #target_coord, distance = expanding2.get_docking_coord(self, target_planet_id, ship_id)
-
-                    # if target_coord is None:
-                    #     ## NO AVAILABLE SPOT NEAR THE TARGET
-                    #     self.set_ship_moved_and_fill_position(ship_id, angle=0, thrust=0)
-                    #     continue
-
                     ## CALCULATE PLANET DISTANCE
                     ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
                     planet_coord = self.myMap.data_planets[target_planet_id]['coords']
@@ -269,7 +249,6 @@ class MyMoves():
                     ## ADD BACK TO HEAP
                     if new_target_planet_id is None:
                         planet_distance = MyCommon.Constants.BIG_DISTANCE
-                        # enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
                         enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False, docked_only=True)
                         heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
                         continue
@@ -288,11 +267,6 @@ class MyMoves():
                         continue
 
                 if target_planet_id is None:
-                    ## NO MORE PLANETS TO CONQUER AT THIS TIME
-                    # attacking.closest_section_in_war(self, ship_id)
-                    # attacking.closest_section_with_enemy(self, ship_id, move_now=True)
-                    # continue
-
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
                     ## ADD BACK TO HEAP
                     planet_distance = MyCommon.Constants.BIG_DISTANCE
@@ -323,17 +297,12 @@ class MyMoves():
                     thrust, angle = astar.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
                     logging.debug("get_thrust_angle_from_Astar thrust: {} angle: {}".format(thrust, angle))
 
-                    # safe_thrust = self.check_intermediate_collisions(ship_id, angle, thrust)
                     safe_thrust = thrust  ## NOT LOOKING FOR INTERMEDIATE COLLLISIONS
 
                     if thrust == 0:
                         logging.debug("Docking but not suppose to dock yet??? ship_id: {}".format(ship_id))
-                        ## BEFORE
                         self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, target_planet_id))
 
-                        ## GET ANOTHER DOCKING COORD (NOT COMPLETELY WORKING YET)
-                        # safe_thrust, angle = expanding2.get_closest_docking_coord(self, target_planet_id, ship_id)
-                        # self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
                     else:
                         ## ADD TO COMMAND QUEUE
                         self.command_queue.append(MyCommon.convert_for_command_queue(ship_id, safe_thrust, angle))
@@ -342,41 +311,6 @@ class MyMoves():
                 target_type = MyCommon.Target.PLANET
                 ship_task = MyCommon.ShipTasks.EXPANDING
                 self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, safe_thrust, target_coord)
-
-
-    def check_intermediate_collisions(self, ship_id, angle, thrust):
-        """
-        CHECK IF AN INTERMEDIATE COLLISION EXISTS (IN SUB TURNS)
-        IF SO, RETURN THE THRUST THAT HAS NO COLLISION
-        BASICALLY IT CHECKS IF THE CURRENT ANGLE/THRUST IS GOOD
-
-        NO LONGER USED?
-        """
-
-        ship_coord = self.myMap.data_ships[self.myMap.my_id][ship_id]['coords']
-        dx = thrust / 7
-        prev_thrust = 0
-
-        logging.debug("check_intermediate_collisions thrust: {}".format(thrust))
-
-        for step_num in range(1, 7):
-            curr_thrust = int(round(dx * step_num))
-
-            logging.debug("curr_thrust {}".format(curr_thrust))
-
-            intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, curr_thrust)
-            intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
-
-            no_collision = self.no_intermediate_collision(step_num, intermediate_point)
-            if no_collision:
-                prev_thrust = curr_thrust
-            else:
-                logging.debug(
-                    "Collision detected! ship_id: {} intermediate_point: {} step_num: {} . Will return prev_thrust: {}".format(
-                        ship_id, intermediate_point, step_num, prev_thrust))
-                return prev_thrust  ## CURRENT THRUST HAS COLLISION
-
-        return thrust  ## RETURN ORIGINAL THRUST
 
 
     def check_intermediate_collisions2(self, ship_id, angle, thrust):
@@ -435,12 +369,10 @@ class MyMoves():
         CHECK IF THERE IS A COLLISION
         PROVIDED THE STEP_NUM AND THE POINT (y,x)
         """
-        # return self.position_matrix[step_num][point[0]][point[1]] != Matrix_val.ALLY_SHIP.value
 
         if step_num == 0:
             return True
         else:
-            #return self.position_matrix[step_num][point[0]][point[1]] == 0
             try:
                 collision_value = self.position_matrix[step_num][point[0]][point[1]]
                 return (self.position_matrix[step_num][point[0]][point[1]] == 0 \
@@ -482,9 +414,6 @@ class MyMoves():
 
         self.myMap.ships_moved_already.add(ship_id)
         ship_point = self.myMap.data_ships[self.myMap.my_id][ship_id]['point']
-
-        ## ADD TO POSITION MATRIX
-        #expanding2.fill_position_matrix(self.position_matrix[7], ship_point, mining)
 
         ## FILL IN INTERMEDIATE POSITION MATRIX
         expanding2.fill_position_matrix_intermediate_steps(self, ship_id, angle, thrust, mining)

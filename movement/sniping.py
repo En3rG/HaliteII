@@ -77,7 +77,6 @@ def move_sniping_ships(MyMoves):
     MOVE SHIP TOWARDS ASSASSINATING ENEMY DOCKED SHIPS
     """
     for ship_id in MyMoves.myMap.myMap_prev.ships_sniping:
-    #for ship_id in [2]:
 
         if ship_id not in MyMoves.myMap.ships_moved_already:
             try:

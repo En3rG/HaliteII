@@ -128,11 +128,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     ## GET ANGLE TO TARGET
     angle_towards_target = MyCommon.get_angle(ship_coord, target_coord)
 
-    ## GET SECTION (ONLY BASE ON LAST POSITION MATRIX)
-    # position_matrix = MyMoves.position_matrix[7]
-    # pad_values = -1
-    # section_matrix = MyCommon.get_circle_in_square(position_matrix, ship_coord, circle_radius, square_radius, pad_values)
-
     ## GET SECTION (FOR A* 2nd Version)
     ## GETTING SECTIONS FROM 7 POSITION MATRIXES
     pad_values = -1
@@ -176,16 +171,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
     mid_point = (MyCommon.Constants.ASTAR_SQUARE_RADIUS, MyCommon.Constants.ASTAR_SQUARE_RADIUS) ## MIDDLE OF SECTION MATRIX
     mid_coord = MyCommon.Coordinates(mid_point[0], mid_point[1])
 
-    ## PERFORM A* TOWARDS TARGET
-    ## WE DONT REALLY NEED TABLE OR SIMPLIFIED PATHS HERE
-    #path_table_forward, simplified_paths = astar.get_Astar_table(section_matrix, mid_point, section_target_point)
-
-    ## RETURN ANGLE/THRUST
-    ## JUST GETTING THE FIRST STRAIGHT (COULD COLLIDE WITH SOMETHING)
-    #astar_destination_point = path_table_forward[mid_point]
-
-    #logging.debug("At ship_id: {} section_target_point: {} temp_target_coord: {} target_coord: {} temp_target_point: {}".format(ship_id, section_target_point, temp_target_coord, target_coord, temp_target_point))
-
     if mid_point == section_target_point:
 
         ## REACHED ITS TARGET
@@ -207,10 +192,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
 
     else:
         ## GET FURTHEST POINT WITHIN THE CIRCLE
-
         ## UPDATE SECTION MATRIX TO CLEAR MID POINT (JUST IN CASE NEW SHIPS WENT IN THIS LOCATION)
 
-        #path_points = astar.a_star(section_matrix, mid_point, section_target_point)
+
         path_points = a_star2(section_matrixes, mid_point, section_target_point)
 
 
@@ -226,36 +210,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         logging.debug("A* path_points: {}".format(path_points))
         logging.debug("A* path_points length: {}".format(len(path_points)))
 
-
-
         if path_points:
-            ## GOING FROM START POINT TO END POINT
-            # astar_destination_point = path_points[-2]
-            # for current_point in reversed(path_points[:-1]):
-            #     logging.debug("current_point: {} ".format(current_point))
-            #
-            #     current_coord = MyCommon.Coordinates(current_point[0], current_point[1])
-            #
-            #     ## NOT DOING INTERMEDIATE COLLISION
-            #     # if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-            #     #         and theta_clear(mid_coord, current_coord, section_matrix):
-            #
-            #     ## DOING INTERMEDIATE COLLISION
-            #     if MyCommon.within_circle(current_coord, mid_coord, max_travel_distance) \
-            #             and theta_clear(MyMoves, ship_id, current_coord):
-            #
-            #         astar_destination_point = current_point
-            #         logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
-            #     else:
-            #         ## OUTSIDE THE CIRCLE OR COLLISION DETECTED
-            #         break
-
-
-            ## GOING FROM END POINT TO START POINT
-            ## MAKING FIRST STEP (-2) AS DEFAULT (PREVENT JUST SITTING)
-            # astar_destination_point = path_points[-2]
-            # for current_point in path_points[:-2]:
-
             ## MAKING LAST STEP (OR ORIGIN) AS DEFAULT
             ## PREVENTS KNOWN COLLISIONS TO HAPPEN (MIGHT KEEP UNITS NOT MOVING THOUGH)
             step1_point = path_points[-2]
@@ -271,13 +226,6 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                     astar_destination_point = current_point
                     logging.debug("astar_destination_point: {} is good (no collision)".format(astar_destination_point))
                     break
-
-            # if astar_destination_point is None:
-            #     ## THIS SHIP HAS COLLISION EVERYWHERE FROM A*
-            #     ## EVEN STAYING AT THIS LOCATION HAS COLLISION
-            #     ## NEED TO UPDATE THIS LATER
-            #     logging.warning("ship_id: {} will definitely collide, but staying here for now".format(ship_id))
-            #     astar_destination_point = mid_point
 
             logging.debug("astar_destination_point {} collision_value {}".format(astar_destination_point, collision_value))
 
@@ -461,35 +409,6 @@ def theta_clear(MyMoves, ship_id, current_coord):   ## DOING INTERMEDIATE COLLIS
 
     return thrust == safe_thrust, collision_value
 
-    # ## NOT DOING INTERMEDIATE COLLISION
-    # angle = MyCommon.get_angle(start_coord, target_coord)
-    # distance = MyCommon.calculate_distance(start_coord, target_coord)
-    #
-    # for thrust in range(int(round(distance))):
-    #     temp_coord = MyCommon.get_destination_coord(start_coord, angle, thrust)
-    #     round_coord = MyCommon.Coordinates(int(round(temp_coord.y)), int(round(temp_coord.x)))
-    #     if section_matrix[round_coord.y][round_coord.x] != 0:
-    #         return False
-    #
-    # return True
-
-
-    ## NOT USING GET DESTINATION COORDS
-    ## SHOULD BE MORE OPTIMAL
-    # angle = MyCommon.get_angle(start_coord, target_coord)
-    # distance = MyCommon.calculate_distance(start_coord, target_coord)
-    # unit_vector = -np.cos(np.radians(-angle - 90)), -np.sin(np.radians(-angle - 90))
-    # start_point = [start_coord.y, start_coord.x]
-    #
-    # for multiplier in range(1,int(round(distance)) + 1):
-    #     new_coord = [start_point[0] + multiplier * unit_vector[0],
-    #                  start_point[1] + multiplier * unit_vector[1]]
-    #     round_new_coord = (int(round(new_coord[0])), int(round(new_coord[1])))
-    #
-    #     if section_matrix[round_new_coord[0]][round_new_coord[1]] != 0:
-    #         return False
-    #
-    # return True
 
 
 

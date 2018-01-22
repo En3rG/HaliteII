@@ -62,14 +62,6 @@ class Exploration():
         DISTANCE MATRIX FOR 15x15 MATRIX
         ASSUMING START IS AT THE CENTER
         """
-        ## LOOPING, STRAIGHT NUMPY SHOULD BE FASTER
-        # matrix = np.zeros((15, 15), dtype=np.float16)
-        # start = MyCommon.Coordinates(7, 7)
-        #
-        # for r in range(15):
-        #     for c in range(15):
-        #         matrix[r][c] = MyCommon.calculate_distance(start, MyCommon.Coordinates(r,c))
-        # return matrix
 
         ## USING NUMPY VECTORIZED
         start_point = (center,center)
@@ -150,43 +142,6 @@ class Exploration():
         """
         GENERATES A TABLE WITH ACTUAL DISTANCES BETWEEN SECTIONS
         """
-
-        ## USING DICTIONARY
-        # dict = {}
-        # dict[curr_section] = 0 ## DISTANCE TO ITSELF IS 0
-        #
-        # for r in range(row_length):
-        #     for c in range(col_length):
-        #         if dict.get((r, c)):
-        #             ## ALREADY EXISTS
-        #             ## CALCULATED ALREADY
-        #             pass
-        #         else:
-        #             coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
-        #             coord2 = MyCommon.Coordinates(r, c)
-        #             dict[(r, c)] = MyCommon.calculate_distance(coord1, coord2)
-        #
-        # return dict
-
-        ## USING NUMPY  (LOOPING SO SLOW)
-        # matrix = np.zeros((row_length + 1, col_length + 1), dtype=np.float16)
-        #
-        # logging.debug("matrix size {}".format(matrix.size))
-        #
-        # for r in range(row_length + 1):
-        #     for c in range(col_length + 1):
-        #         if matrix[r][c] != 0:
-        #             ## ALREADY EXISTS
-        #             ## CALCULATED ALREADY
-        #             pass
-        #         else:
-        #             coord1 = MyCommon.Coordinates(curr_section[0], curr_section[1])
-        #             coord2 = MyCommon.Coordinates(r, c)
-        #             matrix[r][c] = MyCommon.calculate_distance(coord1, coord2)
-        #
-        # return matrix
-
-
         ## USING NUMPY (VECTORIZED), MUCH FASTER
         matrix = np.zeros((row_length, col_length), dtype=np.float16)
         indexes = [(y, x) for y, row in enumerate(matrix) for x, val in enumerate(row)]

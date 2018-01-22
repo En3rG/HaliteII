@@ -59,13 +59,6 @@ def get_predictions_queue(Q):
     q = {}
     logging.debug("At get_queue time: {}".format(datetime.datetime.now()))
 
-    # if Q.empty():
-    #     logging.debug("Q is empty")
-    # else:
-    #     while not Q.empty():
-    #         id, ship_ids, data = Q.get()
-    #         q[id] = (ship_ids,data)
-
     ## SINCE Q.empty() MAY NOT BE ACCURATE AND CAUSES .get() TO LOCK UP
     ## WE'LL USE TIMEOUT INSTEAD
     while True:
@@ -96,12 +89,6 @@ def clean_predicting_args(MP):
     for id in MP.enemyIDs:
         logging.debug("Cleaning args queue for id: {} at {}".format(id,datetime.datetime.now()))
 
-        # while not MP.predictors[id]["args_queue"].empty():
-        #     logging.debug("Not empty")
-        #     garbage = MP.predictors[id]["args_queue"].get()  ## False FOR NO WAIT (SEEMS TO TAKE MORE MEMORY WHEN FALSE)
-        #     garbage = None
-        #     logging.debug("Cleaned at {}".format(datetime.datetime.now()))
-
         ## SINCE Q.empty() MAY NOT BE ACCURATE AND CAUSES .get() TO LOCK UP
         ## WE'LL USE TIMEOUT INSTEAD
         while True:
@@ -118,10 +105,6 @@ def clean_predicting_args(MP):
                 logging.debug("Cleaned timed out {}".format(datetime.datetime.now()))
                 break
 
-        ## LETS TRY JUST SETTING IT TO NONE, THEN INITIALIZE QUEUE()
-        ## SETTING QUEUE TO NONE/QUEUE() DOESNT WORK (PIPE ERROR)
-        # MP.predictors[id]["args_queue"] = None
-        # MP.predictors[id]["args_queue"] = Queue()
 
     logging.debug("Done cleaning: {}".format(datetime.datetime.now()))
 
@@ -163,12 +146,6 @@ def get_data_training(id, myMap, myMatrix, MP, turn):
         args = ("train_" + str(id) + "_" + str(turn), id, x_train, y_train)
         MP.add_training(id, args)
 
-    ## NO DIFFERENCE IN del OR SET TO None. EXCEPT del DELETE VARIABLE AS WELL
-    # del x_train
-    # del y_train
-    # del args
-    x_train, y_train, args = None, None, None
-
 def get_data_predicting(id, myMap, myMatrix, MP, turn):
     """
     GET DATA FOR PREDICTING
@@ -180,13 +157,6 @@ def get_data_predicting(id, myMap, myMatrix, MP, turn):
         args = ("pred_" + str(id) + "_" + str(turn), id, x_test, ship_ids)
         MP.add_predicting(id, args)
         logging.debug("Added to queue for predicting id: {} time: {}".format(str(id), datetime.datetime.now()))
-        # MP.worker_predict_model("pred_" + str(id) + "_" + str(turn), id, x_train)  ## CALLS THE FUCTION DIRECTLY
-
-    ## NO DIFFERENCE IN del OR SET TO None. EXCEPT del DELETE VARIABLE AS WELL
-    # del x_test
-    # del ship_ids
-    # del args
-    x_test, ship_ids, args = None, None, None
 
 
 def gather_clean_predictions(MP,start,turn):
@@ -197,15 +167,6 @@ def gather_clean_predictions(MP,start,turn):
     predictions = get_predictions_queue(MP.predictions_queue)
     clean_predicting_args(MP)
 
-    ## TERMINATE PREDICTORS THEN SPAWN THEM
-    ## THIS HELPS MINIMIZE MEMORY CONSUMPTION TO 1GB?? NOPE
-    ## ALSO LOG PER PREDICTORS ARE NOT TRACKED
-    ## SPAWNING COULD TAKE 2 SECS, THUS NEED TO SPAWN AND TERMINATE DIFFERENT PROCESSES PER TURN
-    ## THIS STILL CAUSES TO TAKE ALOT OF MEMORY!!!!
-    ## clear_session() FIXES THE ISSUE
-    #MP.terminate_predictors(turn%2) ## TERMINATE FOR THIS TURN
-    #MP.spawn_predictors((turn+1)%2) ## SPAWN FOR NEXT TURN
-
     return predictions
 
 
@@ -213,11 +174,6 @@ def gather_clean_predictions(MP,start,turn):
 
 class MyProcesses():
     def __init__(self,game,disable_log, wait_time, y, x, z, num_epoch, batch_size):
-        ## FOR TESTING ONLY
-        #log_myID(game.map)
-        #log_numPlayers(game.map)
-
-        #self.main_conn, self.sub_conn = Pipe()  ## Not used
 
         ## DISABLE LOG IF TRUE
         self.num_epoch = num_epoch
@@ -238,7 +194,6 @@ class MyProcesses():
         self.set_trainers()
         self.exit = False
         self.predictions_queue = Queue()
-        #self.model_queues = self.init_model_queues()
 
         self.spawn_trainers()
         self.spawn_predictors(1)
@@ -379,9 +334,6 @@ class MyProcesses():
             model = None
             logger.error("get_model_queues called but its empty!!!")
         else:
-            #model = self.model_queues[id].get()
-            #self.model_queues[id].put(copy.deepcopy(model))
-
             model_pickled = self.model_queues[id].get()
             model = pickle.loads(model_pickled)
             self.model_queues[id].put(model_pickled)
@@ -400,8 +352,6 @@ class MyProcesses():
             discard = self.model_queues[id].get()
             discard = None
 
-        #self.model_queues[id].put(model)
-
         model_pickled = pickle.dumps(model)
         self.model_queues[id].put(model_pickled)
 
@@ -413,10 +363,6 @@ class MyProcesses():
         for id in self.enemyIDs:
             self.predictors[id] = {}
             self.predictors[id]["handler"] = None
-            ## IF HANDLER IS BASED ON TURNS
-            # self.predictors[id]["handler"] = {}
-            # self.predictors[id]["handler"][0] = None
-            # self.predictors[id]["handler"][1] = None
             self.predictors[id]["args_queue"] = Queue()
 
     def set_trainers(self):
@@ -426,7 +372,6 @@ class MyProcesses():
         for id in self.enemyIDs:
             self.trainers[id] = {}
             self.trainers[id]["handler"] = None
-            #self.trainers[id]["processor"] = self.init_process()
             self.trainers[id]["thread"] = None ## self.init_thread() ## <-- errors! why??
             self.trainers[id]["args_queue"] = Queue()
 
@@ -453,13 +398,6 @@ class MyProcesses():
         for id in self.enemyIDs:
             self.predictors[id]["handler"].terminate()
 
-        ## WHEN WE HAVE 2 HANDLERS BASE ON TURN
-        # logging.debug("About to terminate predictors at: {}".format(datetime.datetime.now()))
-        # try:
-        #     for id in self.enemyIDs:
-        #         self.predictors[id]["handler"][odd_even_turn].terminate()
-        # except:
-        #     pass
 
     def spawn_predictors(self,odd_even_turn):
         """
@@ -473,11 +411,6 @@ class MyProcesses():
             self.predictors[id]["handler"] = Process(target=self.predictor_handler, args=arguments)
             self.predictors[id]["handler"].start()
 
-        ## WHEN WE HAVE 2 HANDLERS BASE ON TURN
-        # for id in self.enemyIDs:
-        #     arguments = (id,)
-        #     self.predictors[id]["handler"][odd_even_turn] = Process(target=self.predictor_handler, args=arguments)
-        #     self.predictors[id]["handler"][odd_even_turn].start()
 
     def spawn_trainers(self):
         """
@@ -485,7 +418,6 @@ class MyProcesses():
         """
         for id in self.enemyIDs:
             arguments = (id,)
-            #self.trainers[id]["handler"] = Process(target=self.trainer_handler, args=arguments)
             self.trainers[id]["handler"] = Process(target=self.trainer_handler2, args=arguments)
             self.trainers[id]["handler"].start()
 
@@ -508,12 +440,6 @@ class MyProcesses():
 
                 try:
                     start = time.clock()
-
-                    ## USING MODELS IN QUEUES
-                    # model = self.get_model_queues(id, logger)
-                    # predictions = model.predict(x_train)
-                    # logger.debug("Predictions done")
-
 
                     ## IS THIS REALLY REQUIRED TO clear_session? I DONT THINK SO
                     config = tf.ConfigProto(intra_op_parallelism_threads=4,
@@ -577,33 +503,23 @@ class MyProcesses():
         ## USING THREADS
         while self.exit == False:
             logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
-            #if not self.trainers[id]["args_queue"].empty():
 
-            #if self.trainers[id]["args_queue"].qsize() > 1 and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
             if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
-
-                # self.trainers[id]["thread"] = Thread(target=self.worker_train_model, args=arguments)
-                # #self.trainers[id]["thread"] = Thread(target=worker_train_model, args=arguments)
-                # self.trainers[id]["thread"].start()
 
                 ## DONT START THREADS ANYMORE, DO TRAINING IN THIS PROCESS
                 name, id, x_train, y_train = arguments
                 model = self.get_model_queues(id, logger)
                 logger.info("Got Model")
-                #model = copy.deepcopy(model)
                 logger.info("Done copying {}".format(type(model)))
                 model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=1)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
                 logger.info("Trained")
                 self.set_model_queues(id, model)
                 logger.info("Time after training {}".format(time.clock()))
 
-
-
             time.sleep(0.05)
 
-        #logger.debug("Kiling")
         self.trainers[id]["processor"].terminate()
         self.trainers[id]["handler"].terminate()
 
@@ -639,13 +555,6 @@ class MyProcesses():
             if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
-
-
-                ## USING THREADS DOESNT WORK AT ALL
-                # self.trainers[id]["thread"] = Thread(target=self.worker_train_model2, args=arguments+(model,))
-                # #self.trainers[id]["thread"] = Thread(target=worker_train_model, args=arguments)
-                # self.trainers[id]["thread"].start()
-
 
                 ## DONT START THREADS ANYMORE, DO TRAINING IN THIS PROCESS
                 ## WORKS BUT GETTING UPDATED MAP FROM HLT ENGINE SLOWS DOWN AND TIMES OUT

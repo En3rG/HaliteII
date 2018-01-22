@@ -95,11 +95,6 @@ class MyMap():
 
         self.check_limit()                      ## KEEP A LIMIT OF NODES IN MEMORY
 
-        # self.taken_coords = set()          ## NO LONGER USED
-
-        # self.all_target_coords = set()     ## WILL CONTAIN ALL TARGET COORDS (TO PREVENT COLLISION OR SAME DESTINATION)
-                                             ## NO LONGER USED
-
         #self.groups = grouping.Groups(self) ## NO LONGER USED
 
 
@@ -268,11 +263,6 @@ class MyMap():
         """
         SET STATUS OF SHIPS
         """
-        # for ship_id in self.ships_owned:
-        #     ## CHECK IF SHIP IS NEW
-        #     if self.myMap_prev is not None and ship_id not in self.myMap_prev.ships_owned:
-        #         self.ships_new.add(ship_id)
-
         if self.myMap_prev is not None:
             ## CHECK FOR SHIPS THAT ARE NEW
             self.ships_new = self.ships_owned - self.myMap_prev.ships_owned
@@ -355,23 +345,12 @@ class MyMatrix():
         GET MAP MATRIX PER PLAYER ID
         """
         final_matrix = {}
-        # matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
-        # matrix_hp = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
 
         #for player in self.game_map.all_players():
         for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.myMap.my_id:
                 ## SET PLANET TO PREDICTION MATRIX
-                #self.prediction_matrix = copy.deepcopy(EXP.all_planet_matrix)
-                #curr_matrix = np.zeros((self.myMap.height, self.myMap.width), dtype=np.float16)
-                #self.prediction_matrix = self.fill_planets_predictions(curr_matrix) ## NO LONGER USED
-
                 self.ally_matrix, _ = self.fill_ships_ally(self.ally_matrix, np.copy(self.EXP.all_planet_matrix), ships)
-
-            ## FILLING PLANET MATRIX PER TURN
-            # matrix_current = copy.deepcopy(matrix)
-            # matrix_hp_current = copy.deepcopy(matrix_hp)
-            # matrix_current, matrix_hp_current = self.fill_planets(matrix_current, matrix_hp_current, player_id)
 
             ## JUST TAKING MATRIX FROM EXPLORATION
             matrix_current, matrix_hp_current = np.copy(self.EXP.all_planet_matrix), np.copy(self.EXP.all_planet_hp_matrix)
@@ -381,7 +360,6 @@ class MyMatrix():
                 ## FILL CURRENT PLAYER'S SHIPS
                 matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,ships)
 
-            #for player_enemy in self.game_map.all_players():
             for player_enemy_id, enemy_ships in self.myMap.data_ships.items():
                 if player_enemy_id == player_id:
                     pass
@@ -427,24 +405,11 @@ class MyMatrix():
             else:
                 value = Matrix_val.ENEMY_PLANET.value
 
-            #matrix[round(planet.y)][round(planet.x)] = value
-            ## INSTEAD OF FILLING JUST THE CENTER, FILL IN A BOX
-            #matrix[round(planet.y)-round(planet.radius):round(planet.y)+round(planet.radius)+1, \
-            #       round(planet.x)-round(planet.radius):round(planet.x)+round(planet.radius)+1] = value
-            ## FILLING A CIRCLE (BETTER)
-            #matrix = self.fill_circle(matrix, planet.y, planet.x, planet.radius, value)
-            ## JUST USING myMap, NOT game_map
             matrix = MyCommon.fill_circle(matrix, \
                                           planet['coords'], \
                                           planet['radius']+MyCommon.Constants.FILL_PLANET_PAD, \
                                           value)
 
-            ## FILL IN MATRIX_HP WITH HP OF PLANET (BOX)
-            #matrix_hp[round(planet.y) - round(planet.radius):round(planet.y) + round(planet.radius)+1, \
-            #          round(planet.x) - round(planet.radius):round(planet.x) + round(planet.radius)+1] = planet.health/Matrix_val.MAX_SHIP_HP.value
-            ## FILLING A CIRCLE (BETTER)
-            #matrix_hp = self.fill_circle(matrix_hp, planet.y, planet.x, planet.radius, planet.health/Matrix_val.MAX_SHIP_HP.value)
-            ## JUST USING myMap, NOT game_map
             matrix_hp = MyCommon.fill_circle(matrix_hp, \
                                              planet['coords'], \
                                              planet['radius']+MyCommon.Constants.FILL_PLANET_PAD, \
@@ -464,8 +429,6 @@ class MyMatrix():
             else:
                 value = Matrix_val.ALLY_SHIP_DOCKED.value
 
-            #matrix[ship['point'][0]][ship['point'][1]] = value
-
             matrix[ship['point'][0]][ship['point'][1]] = ship_id
             matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 
@@ -484,8 +447,6 @@ class MyMatrix():
             else:
                 value = Matrix_val.ENEMY_SHIP_DOCKED.value
 
-            #matrix[round(ship['y'])][round(ship['x'])] = value
-            #matrix_hp[round(ship['y'])][round(ship['x'])] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
             matrix[ship['point'][0]][ship['point'][1]] = value
             matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 

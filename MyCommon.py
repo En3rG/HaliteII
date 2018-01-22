@@ -147,7 +147,6 @@ def fill_circle(array, center, radius, value, cummulative=False, override_edges=
     ## x IS JUST AN ARRAY OF 1xX (COLS)
     y, x = np.ogrid[-center.y:height - center.y, -center.x:width - center.x]
     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
-    #mask = x * x + y * y <= radius * radius
 
     if override_edges:
         mask = x * x + y * y <= radius * radius + radius * override_edges  ## USED FOR FILLING PLANETS IN EXPLORE
@@ -271,10 +270,6 @@ def calculate_distance(coords1, coords2, rounding=True):
     """
     CALCULATE DISTANCE BETWEEN 2 POINTS
     """
-    # y1 = int(round(coords1.y))
-    # y2 = int(round(coords2.y))
-    # x1 = int(round(coords1.x))
-    # x2 = int(round(coords2.x))
     y1 = coords1.y
     y2 = coords2.y
     x1 = coords1.x
@@ -530,128 +525,9 @@ def ship_can_dock(MyMoves, coord, target_planet_id):
     d = calculate_distance(coord, target_planet_coord, rounding=False)
     dock_val = d - target_radius
 
-    ## DOCKING RADIUS NOT REALLY 4??? SUTRACT XXX
-    #if d <= target_radius + MyCommon.Constants.DOCK_RADIUS - 0.22:
     if dock_val < Constants.DOCK_RADIUS:
         return True
 
     ## TOO FAR
     return False
-
-
-
-# array = [
-#     [1, 2, 3, 4, 5, 6, 7, 8, 9],
-#     [2, 3, 4, 5, 6, 7, 8, 9, 1],
-#     [3, 4, 5, 0, 7, 8, 9, 1, 2],
-#     [4, 5, 6, 7, 8, 9, 1, 2, 3],
-#     [5, 0, 7, 8, 9, 4, 5, 6, 7],
-#     [6, 7, 8, 9, 1, 2, 3, 4, 5]
-# ]
-# a = np.asarray(array)
-# circle_radius = 2
-# square_radius = 2
-#
-# #array = np.random.randint(5, size=(40,40))
-# print(get_circle_in_matrix(a, Coordinates(4,1), circle_radius, square_radius))
-
-
-# coord = Coordinates(0,0)
-# angle = 45
-# thrust = 7.22
-# coord2 = get_destination_coord(coord,angle,thrust,rounding=False)
-# # print(coord2)
-# # coord2 = get_destination_coord(coord,angle,thrust,rounding=True)
-# print("Rounded: ",coord2)
-# print("Distance:",calculate_distance(coord, coord2))
-# print("in circle: ",within_circle(coord2,coord,7))
-#
-#
-# print(calculate_distance(coord,coord2,rounding=False))
-
-
-
-# def get_distances(start, height, width):
-#     matrix = np.zeros((height, width), dtype=np.float16)
-#     indexes = [(y, x) for y, row in enumerate(matrix) for x, val in enumerate(row)]
-#     to_points = np.array(indexes)
-#     start_point = np.array(start)
-#     distances = np.linalg.norm(to_points - start_point, ord=2, axis=1.)
-#
-#     return distances.reshape((height, width))
-#
-#
-# height = 16
-# width = 16
-# start = [8, 8]
-# distance_matrix = get_distances(start, height, width)
-# print(distance_matrix)
-
-
-
-# array = np.zeros((31,31), dtype=np.float16)
-# center = Coordinates(15,15)
-# radius = 10
-# value = 1
-# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
-# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
-# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-#
-#
-# print("-------")
-#
-# array = np.zeros((31,31), dtype=np.float16)
-# center = Coordinates(15,15)
-# radius = 10
-# value = 1
-# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
-# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=2))
-# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-#
-# print("-------")
-#
-# array = np.zeros((31,31), dtype=np.float16)
-# center = Coordinates(15,15)
-# radius = 10
-# value = 1
-# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
-# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=2.1))
-# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-#
-# print("-------")
-#
-# array = np.zeros((20,20), dtype=np.float16)
-# center = Coordinates(9,9)
-# radius = 7
-# value = 1
-# np.set_printoptions(threshold=np.inf,linewidth=np.inf)  ## SET PRINT THRESHOLD TO INFINITY
-# print(fill_circle(array, center, radius, value, cummulative=False, override_edges=0))
-# np.set_printoptions(threshold=10)     ## SET PRINT THRESHOLD TO 10
-
-
-# test = np.array([[0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-#                  [0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]])
-#
-# center = Coordinates(11,11)
-# section = get_circle_in_square(test,center,7, 8, pad_values=-1)
-# print(section)
 

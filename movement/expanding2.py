@@ -35,32 +35,6 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
     except: pass
 
 
-    ## A BIT FURTHER NORTH, EAST, SOUTH AND WEST
-    # position_matrix[ship_point[0] - 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
-    # position_matrix[ship_point[0]][ship_point[1] + 2] = Matrix_val.ALLY_SHIP.value
-    # position_matrix[ship_point[0] + 2][ship_point[1]] = Matrix_val.ALLY_SHIP.value
-    # position_matrix[ship_point[0]][ship_point[1] - 2] = Matrix_val.ALLY_SHIP.value
-
-
-
-    # if not(intermediate) or mining:
-    #     ## DO NOT FILL DIAGONALS DURING AN INTERMEDIATE STEP POSITION MATRIX FILL
-    #     ## UNLESS ITS DOCKING, INTERMEDIATE STEP IS SAME AS FINAL STEP
-    #     ## ALSO DIAGONALS?
-    #     try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
-    #     except: pass
-    #     try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
-    #     except: pass
-    #     try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
-    #     except: pass
-    #     try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-    #         # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
-    #     except: pass
-
-
     # HERE ALWAYS FILLING DIAGONALS (EVEN ON INTERMEDIATE STEPS)
     try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP_CORNER.value
     # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
@@ -91,14 +65,7 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
         intermediate_coord = MyCommon.get_destination_coord(ship_coord, angle, int(round(dx*x)))
         intermediate_point = MyCommon.get_rounded_point(intermediate_coord)
 
-        # logging.debug("About to fill intermediate step: {}".format(x))
         fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=True)
-        # if thrust == 0:
-        #     ## IF THRUST IS 0, DOCKING
-        #     ## NEED TO FILL DIAGONALS
-        #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=False)
-        # else:
-        #     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, intermediate=True)
 
     ## LAST TURN
     x = 7
@@ -138,7 +105,6 @@ def get_docking_coord(MyMoves, target_planet_id, ship_id):
     ## CHECK IF DOCKING COORD FOUND IS FREE/AVAILABLE
     ## IF NOT, TRY TO GET NEW COORDS
     if not(isPositionMatrix_free(MyMoves.position_matrix[7], docking_coord)):
-        #new_target_coord = get_new_target_coord(MyMoves.position_matrix, new_target_coord, reverse_angle)
 
         new_docking_coord = get_new_docking_coord(MyMoves, ship_id, target_planet_id, MyMoves.position_matrix[7], docking_coord, reverse_angle)
         if new_docking_coord is None:  ## TRY GOING CLOCKWISE/COUNTERCLOCKWISE
@@ -171,17 +137,6 @@ def get_new_docking_coord(MyMoves, ship_id, target_planet_id, position_matrix, c
                  (reverse_angle - 45, 3), \
                  ]
 
-    ## NEED DIFFERENT POSITIONS WHEN TAKING BIGGER RADIUS
-    ## TAKING BIGGEST RADIUS 2x ON NORTH, EAST, SOUTH, WEST
-    ## ONE IN DIAGONALS
-    # positions = [(reverse_angle, 3), \
-    #              (reverse_angle + 20, 2), \
-    #              (reverse_angle - 20, 2), \
-    #              (reverse_angle + 90, 4), \
-    #              (reverse_angle - 90, 4), \
-    #              (reverse_angle - 65, 4), \
-    #              (reverse_angle - 65, 4), \
-    #              ]
 
     for angle, thrust in positions:
         new_coord = MyCommon.get_destination_coord(coord, angle, thrust)
@@ -189,10 +144,7 @@ def get_new_docking_coord(MyMoves, ship_id, target_planet_id, position_matrix, c
         round_coord = MyCommon.Coordinates(round_point[0], round_point[1])
 
         if isPositionMatrix_free(position_matrix, round_coord) and MyCommon.ship_can_dock(MyMoves, new_coord, target_planet_id):
-        #if isPositionMatrix_free(position_matrix, round_coord):
             logging.debug("New docking coord found is good (Free and dockable: new_coord: {}".format(new_coord))
-            #ship_can_dock(MyMoves, round_coord, target_planet_id)
-            #return new_coord
             return round_coord ## THIS IS BETTER? LESS COLLISION?
 
     logging.debug("No new position found for ship_id: {} target_planet_id: {} coord: {}".format(ship_id, target_planet_id,coord))
@@ -222,9 +174,7 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
         round_coord = MyCommon.Coordinates(round_point[0], round_point[1])
 
         if isPositionMatrix_free(position_matrix, round_coord) and MyCommon.ship_can_dock(MyMoves, new_target_coord, target_planet_id):
-        #if isPositionMatrix_free(position_matrix, round_coord):
             logging.debug("Good enough 2")
-            #ship_can_dock(MyMoves, round_coord, target_planet_id)
             return round_coord
 
         ## GOING COUNTER CLOCKWISE
@@ -234,9 +184,7 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
         round_coord = MyCommon.Coordinates(round_point[0], round_point[1])
 
         if isPositionMatrix_free(position_matrix, round_coord) and MyCommon.ship_can_dock(MyMoves, new_target_coord_left, target_planet_id):
-        #if isPositionMatrix_free(position_matrix, round_coord):
             logging.debug("Good enough 3")
-            #ship_can_dock(MyMoves, round_coord, target_planet_id)
             return round_coord
 
         ## UPDATE VALUES FOR NEXT ITERATION

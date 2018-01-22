@@ -125,17 +125,6 @@ def has_room_to_dock(MyMoves, planet_id):
     RETURNS TRUE IF THERE IS STILL A DOCKING SPACE AVAILABLE
     """
 
-    ## WHEN NOT USING HEAPQ
-    # len_miners_prev = len(MyMoves.myMap.myMap_prev.data_planets[planet_id]['my_miners'])
-    # len_miners_now = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
-    # max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']
-    #
-    # ## PREVIOUSLY AND CURRENTLY, HAVE LESS MINERS THAN NUMBER OF DOCKS
-    # if len_miners_prev < max_docks and len_miners_now < max_docks:
-    #     return True
-    #
-    # return False
-
     ## WHEN USING HEAPQ, OR MOVING CLOSER SHIPS FIRST
     len_miners_now = len(MyMoves.myMap.data_planets[planet_id]['my_miners'])
     max_docks = MyMoves.myMap.data_planets[planet_id]['num_docks']

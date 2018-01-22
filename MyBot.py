@@ -3,7 +3,6 @@ import sys, os
 stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
 
-
 import hlt
 import logging
 from initialization.explore import Exploration
@@ -32,11 +31,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '99'
 tf.logging.set_verbosity(tf.logging.ERROR)
 
 
-
-
-## BEFORE IF MULTIPROCESS IS RUNNING, CAUSES ENGINE TO RECEIVE 'Using Tensorflow backend'. N/A ANYMORE.
-
-
 if __name__ == "__main__":
     freeze_support()
 
@@ -49,34 +43,23 @@ if __name__ == "__main__":
     game = hlt.Game("En3rG")
     logging.info("Starting my bot!")
 
+    ## INITIALIZE PROCESSES
+    ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
+    # MP = MyProcesses(game,
+    #                  MyCommon.Constants.DISABLE_LOG,
+    #                  MyCommon.Constants.WAIT_TIME,
+    #                  MyCommon.Constants.INPUT_MATRIX_Y,
+    #                  MyCommon.Constants.INPUT_MATRIX_X,
+    #                  MyCommon.Constants.INPUT_MATRIX_Z,
+    #                  MyCommon.Constants.NUM_EPOCH,
+    #                  MyCommon.Constants.BATCH_SIZE)
 
-    try:
+    start = datetime.datetime.now()
 
-        ## INITIALIZE PROCESSES
-        ## THIS TAKES ALMOST 800MB OF MEMORY (EVEN WITH THIS FUNCTION ALONE)
-        # MP = MyProcesses(game,
-        #                  MyCommon.Constants.DISABLE_LOG,
-        #                  MyCommon.Constants.WAIT_TIME,
-        #                  MyCommon.Constants.INPUT_MATRIX_Y,
-        #                  MyCommon.Constants.INPUT_MATRIX_X,
-        #                  MyCommon.Constants.INPUT_MATRIX_Z,
-        #                  MyCommon.Constants.NUM_EPOCH,
-        #                  MyCommon.Constants.BATCH_SIZE)
+    ## PERFORM INITIALIZATION PREP
+    EXP = Exploration(game)
 
-        start = datetime.datetime.now()
-
-        ## PERFORM INITIALIZATION PREP
-        EXP = Exploration(game)
-
-        logging.info("EXP time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-
-    except Exception as e:
-        logging.error("Error found: ==> {}".format(e))
-
-        for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
-            fname, lineno, fn, text = frame
-            logging.error("Error in {} on line {}".format(fname, lineno))
-
+    logging.info("EXP time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
 
     ## ALLOW SOME TIME FOR CHILD PROCESSES TO SPAWN
     time.sleep(2)
@@ -104,28 +87,10 @@ if __name__ == "__main__":
             logging.info("hlt update_map time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start)))
             start = datetime.datetime.now()
 
-
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
             logging.info("myMap completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
-
-
-
-            ## GET PROJECTIONS OF ENEMY SHIPS
-            # myProjection = MyProjection(myMap)
-            # logging.info("myProjection completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            # start = datetime.datetime.now()
-
-
-
-            ## FOR TESTING ONLY
-            ## SEE IF ENEMY IS ONCOMING
-            # myProjection.check_for_enemy()
-            # logging.info("myProjection.check_for_enemy completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            # start = datetime.datetime.now()
-
-
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
@@ -139,9 +104,6 @@ if __name__ == "__main__":
             turn += 1
             logging.info("model_handler completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
-            ## GETTING MEMORY USAGE IS QUITE SLOW (TIMES OUT)
-            # mem_usage = memory_usage((model_handler, (MP,turn, myMap, myMatrix)))
-            # logging.debug("mem_usage: {}".format(mem_usage))
 
             ## TRANSLATE PREDICTIONS
             #predicted_moves = NeuralNet.translate_predictions(predictions)
@@ -151,15 +113,10 @@ if __name__ == "__main__":
 
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
-            ## CURRENTLY FROM STARTER BOT MOVES
-            #moves.starter_bot_moves(game_map,command_queue)
-            ## MY MOVES
-            #myMoves = moves.MyMoves(myMap, myMatrix, EXP)
             myMoves = moves2.MyMoves(myMap, myMatrix, EXP, turn)
             command_queue = myMoves.command_queue
             logging.info("myMoves completed in <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
             start = datetime.datetime.now()
-
 
             ## SAVE OLD DATA FOR NEXT TURN
             ## WHEN USING DEEPCOPY SEEMS TO TIME OUT AFTER 7 TURNS
@@ -176,7 +133,6 @@ if __name__ == "__main__":
             ## TURN END
             logging.info("Commands send at {}".format(datetime.datetime.now()))
 
-
             ## TESTING ONLY
             log_myMap_ships(myMap)
             log_myMap_planets(myMap)
@@ -184,13 +140,6 @@ if __name__ == "__main__":
             ## FOR TESTING ONLY
             log_all_ships(myMap)
             log_all_planets(myMap)
-
-            ## FOR TESTING ONLY
-            # log_planets(game_map)
-            # log_players(game_map)
-
-            ## CLEAN UP OBJECTS NO LONGER REQUIRED NEXT TURN
-            ## NECESSARY?? NOPE
 
             logging.info("Total Turn Elapse Time: <<< {} >>> at {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start), datetime.datetime.now()))
 
@@ -217,16 +166,6 @@ if __name__ == "__main__":
         #os.killpg(0, signal.SIGKILL) ## MP.exit SEEMS ENOUGH (NEED TO CLOSE WINDOW THOUGH)
         ## GAME END
         pass
-
-
-## KERAS/TENSORFLOW ERROR ON SERVER. COMMENT OUT THE FOLLOWING
-## - KERAS IMPORT
-## - MP
-## - MODEL_HANDLER
-## - PREDICTION
-## - SET_DELAY
-## - MP.exit = True
-
 
 
 ## OLD MAP USED

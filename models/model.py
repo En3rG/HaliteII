@@ -146,9 +146,6 @@ class NeuralNet():
                 ## PREVIOUS SHIP POSITION
                 prev_x = round(ship_data['x'])
                 prev_y = round(ship_data['y'])
-                # prev_y = ship_data['point'][0]
-                # prev_x = ship_data['point'][1]
-
 
                 ## MATRICES BASED ON PREVIOUS MATRIX
                 matrix, matrix_hp = myMatrix.matrix_prev.matrix[player_id]
@@ -184,8 +181,6 @@ class NeuralNet():
                         ## GET PREVIOUS LOCATION OF THIS SHIP
                         prev_prev_y = round(ship_prev.get('y'))
                         prev_prev_x = round(ship_prev.get('x'))
-                        # prev_prev_y = ship_prev.get('point')[0]
-                        # prev_prev_x = ship_prev.get('point')[1]
 
                         row = half_y + (prev_prev_y - prev_y)
                         col = half_x + (prev_prev_x - prev_x)
@@ -193,10 +188,8 @@ class NeuralNet():
                         ## PLACE A 1 TO REPRESENT PREVIOUS LOCATION
                         matrix_prev_loc[row][col] = Matrix_val.ALLY_SHIP.value
 
-
                     ## NEED TO GET y_train FOR THIS SHIP
                     y_train_current = np.zeros((15, 15), dtype=np.int8)
-
 
                     now_ship = myMap.data_ships[player_id].get(ship_id)
 
@@ -204,8 +197,6 @@ class NeuralNet():
                         ## CURRENT SHIP POSITION
                         now_x = round(now_ship['x'])
                         now_y = round(now_ship['y'])
-                        # now_y = now_ship['point'][0]
-                        # now_x = now_ship['point'][1]
 
                         row = 7 + (now_y - prev_y)
                         col = 7 + (now_x - prev_x)
@@ -311,8 +302,6 @@ class NeuralNet():
             ## CURRENT SHIP POSITION
             now_x = round(ship_data['x'])
             now_y = round(ship_data['y'])
-            # now_x = ship_data['point'][0]
-            # now_y = ship_data['point'][1]
 
             matrix, matrix_hp = myMatrix.matrix[player_id]
 
@@ -342,8 +331,6 @@ class NeuralNet():
                     ## GET PREVIOUS LOCATION OF THIS SHIP
                     prev_y = round(ship_prev.get('y'))
                     prev_x = round(ship_prev.get('x'))
-                    # prev_y = ship_prev.get('point')[0]
-                    # prev_x = ship_prev.get('point')[1]
 
                     row = half_y + (prev_y - now_y)
                     col = half_x + (prev_x - now_x)
@@ -409,10 +396,6 @@ class NeuralNet():
                 ship_ids, data = dict
 
                 for id, pred in zip(ship_ids,data):
-
-                    ## NO NEED TO RESHAPE. CAN JUST GET ARGMAX AND HAVE A DICTIONARY TO GET VALUES FASTER
-                    # ncols = 15
-                    # new = np.reshape(pred, (-1, ncols))  ## -1 TO AUTOMATICALLY CALCULATE #ROWS PER ncols GIVEN
 
                     argmax = np.argmax(pred) ## GET INDEX WITH HIGHEST PROBABILITY
                     new_location = Predicted.get_new_location(argmax) ## RETURN COORDINATE GIVEN THE ARGMAX

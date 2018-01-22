@@ -7,6 +7,7 @@ import MyCommon
 import heapq
 import initialization.astar as astar
 import movement.attacking as attacking
+import movement.attacking2 as attacking2
 import movement.expanding as expanding
 import movement.expanding2 as expanding2
 import movement.attacking as attacking
@@ -86,7 +87,8 @@ class MyMoves():
 
             ## LOOK FOR SHIPS ABOUT TO BATTLE
             ## MOVE THOSE SHIPS
-            attacking.move_battling_ships(self)
+            #attacking.move_battling_ships(self)
+            attacking2.move_battling_ships(self)
 
             ## USING HEAPQ
             ## INITIALLY THOUGHT USING HEAP WAS SLOW

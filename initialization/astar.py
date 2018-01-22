@@ -204,7 +204,7 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
         # logging.debug("section_matrixes[4]: {}".format(section_matrixes[4]))
         # logging.debug("section_matrixes[5]: {}".format(section_matrixes[5]))
         # logging.debug("section_matrixes[6]: {}".format(section_matrixes[6]))
-        # logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
+        logging.debug("section_matrixes[7]: {}".format(section_matrixes[7]))
 
 
         logging.debug("A* path_points: {}".format(path_points))
@@ -232,7 +232,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
             ## IF ITS THE SAME AS FIRST COORD, AND COLLISION VALUE IS NOT OUR SHIP (1), THEN GO TO STEP 1
             ## WILL SKIP, PLANETS OR CORNER IN FILL MATRIX
             if astar_destination_point == path_points[-1] and collision_value is not None \
-                    and (int(collision_value) == Matrix_val.ALLY_SHIP.value or int(collision_value) == Matrix_val.ALLY_SHIP_CORNER.value) :
+                    and (int(collision_value) == Matrix_val.ALLY_SHIP.value or
+                         int(collision_value) == Matrix_val.ALLY_SHIP_CORNER.value or
+                         int(collision_value) == Matrix_val.PREDICTION_PLANET.value*2) :
                 logging.debug("Everything is bad, but will go step 1")
                 astar_destination_coord = MyCommon.Coordinates(step1_point[0], step1_point[1])
                 angle, thrust = MyCommon.get_angle_thrust(mid_coord, astar_destination_coord)
@@ -240,7 +242,9 @@ def get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, target_distance,
                 new_point = MyCommon.get_destination_coord(ship_coord,angle,thrust,rounding=True)
 
                 ## BEFORE, BASICALLY GOES TO STEP 1 IF ITS A CORNER
-                if MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value:
+                ## BUT GETS A NEW ANGLE IF ITS A SHIP/PLANET
+                if MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value or \
+                    MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.PREDICTION_PLANET.value*2:
                     ## WILL DEFINITELY COLLIDE TO ONE OF OUR SHIPS
                     ## GET NEW ANGLE
                     logging.debug("Colliding to ally ship, do prevention")

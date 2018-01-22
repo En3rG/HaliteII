@@ -14,8 +14,6 @@ from multiprocessor.processors import MyProcesses
 from multiprocessing import freeze_support, Queue
 #from models.model import NeuralNet, make_keras_picklable
 from models.data import MyMap, MyMatrix
-from projection.projection import MyProjection
-from movement import moves
 from movement import moves2
 import MyCommon
 import time

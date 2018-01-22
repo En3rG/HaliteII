@@ -211,8 +211,6 @@ def gather_clean_predictions(MP,start,turn):
 
 
 
-
-
 class MyProcesses():
     def __init__(self,game,disable_log, wait_time, y, x, z, num_epoch, batch_size):
         ## FOR TESTING ONLY
@@ -602,17 +600,6 @@ class MyProcesses():
                 logger.info("Time after training {}".format(time.clock()))
 
 
-        ## USING PROCESSORS, NOT WORKING RIGHT
-        # while self.exit == False:
-        #     logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),
-        #                                                    self.trainers[id]["args_queue"].qsize()))
-        #     logger.debug("Process status: {}".format(self.trainers[id]["processor"].is_alive() == False))
-        #     #if not self.trainers[id]["args_queue"].empty():
-        #     if not self.trainers[id]["args_queue"].empty() and not self.trainers[id]["processor"].is_alive(): ## causes error??
-        #         logger.debug("Popping from Queue")
-        #         arguments = self.trainers[id]["args_queue"].get()
-        #         self.trainers[id]["processor"] = Process(target=self.test_delay, args=arguments)
-        #         self.trainers[id]["processor"].start()
 
             time.sleep(0.05)
 
@@ -692,61 +679,7 @@ class MyProcesses():
         ## MINIMIZE MEMORY CONSUMPTION
         arguments = None ## NOT REALLY DOING MUCH
 
-    def worker_predict_model(self, name,id,x_train):
-        """
-        PREDICT MODEL ROM FILE
 
-        NO LONGER USED
-        """
-        logger = MyCommon.get_logger(name)
-        MyCommon.disable_log(self.disable_log, logging)
-        try:
-            # model = self.get_model_queues(id, logger)
-            # predictions = model.predict(x_train)
-            # logger.debug("Predictions done")
-            start = time.clock()
-            model = self.load_model(id,logger)
-            logger.debug("Loaded model")
-            predictions = model.predict(x_train)
-            end = time.clock()
-            logger.debug("Predictions done {}".format(end-start))
-        except:
-            pass
-
-
-    def worker_train_model(self,name,id,x_train,y_train):
-        """
-        TRAIN MODEL TO QUEUE
-
-        NO LONGER USED.
-        """
-        logger = MyCommon.get_logger(name)
-        MyCommon.disable_log(self.disable_log, logging)
-        logger.info("At {} and sleeping at {}".format(name, time.clock()))
-        model = self.get_model_queues(id,logger)
-        logger.info("Got Model")
-        model = copy.deepcopy(model)
-        logger.info("Done copying {}".format(type(model)))
-        model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch, verbose=0)    ## ERROR IS HERE. WHY? Sequential object has no attribute model
-        logger.info("Trained")
-        self.set_model_queues(id, model)
-        logger.info("Time after training {}".format(time.clock()))
-
-    def worker_train_model2(self, name, id, x_train, y_train,model):
-        """
-        TRAIN MODEL TO FILE
-
-        NO LONGER USED.
-        """
-        logger = MyCommon.get_logger(name)
-        MyCommon.disable_log(self.disable_log, logging)
-        logger.info("At {} and sleeping at {}".format(name, time.clock()))
-        logger.info("Got Model")
-        logger.info("Done copying {}".format(type(model)))
-        model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
-        logger.info("Trained")
-        self.save_model(id, model)
-        logger.info("Time after training {}".format(time.clock()))
 
 
 

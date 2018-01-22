@@ -108,68 +108,6 @@ def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, min
     fill_position_matrix(MyMoves.position_matrix[x], intermediate_point, mining, intermediate=False)
 
 
-
-
-
-
-
-
-
-
-
-def get_closest_docking_coord(MyMoves, target_planet_id, ship_id):
-    """
-    GET CLOSEST DOCKING COORD FROM DOCKABLE MATRIX
-
-    NOT USED.  NOT COMPLETELY WORKING YET (NUMPY NO POP)
-    """
-    def get_coord_closest_dock_value(values, distances):
-        """
-        GET COORDS OF CLOSEST DOCK VALUES (BASED ON CLOSEST DISTANCE FIRST)
-        """
-        v_indx = np.where(values == Matrix_val.DOCKABLE_AREA.value)
-        return values[v_indx][np.argsort(distances[v_indx])]
-
-
-    ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
-    ship_point = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['point']
-    circle_radius = 7
-    square_radius = 8
-
-    dockable_matrix = MyCommon.get_circle_in_square(MyMoves.EXP.dockable_matrix,
-                                                           ship_coord,
-                                                    circle_radius,
-                                                    square_radius,
-                                                           pad_values = -1)
-
-    position_matrix = MyCommon.get_circle_in_square(MyMoves.position_matrix[7],
-                                                    ship_coord,
-                                                    circle_radius,
-                                                    square_radius,
-                                                    pad_values=-1)
-
-    section_matrix = np.add(dockable_matrix,position_matrix)
-
-
-    distances = MyMoves.EXP.distance_matrix_DxD
-
-    closest_points = get_coord_closest_dock_value(section_matrix, distances)
-
-    logging.debug(closest_points)
-
-    while len(closest_points) > 0:
-        closest_point = closest_points.pop()
-        slope = (closest_point[0] - square_radius, closest_point[1] - square_radius)
-        target_coord = MyCommon.Coordinates(ship_point[0] + slope[0], ship_point[1] + slope[1])
-
-        if target_coord:
-            thrust, angle = astar.get_thrust_angle_from_Astar(MyMoves, ship_id, target_coord, distance, target_planet_id)
-            if thrust != 0:
-                return thrust, angle
-
-    return None, None
-
-
 def get_docking_coord(MyMoves, target_planet_id, ship_id):
     """
     RETURN TARGET COORD TOWARDS A SPECIFIED PLANET
@@ -329,31 +267,3 @@ def isPositionMatrix_free(position_matrix, coord):
 
 
 
-
-# ship_coord = MyCommon.Coordinates(34.2850, 57.5704)
-# angle_towards_target = 277
-# fake_target_thrust = 10
-# temp_target_coord = MyCommon.get_destination_coord(ship_coord, angle_towards_target, fake_target_thrust)
-# print(temp_target_coord)
-
-
-
-# coord = MyCommon.Coordinates(115.9589 , 171.9589)
-# target = MyCommon.Coordinates(24.5, 45.5)
-# d = MyCommon.calculate_distance(coord, target, rounding=False)
-# print(d)
-
-
-## GET DISTANCES BETWEEN point and a set of points
-# to_points = np.array([(0,1),(1,0),(-1,0),(0,-1),(2,2)])
-# start = np.array([0,0])
-# distances = np.linalg.norm(to_points - start, ord=2, axis=1.)  # distances is a list
-#
-# print(type(distances))
-
-
-# coord = MyCommon.Coordinates(125.9814,189.031)
-# print(MyCommon.get_destination_coord(coord, 162, 3, rounding=True))
-#
-# coord = MyCommon.Coordinates(130.9572,189.0428)
-# print(MyCommon.get_destination_coord(coord, 236, 4, rounding=True))

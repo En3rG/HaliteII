@@ -5,28 +5,8 @@ import heapq
 import numpy as np
 import MyCommon
 from models.data import Matrix_val
-from initialization.astar import a_star
 import datetime
 import initialization.astar as astar
-
-
-class LaunchPads():
-    """
-    WILL CONTAIN THE COORDINATE OF START PLANET (FLY OFF COORD)
-    AND TARGET PLANET (LAND ON COORD)
-
-    NO LONGER USED.
-    """
-    def __init__(self,fly_off_coord,land_on_coord):
-        self.fly_off = fly_off_coord ## COORDINATE OBJECT
-        self.land_on = land_on_coord ## COORDINATE OBJECT
-
-    ## OVERRIDE PRINTING FUNCTION
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return "fly_off: {} land_on: {}".format(self.fly_off, self.land_on)
 
 
 class Exploration():
@@ -69,8 +49,6 @@ class Exploration():
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix, self.all_planet_hp_matrix = self.fill_planets_for_paths()
 
-        self.get_launch_coords() ## NO LONGER USED
-
         self.distance_matrix_AxA = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS * 2 + 1)
         self.distance_matrix_DxD = self.get_distance_matrix(MyCommon.Constants.DEFENDING_PERIMETER_CHECK, MyCommon.Constants.DEFENDING_PERIMETER_CHECK * 2 + 1)
         self.distance_matrix_backup = self.get_distance_matrix(MyCommon.Constants.BACKUP_SQUARE_RADIUS,
@@ -78,8 +56,6 @@ class Exploration():
 
         self.dockable_matrix = self.fill_dockable_matrix()
 
-
-        #self.A_paths = self.get_paths() ## NO LONGER USED??
 
     def get_distance_matrix(self, center, square_diameter):
         """
@@ -149,18 +125,6 @@ class Exploration():
                     matrix[id2][id] = matrix[id][id2]
 
         return matrix
-
-        ## COULD WE ALSO USE SCIPY??
-        # >> > from scipy.spatial import distance
-        # >> > coords = [(35.0456, -85.2672),
-        #                ...(35.1174, -89.9711),
-        #                ...(35.9728, -83.9422),
-        #                ...(36.1667, -86.7833)]
-        # >> > distance.cdist(coords, coords, 'euclidean')
-        # array([[0., 4.7044, 1.6172, 1.8856],
-        #        [4.7044, 0., 6.0893, 3.3561],
-        #        [1.6172, 6.0893, 0., 2.8477],
-        #        [1.8856, 3.3561, 2.8477, 0.]])
 
 
     def get_distances_section(self):
@@ -390,28 +354,6 @@ class Exploration():
         return k[v.index(max(v))]
 
 
-    def get_launch_coords(self):
-        """
-        DETERMINE LAUNCH COORDS PER START (PLANET) TO TARGET (PLANET)
-
-        NO LONGER USED?
-        """
-
-        for planet_id, start_planet in self.planets.items():
-            for target_planet in self.game_map.all_planets():
-                ## GET FLY OFF COORD
-                angle = MyCommon.get_angle(start_planet['coords'],MyCommon.Coordinates(target_planet.y,target_planet.x))
-                distance = start_planet['radius'] + Exploration.LAUNCH_OFF_DISTANCE
-                fly_off_coord = MyCommon.get_destination_coord(start_planet['coords'], angle, distance)
-
-                ## GET LAND ON COORD
-                angle = MyCommon.get_angle(MyCommon.Coordinates(target_planet.y, target_planet.x),start_planet['coords'])
-                distance = target_planet.radius + Exploration.LAUNCH_ON_DISTANCE
-                land_on_coord = MyCommon.get_destination_coord(MyCommon.Coordinates(target_planet.y, target_planet.x), angle, distance)
-
-                ## EACH PLANET WILL HAVE TARGET TO EACH OTHER PLANETS AND ITS LAUNCH PAD INFO
-                self.planets[planet_id][target_planet.id] = LaunchPads(fly_off_coord,land_on_coord)
-
     def fill_dockable_matrix(self):
         """
         FILL MATRIX WITH DOCKABLE VALUE
@@ -495,103 +437,4 @@ class Exploration():
 
         self.planet_matrix[planet.id] = matrix
 
-
-    def get_paths(self):
-        """
-        GET A* PATHS FROM PLANET (START LAUNCHPAD) TO PLANET (TARGET LAUNCHPAD)
-
-        GET A* PATH FROM STARTING LOCATION (3 SHIPS) TO BEST PLANET
-
-        NO LONGER USED
-        """
-        paths = {}
-
-        ## GET A* PATHS FROM A PLANET TO EACH PLANET
-        paths = self.get_planet_to_planet_paths(paths)
-
-        ## GET A* FROM EACH OF THE STARTING SHIPS TO BEST PLANET
-        #paths = self.get_starting_ships_paths(paths)
-
-        return paths
-
-
-    def get_planet_to_planet_paths(self, paths):
-        """
-        GET A* PATHS FROM FLY OFF TO LAND OFF LAUNCH COORDS
-
-        NO LONGER USED
-        """
-        done = set()
-
-        for planet_id, planet in self.planets.items():
-            for target_planet in self.game_map.all_planets():
-                if (planet_id, target_planet.id) not in done:
-                    fly_off_point = (self.planets[planet_id][target_planet.id].fly_off.y, \
-                                     self.planets[planet_id][target_planet.id].fly_off.x)
-                    land_on_point = (self.planets[planet_id][target_planet.id].land_on.y, \
-                                     self.planets[planet_id][target_planet.id].land_on.x)
-
-                    ## GET PATHS
-                    path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, fly_off_point, land_on_point)
-                    path_table_reverse = astar.get_start_target_table([] if simplified_paths == [] else simplified_paths[::-1])
-
-                    paths[(planet_id, target_planet.id)] = path_table_forward
-                    paths[(target_planet.id, planet_id)] = path_table_reverse
-
-                    ## ADD TO DONE ALREADY
-                    done.add((planet_id, target_planet.id))
-                    done.add((target_planet.id, planet_id))
-
-        return paths
-
-
-    def get_starting_ships_paths(self, paths):
-        """
-        GET A* PATHS FROM EACH OF THE STARTING SHIPS TO THE BEST PLANET
-
-        NO LONGER USED
-        """
-
-        ## USE A* TO GET PATH FROM STARTING CENTROID TO BEST PLANET
-
-        target_planet = self.planets[self.best_planet_id]
-        ## GET ANGLE OF CENTROID TO BEST PLANET
-        target_coord = MyCommon.Coordinates(target_planet['coords'].y, target_planet['coords'].x)
-        angle = MyCommon.get_angle(self.myStartCoords, target_coord)
-
-        ## FOR CENTROID TARGET ONLY
-        # fly_off_point = (self.myStartCoords.y, self.myStartCoords.x)
-        # distance = target_planet['radius'] + Exploration.LAUNCH_OFF_DISTANCE
-        # land_on_coord = MyCommon.get_destination_coord(target_coord, angle, distance)
-        # land_on_point = (land_on_coord.y, land_on_coord.x)
-        #
-        # path_points = a_star(self.all_planet_matrix, fly_off_point, land_on_point)
-        # simplified_paths = self.simplify_paths(path_points)
-        # path_table_forward = self.get_start_target_table(simplified_paths)
-        # paths[(-1, self.best_planet_id)] = path_table_forward  ## -1 ID FOR STARTING POINT
-
-        ## GET A* FOR EACH STARTING SHIPS
-        matrix = self.planet_matrix[self.best_planet_id]
-        looking_for_val = Matrix_val.PREDICTION_PLANET.value
-        ## GO THROUGH EACH OF OUR SHIPS
-        for player in self.game_map.all_players():
-            if player.id == self.game_map.my_id:
-                for ship in player.all_ships():
-                    starting_point = (ship.y, ship.x)
-                    starting_coord = MyCommon.Coordinates(ship.y, ship.x)
-                    closest_coord = MyCommon.get_coord_of_value_in_angle(matrix, starting_coord, looking_for_val, angle)
-
-                    if closest_coord:
-                        reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-                        destination_coord = MyCommon.get_destination_coord(closest_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
-                        closest_point = (destination_coord.y, destination_coord.x)
-
-                        path_table_forward, simplified_paths = astar.get_Astar_table(self.all_planet_matrix, starting_point, closest_point)
-                        paths[(-1, ship.id, self.best_planet_id)] = path_table_forward  ## -1 ID FOR STARTING POINT
-
-                    else:
-                        ## DIDNT FIND. SHOULDNT HAPPEN FOR THE STARTING 3 SHIPS
-                        logging.error("One of the starting ships didnt see the best planet, given the angle.")
-
-        return paths
 

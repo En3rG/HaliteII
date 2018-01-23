@@ -78,7 +78,7 @@ def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord):
                                                 pad_values,
                                                 pad_outside_circle=True)
 
-    ships = MyCommon.get_ship_ids_in_array(area_matrix, MyMoves.EXP.distance_matrix_backup)
+    ships = MyCommon.get_ship_ids_in_array(area_matrix, MyMoves.EXP.distance_matrix_DxD)
 
     logging.debug("ships {}".format(ships))
 

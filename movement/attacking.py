@@ -6,6 +6,7 @@ import heapq
 from models.data import Matrix_val
 import initialization.astar as astar
 
+
 def set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task):
     """
     SET COMMAND TO SEND

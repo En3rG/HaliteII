@@ -19,6 +19,12 @@ from initialization.explore import Exploration
 from models.data import Matrix_val
 import MyCommon
 
+
+"""
+CAN DELETE ENTIRE FILE.
+NO LONGER USED!!!
+"""
+
 graph = tf.get_default_graph()      ## FROM ONLINE FOR MULTITHREADING
 
 

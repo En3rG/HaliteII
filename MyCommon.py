@@ -150,9 +150,11 @@ def fill_circle(array, center, radius, value, cummulative=False, override_edges=
     ## MASKS IS A HEIGHTxWIDTH ARRAY WITH TRUE INSIDE THE CIRCLE SPECIFIED
 
     if override_edges:
-        mask = x * x + y * y <= radius * radius + radius * override_edges  ## USED FOR FILLING PLANETS IN EXPLORE
+        ## USED FOR FILLING PLANETS IN EXPLORE
+        mask = x * x + y * y <= radius * radius + radius * override_edges
     else:
-        mask = x * x + y * y <= radius * radius + radius*Constants.CIRCLE_RADIUS_EXTRA_EDGES  ## WHEN WANT TO BE MORE CIRCLE (DUE TO ROUNDING)
+        ## WHEN WANT TO BE MORE CIRCLE (DUE TO ROUNDING)
+        mask = x * x + y * y <= radius * radius + radius*Constants.CIRCLE_RADIUS_EXTRA_EDGES
 
     if cummulative:  ## VALUE KEEPS GETTING ADDED
         array[mask] += value
@@ -175,7 +177,6 @@ def get_angle(coords, target_coords):
 def get_destination_coord(start_coord, angle, thrust, rounding=False):
     """
     GIVEN ANGLE AND THRUST, GET DESTINATION COORDS
-
     start_coord HAVE (y,x) FORMAT
     """
     if angle == 0:

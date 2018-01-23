@@ -16,9 +16,6 @@ class Exploration():
     GATHERS BEST PLANET TO CONQUER FIRST
     GATHERS PATHS, EACH PLANET TO EACH PLANET
     """
-    LAUNCH_OFF_DISTANCE = 4    ## OFFSET FROM PLANET RADIUS, NO LONGER USED
-    LAUNCH_ON_DISTANCE = 4
-
     def __init__(self,game):
         self.game_map = game.map
         self.height = self.game_map.height + 1
@@ -27,29 +24,18 @@ class Exploration():
         logging.debug("Map height: {}".format(self.height))
         logging.debug("Map width: {}".format(self.width))
 
-
         self.planets = self.get_planets()
-
         self.sections_distance_table = self.get_distances_section()                  ## DISTANCES FROM SECTION TO SECTION
-
         self.sections_planet_distance_table = self.get_distances_section_to_planet() ## DISTANCES FROM SECTION TO PLANET
-
-        self.sections_planet_score_table = self.get_scores_section_to_planet()  ## DISTANCES FROM SECTION TO PLANET
-
+        self.sections_planet_score_table = self.get_scores_section_to_planet()       ## DISTANCES FROM SECTION TO PLANET
         self.planets_distance_matrix = self.get_distances()
-
         self.planets_score_matrix = self.get_planets_score()
-
         self.myStartCoords = self.get_start_coords()
-
         self.distances_from_start = self.get_start_distances()
-
         self.best_planet_id = self.get_best_planet()
-
-        self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
+        self.planet_matrix = {}                     ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix, self.all_planet_hp_matrix = self.fill_planets_for_paths()
-
-        self.distance_matrix_AxA = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, 
+        self.distance_matrix_AxA = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS,
                                                             MyCommon.Constants.ATTACKING_RADIUS * 2 + 1)
         self.distance_matrix_DxD_perimeter = self.get_distance_matrix(MyCommon.Constants.DEFENDING_PERIMETER_CHECK,
                                                                       MyCommon.Constants.DEFENDING_PERIMETER_CHECK * 2 + 1)
@@ -66,7 +52,6 @@ class Exploration():
         DISTANCE MATRIX FOR 15x15 MATRIX
         ASSUMING START IS AT THE CENTER
         """
-
         ## USING NUMPY VECTORIZED
         start_point = (center,center)
         n_rows, n_cols = square_diameter, square_diameter
@@ -324,18 +309,16 @@ class Exploration():
 
         for planet in self.game_map.all_planets():
             value = Matrix_val.DOCKABLE_AREA.value
-            matrix = MyCommon.fill_circle(matrix, \
-                                          MyCommon.Coordinates(planet.y, planet.x), \
-                                          ## -1 TO MAKE SURE ITS DOCKABLE, DUE TO POSSIBLE ROUNDING ISSUE
-                                          planet.radius, \
-                                          value, \
+            matrix = MyCommon.fill_circle(matrix,
+                                          MyCommon.Coordinates(planet.y, planet.x),
+                                          planet.radius,
+                                          value,
                                           cummulative=True, override_edges=0)
 
-            matrix = MyCommon.fill_circle(matrix, \
-                                          MyCommon.Coordinates(planet.y, planet.x), \
-                                          ## -1 TO MAKE SURE ITS DOCKABLE, DUE TO POSSIBLE ROUNDING ISSUE
-                                          planet.radius + MyCommon.Constants.DOCK_RADIUS, \
-                                          value, \
+            matrix = MyCommon.fill_circle(matrix,
+                                          MyCommon.Coordinates(planet.y, planet.x),
+                                          planet.radius + MyCommon.Constants.DOCK_RADIUS,
+                                          value,
                                           cummulative=True, override_edges=0)
         return matrix
 
@@ -343,9 +326,7 @@ class Exploration():
     def fill_planets_for_paths(self):
         """
         FILL PLANETS (AND ITS ENTIRE RADIUS) FOR A* MATRIX
-
         ADDING 4 ON RADIUS TO PREVENT COLLIDING ON MINING SHIPS
-
         STILL USED, EVEN WHEN USING JUST SECTIONED A*
         """
         matrix = np.zeros((self.height, self.width), dtype=np.float16)
@@ -355,24 +336,24 @@ class Exploration():
             value = Matrix_val.PREDICTION_PLANET.value
 
             ## WITHOUT PADDING
-            matrix = MyCommon.fill_circle(matrix, \
-                                          MyCommon.Coordinates(planet.y, planet.x), \
-                                          planet.radius, \
-                                          value, \
-                                          cummulative=True, \
-                                          override_edges=1.95) ## 2 BEFORE
+            matrix = MyCommon.fill_circle(matrix,
+                                          MyCommon.Coordinates(planet.y, planet.x),
+                                          planet.radius,
+                                          value,
+                                          cummulative=True,
+                                          override_edges=1.95)
 
             ## WITH PADDING
-            matrix = MyCommon.fill_circle(matrix, \
-                                          MyCommon.Coordinates(planet.y, planet.x), \
-                                          planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
-                                          value, \
-                                          cummulative=True, \
+            matrix = MyCommon.fill_circle(matrix,
+                                          MyCommon.Coordinates(planet.y, planet.x),
+                                          planet.radius + MyCommon.Constants.FILL_PLANET_PAD,
+                                          value,
+                                          cummulative=True,
                                           override_edges=0)
 
-            matrix_hp = MyCommon.fill_circle(matrix_hp, \
-                                             MyCommon.Coordinates(planet.y, planet.x), \
-                                             planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
+            matrix_hp = MyCommon.fill_circle(matrix_hp,
+                                             MyCommon.Coordinates(planet.y, planet.x),
+                                             planet.radius + MyCommon.Constants.FILL_PLANET_PAD,
                                              planet.health / Matrix_val.MAX_SHIP_HP.value)
 
             ## FILL THIS SPECIFIC PLANET
@@ -387,11 +368,10 @@ class Exploration():
         """
         matrix = np.zeros((self.height, self.width), dtype=np.int8)
         value = Matrix_val.PREDICTION_PLANET.value
-        matrix = MyCommon.fill_circle(matrix, \
-                                      MyCommon.Coordinates(planet.y, planet.x), \
-                                      planet.radius + MyCommon.Constants.FILL_PLANET_PAD, \
-                                      #planet.radius, \
-                                      value, \
+        matrix = MyCommon.fill_circle(matrix,
+                                      MyCommon.Coordinates(planet.y, planet.x),
+                                      planet.radius + MyCommon.Constants.FILL_PLANET_PAD,
+                                      value,
                                       cummulative=False)
 
         self.planet_matrix[planet.id] = matrix

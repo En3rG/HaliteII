@@ -36,7 +36,14 @@ def undock_ships(MyMoves):
         target_planet_id = None
         target_type = MyCommon.Target.NOTHING
         ship_task = MyCommon.ShipTasks.RETREATING
-        MyMoves.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
+        MyMoves.set_ship_statuses(ship_id,
+                                  target_type,
+                                  target_planet_id,
+                                  ship_coord,
+                                  ship_task,
+                                  angle=0,
+                                  thrust=0,
+                                  target_coord=None)
         MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id))
 
 def move_other_ships(MyMoves):
@@ -48,7 +55,10 @@ def move_other_ships(MyMoves):
     heap = []
     for ship_id, ship in MyMoves.myMap.data_ships[MyMoves.myMap.my_id].items():
         if ship_id not in MyMoves.myMap.ships_moved_already:
-            enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(MyMoves, ship_id, move_now=False, docked_only=False)
+            enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(MyMoves,
+                                                                                      ship_id,
+                                                                                      move_now=False,
+                                                                                      docked_only=False)
             logging.debug("ship_id: {} heap enemy distance: {}".format(ship_id, enemy_distance))
             heapq.heappush(heap, (-enemy_distance, ship_id)) ## WILL GO FROM FURTHEST TO CLOSEST FROM ENEMY
 
@@ -63,7 +73,14 @@ def move_other_ships(MyMoves):
 
         angle, thrust = get_to_closest_corner(MyMoves, ship_id, ship_coord)
 
-        MyMoves.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, thrust, target_coord=None)
+        MyMoves.set_ship_statuses(ship_id,
+                                  target_type,
+                                  target_planet_id,
+                                  ship_coord,
+                                  ship_task,
+                                  angle,
+                                  thrust,
+                                  target_coord=None)
         MyMoves.command_queue.append(MyCommon.convert_for_command_queue(ship_id, thrust, angle))
 
 
@@ -92,6 +109,10 @@ def get_to_closest_corner(MyMoves, ship_id, ship_coord):
             min_distance = distance
             closest_corner = corner_coord
 
-    thrust, angle = astar.get_thrust_angle_from_Astar(MyMoves, ship_id, closest_corner, min_distance, target_planet_id=None)
+    thrust, angle = astar.get_thrust_angle_from_Astar(MyMoves,
+                                                      ship_id,
+                                                      closest_corner,
+                                                      min_distance,
+                                                      target_planet_id=None)
 
     return angle, thrust

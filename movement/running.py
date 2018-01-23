@@ -17,7 +17,14 @@ def set_commands_status(MyMoves, ship_id, thrust, angle, target_coord, ship_task
     ship_coord = MyMoves.myMap.data_ships[MyMoves.myMap.my_id][ship_id]['coords']
     target_type = MyCommon.Target.NOTHING
     target_id = None
-    MyMoves.set_ship_statuses(ship_id, target_type ,target_id, ship_coord, ship_task, angle=angle, thrust=thrust, target_coord=target_coord)
+    MyMoves.set_ship_statuses(ship_id,
+                              target_type,
+                              target_id,
+                              ship_coord,
+                              ship_task,
+                              angle=angle,
+                              thrust=thrust,
+                              target_coord=target_coord)
 
 
 def move_running_ships(MyMoves):

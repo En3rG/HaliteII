@@ -13,45 +13,29 @@ def fill_position_matrix(position_matrix, ship_point, mining, intermediate=False
     """
     FILL POSITION MATRIX WITH 1 TO REPRESENT MY SHIP
     ALSO NEED TO TAKE INTO ACCOUNT ITS NEIGHBORING COORDS
-
     ADDING TRY/EXCEPT TO HANDLE OUT OF BOUNDS FROM MAP
     """
-
     position_matrix[ship_point[0]][ship_point[1]] = Matrix_val.ALLY_SHIP.value
 
     ## ALSO ITS NORTH, EAST, SOUTH AND WEST
     try: position_matrix[ship_point[0] - 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
-        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1,ship_point[1]))
     except: pass
     try: position_matrix[ship_point[0]][ship_point[1] + 1] = Matrix_val.ALLY_SHIP.value
-        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0], ship_point[1] + 1))
     except: pass
     try: position_matrix[ship_point[0] + 1][ship_point[1]] = Matrix_val.ALLY_SHIP.value
-        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1]))
-
     except: pass
     try: position_matrix[ship_point[0]][ship_point[1] - 1] = Matrix_val.ALLY_SHIP.value
-        # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0], ship_point[1] - 1))
     except: pass
-
 
     # HERE ALWAYS FILLING DIAGONALS (EVEN ON INTERMEDIATE STEPS)
     try: position_matrix[ship_point[0] - 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP_CORNER.value
-    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] - 1))
     except: pass
-
     try: position_matrix[ship_point[0] - 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP_CORNER.value
-    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] - 1, ship_point[1] + 1))
     except: pass
-
     try: position_matrix[ship_point[0] + 1][ship_point[1] + 1] = Matrix_val.ALLY_SHIP_CORNER.value
-    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] + 1))
     except: pass
-
     try: position_matrix[ship_point[0] + 1][ship_point[1] - 1] = Matrix_val.ALLY_SHIP_CORNER.value
-    # logging.debug("Filled position_matrix point: {}, {}".format(ship_point[0] + 1, ship_point[1] - 1))
     except: pass
-
 
 
 def fill_position_matrix_intermediate_steps(MyMoves, ship_id, angle, thrust, mining):
@@ -105,8 +89,13 @@ def get_docking_coord(MyMoves, target_planet_id, ship_id):
     ## CHECK IF DOCKING COORD FOUND IS FREE/AVAILABLE
     ## IF NOT, TRY TO GET NEW COORDS
     if not(isPositionMatrix_free(MyMoves.position_matrix[7], docking_coord)):
+        new_docking_coord = get_new_docking_coord(MyMoves,
+                                                  ship_id,
+                                                  target_planet_id,
+                                                  MyMoves.position_matrix[7],
+                                                  docking_coord,
+                                                  reverse_angle)
 
-        new_docking_coord = get_new_docking_coord(MyMoves, ship_id, target_planet_id, MyMoves.position_matrix[7], docking_coord, reverse_angle)
         if new_docking_coord is None:  ## TRY GOING CLOCKWISE/COUNTERCLOCKWISE
             docking_coord = get_new_docking_coord2(MyMoves, ship_id, target_planet_id, docking_coord, reverse_angle)
         else:
@@ -194,7 +183,9 @@ def get_new_docking_coord2(MyMoves, ship_id, target_planet_id, old_target_coord,
 
         spots += 1
 
-    logging.debug("No new position2 found for ship_id: {} target_planet_id: {} coord: {}".format(ship_id, target_planet_id, old_target_coord))
+    logging.debug("No new position2 found for ship_id: {} target_planet_id: {} coord: {}".format(ship_id,
+                                                                                                 target_planet_id,
+                                                                                                 old_target_coord))
     return None
 
 
@@ -204,7 +195,8 @@ def isPositionMatrix_free(position_matrix, coord):
     GIVEN CURRENT POSITION MATRIX AND COORD
     BASED ON POSITION MATRIX [7]
     """
-    logging.debug("At coord: {}.  Position_matrix value is: {}".format(coord, position_matrix[int(round(coord.y))][int(round(coord.x))]))
+    logging.debug("At coord: {}.  Position_matrix value is: {}".format(coord,
+                                                                       position_matrix[int(round(coord.y))][int(round(coord.x))]))
 
     point = MyCommon.get_rounded_point(coord)
     return position_matrix[point[0]][point[1]] == 0

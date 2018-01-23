@@ -95,13 +95,10 @@ class MyMap():
 
         self.check_limit()                      ## KEEP A LIMIT OF NODES IN MEMORY
 
-        #self.groups = grouping.Groups(self) ## NO LONGER USED
-
 
     def check_limit(self):
         """
         DELETE NODES THAT ARE OVER THE MAX LIMIT
-
         MINIMIZE/LIMIT NUMBER OF NODES IN MEMORY
         """
         MyMap.NUM_NODES += 1
@@ -233,9 +230,7 @@ class MyMap():
     def update_ship_task_mining(self,ships):
         """
         UPDATE TASKS OF SHIPS PROVIDED
-
         SHIPS ARE MINE ONLY
-
         NO LONGER USED
         """
         for ship_id in ships:
@@ -248,6 +243,7 @@ class MyMap():
         """
         ## my_miners ARE MY SHIPS MINING OR GOING TO MINE THIS PLANET
         ## NEED TO ADD SHIPS TASKED TO EXPANDING
+        ## MAKE DATA AS CLASS LATER
         self.data_planets[planet.id] = {'y': planet.y, \
                                        'x': planet.x, \
                                         'coords': MyCommon.Coordinates(planet.y, planet.x), \
@@ -351,7 +347,9 @@ class MyMatrix():
         for player_id, ships in self.myMap.data_ships.items():
             if player_id == self.myMap.my_id:
                 ## SET PLANET TO PREDICTION MATRIX
-                self.ally_matrix, _ = self.fill_ships_ally(self.ally_matrix, np.copy(self.EXP.all_planet_matrix), ships)
+                self.ally_matrix, _ = self.fill_ships_ally(self.ally_matrix,
+                                                           np.copy(self.EXP.all_planet_matrix),
+                                                           ships)
 
             ## JUST TAKING MATRIX FROM EXPLORATION
             matrix_current, matrix_hp_current = np.copy(self.EXP.all_planet_matrix), np.copy(self.EXP.all_planet_hp_matrix)
@@ -359,14 +357,18 @@ class MyMatrix():
             if player_id != self.myMap.my_id:
                 ## NOT FILLING OUR SHIPS SINCE IT"LL BE ADDED ONCE ME MOVE EACH SHIPS
                 ## FILL CURRENT PLAYER'S SHIPS
-                matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,matrix_hp_current,ships)
+                matrix_current, matrix_hp_current = self.fill_ships_ally(matrix_current,
+                                                                         matrix_hp_current,
+                                                                         ships)
 
             for player_enemy_id, enemy_ships in self.myMap.data_ships.items():
                 if player_enemy_id == player_id:
                     pass
                 else:
                     ## FILL CURRENT PLAYER'S ENEMY SHIPS
-                    matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current, matrix_hp_current, enemy_ships)
+                    matrix_current, matrix_hp_current = self.fill_ships_enemy(matrix_current,
+                                                                              matrix_hp_current,
+                                                                              enemy_ships)
 
             final_matrix[player_id] = (matrix_current,matrix_hp_current) ## TUPLE OF 2 MATRIXES
 
@@ -381,13 +383,14 @@ class MyMatrix():
         """
         for planet_id, planet in self.myMap.data_planets.items():
             value = Matrix_val.PREDICTION_PLANET.value
-            matrix = MyCommon.fill_circle(matrix, \
-                                          planet['coords'], \
-                                          planet['radius'], \
-                                          value, \
+            matrix = MyCommon.fill_circle(matrix,
+                                          planet['coords'],
+                                          planet['radius'],
+                                          value,
                                           cummulative=False)
 
         return matrix
+
 
     def fill_planets(self,matrix,matrix_hp, player_id):
         """
@@ -406,14 +409,14 @@ class MyMatrix():
             else:
                 value = Matrix_val.ENEMY_PLANET.value
 
-            matrix = MyCommon.fill_circle(matrix, \
-                                          planet['coords'], \
-                                          planet['radius']+MyCommon.Constants.FILL_PLANET_PAD, \
+            matrix = MyCommon.fill_circle(matrix,
+                                          planet['coords'],
+                                          planet['radius']+MyCommon.Constants.FILL_PLANET_PAD,
                                           value)
 
-            matrix_hp = MyCommon.fill_circle(matrix_hp, \
-                                             planet['coords'], \
-                                             planet['radius']+MyCommon.Constants.FILL_PLANET_PAD, \
+            matrix_hp = MyCommon.fill_circle(matrix_hp,
+                                             planet['coords'],
+                                             planet['radius']+MyCommon.Constants.FILL_PLANET_PAD,
                                              planet['health'] / Matrix_val.MAX_SHIP_HP.value)
 
         return matrix, matrix_hp
@@ -434,6 +437,7 @@ class MyMatrix():
             matrix_hp[ship['point'][0]][ship['point'][1]] = ship['health'] / Matrix_val.MAX_SHIP_HP.value
 
         return matrix, matrix_hp
+
 
     def fill_ships_enemy(self, matrix, matrix_hp, enemy_ships):
         """
@@ -457,9 +461,7 @@ class MyMatrix():
         """
         FILL MATRIX WITH PREDICTED ENEMY SHIPS COORDS
         ITS ACCUMULATIVE ATTACK POWER WILL
-
         MATRIX SHOULD BE FILLED WITH PLANETS INFO ALREADY
-
         NO LONGER USED, SINCE NO LONGER PREDICTING (NO NEURAL NET)
         """
 
@@ -479,10 +481,10 @@ class MyMatrix():
                     else:
                         value = Matrix_val.PREDICTION_ENEMY_SHIP_DOCKED.value
                     logging.debug("Predicted ship id: {} new coord: {} {}".format(ship_id, pred_y, pred_x))
-                    self.prediction_matrix = MyCommon.fill_circle(self.prediction_matrix, \
-                                                                  MyCommon.Coordinates(pred_y,pred_x), \
-                                                                  MyCommon.Constants.ATTACK_RADIUS, \
-                                                                  value, \
+                    self.prediction_matrix = MyCommon.fill_circle(self.prediction_matrix,
+                                                                  MyCommon.Coordinates(pred_y,pred_x),
+                                                                  MyCommon.Constants.ATTACK_RADIUS,
+                                                                  value,
                                                                   cummulative=True)
                 except Exception as e:
                     logging.error("Error found: ==> {}".format(e))

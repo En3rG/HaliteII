@@ -18,7 +18,6 @@ import gc
 import tensorflow as tf
 
 
-
 def set_delay(start):
     """
     DELAY TO MAXIMIZE 2 SECONDS PER TURN
@@ -502,9 +501,11 @@ class MyProcesses():
 
         ## USING THREADS
         while self.exit == False:
-            logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
+            logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),
+                                                           self.trainers[id]["args_queue"].qsize()))
 
-            if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
+            if not self.trainers[id]["args_queue"].empty() and \
+                    (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
 
@@ -513,7 +514,7 @@ class MyProcesses():
                 model = self.get_model_queues(id, logger)
                 logger.info("Got Model")
                 logger.info("Done copying {}".format(type(model)))
-                model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=1)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=1)
                 logger.info("Trained")
                 self.set_model_queues(id, model)
                 logger.info("Time after training {}".format(time.clock()))
@@ -550,9 +551,11 @@ class MyProcesses():
         logger.debug("Handler for {}".format(str(id)))
 
         while self.exit == False:
-            logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),self.trainers[id]["args_queue"].qsize()))
+            logger.debug("Queue Empty? {} Size: {}".format(self.trainers[id]["args_queue"].empty(),
+                                                           self.trainers[id]["args_queue"].qsize()))
 
-            if not self.trainers[id]["args_queue"].empty() and (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
+            if not self.trainers[id]["args_queue"].empty() and \
+                    (self.trainers[id]["thread"] == None or self.trainers[id]["thread"].isAlive() == False):
                 logger.debug("Popping from Queue")
                 arguments = self.trainers[id]["args_queue"].get()
 
@@ -561,14 +564,13 @@ class MyProcesses():
                 name, id, x_train, y_train = arguments
                 logger.info("Got Model")
                 start = time.clock()
-                model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=0)  ## ERROR IS HERE. WHY? Sequential object has no attribute model
+                model.fit(x_train, y_train, batch_size=self.batch_size, epochs=self.num_epoch,verbose=0)
                 end = time.clock()
                 logger.info("Trained")
                 logger.info("Training took {}".format(end - start))
                 self.save_model(id, model)
                 end = time.clock()
                 logger.info("Training and Saving model took {}".format(end - start))
-
 
             time.sleep(0.05)
             ## MINIMIZE MEMORY CONSUMPTION

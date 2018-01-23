@@ -23,14 +23,6 @@ import datetime
 import random
 
 
-"""
-when deciding where to go, should we place -1 on all enemy ranges, and if 2 enemy can attack that area,
-it will then have -2.  This can help us decide whether to move there or not. Or whether we can win or not
-
-"""
-
-
-
 class MyMoves():
     """
     EXAMPLE COMMAND QUEUE TO BE SENT TO HALITE ENGINE:
@@ -110,7 +102,14 @@ class MyMoves():
                 target_planet_id = self.myMap.data_ships[self.myMap.my_id][ship_id]['target_id'][1]
                 target_type = MyCommon.Target.PLANET
                 ship_task = MyCommon.ShipTasks.MINING
-                self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle=0, thrust=0, target_coord=None)
+                self.set_ship_statuses(ship_id,
+                                       target_type,
+                                       target_planet_id,
+                                       ship_coord,
+                                       ship_task,
+                                       angle=0,
+                                       thrust=0,
+                                       target_coord=None)
 
 
     def get_target_and_distances(self):
@@ -144,7 +143,10 @@ class MyMoves():
                 if target_planet_id is None:
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
                     planet_distance = MyCommon.Constants.BIG_DISTANCE
-                    enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id,move_now=False,docked_only=True)
+                    enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self,
+                                                                                              ship_id,
+                                                                                              move_now=False,
+                                                                                              docked_only=True)
                     heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
                 else:
@@ -187,7 +189,7 @@ class MyMoves():
 
             if value_coord:
                 reverse_angle = MyCommon.get_reversed_angle(angle)  ## REVERSE DIRECTION/ANGLE
-                target_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)  ## MOVE BACK
+                target_coord = MyCommon.get_destination_coord(value_coord, reverse_angle, MyCommon.Constants.MOVE_BACK)
             else:
                 ## DIDNT FIND. SHOULDNT HAPPEN FOR THE STARTING 3 SHIPS
                 logging.error("One of the starting ships didnt see the best planet, given the angle.")
@@ -215,7 +217,14 @@ class MyMoves():
             ## SET SHIP STATUSES
             target_type = MyCommon.Target.PLANET
             ship_task = MyCommon.ShipTasks.EXPANDING
-            self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, thrust, target_coord)
+            self.set_ship_statuses(ship_id,
+                                   target_type,
+                                   target_planet_id,
+                                   ship_coord,
+                                   ship_task,
+                                   angle,
+                                   thrust,
+                                   target_coord)
 
 
     def move_other_turns(self, heap):
@@ -233,9 +242,18 @@ class MyMoves():
             ## HAS ENEMY TARGET COORD
             ## DISTANCE TO ENEMY SHOULD BE GOOD, MOVE THIS SHIP NOW
             if enemy_target_coord is not None:
-                thrust, angle = astar.get_thrust_angle_from_Astar(self, ship_id, enemy_target_coord, enemy_distance, target_planet_id=None)
+                thrust, angle = astar.get_thrust_angle_from_Astar(self,
+                                                                  ship_id,
+                                                                  enemy_target_coord,
+                                                                  enemy_distance,
+                                                                  target_planet_id=None)
                 ship_task = MyCommon.ShipTasks.ATTACKING
-                attacking.set_commands_status(self, ship_id, thrust=thrust, angle=angle, target_coord=enemy_target_coord, ship_task=ship_task)
+                attacking.set_commands_status(self,
+                                              ship_id,
+                                              thrust=thrust,
+                                              angle=angle,
+                                              target_coord=enemy_target_coord,
+                                              ship_task=ship_task)
                 continue
 
             else:
@@ -244,13 +262,17 @@ class MyMoves():
                     ## NO MORE ROOM, GET A NEW PLANET ID
                     new_target_planet_id = expanding.get_next_target_planet(self, ship_id)
 
-                    logging.debug("new_target_planet_id: {} target_planet_id: {}".format(new_target_planet_id, target_planet_id))
+                    logging.debug("new_target_planet_id: {} target_planet_id: {}".format(new_target_planet_id,
+                                                                                         target_planet_id))
 
                     ## NO MORE PLANETS TO CONQUER AT THIS TIME
                     ## ADD BACK TO HEAP
                     if new_target_planet_id is None:
                         planet_distance = MyCommon.Constants.BIG_DISTANCE
-                        enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False, docked_only=True)
+                        enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self,
+                                                                                                  ship_id,
+                                                                                                  move_now=False,
+                                                                                                  docked_only=True)
                         heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
                         continue
 
@@ -272,7 +294,10 @@ class MyMoves():
                     ## ADD BACK TO HEAP
                     planet_distance = MyCommon.Constants.BIG_DISTANCE
                     # enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False)
-                    enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self, ship_id, move_now=False, docked_only=True)
+                    enemy_distance, enemy_target_coord = attacking.closest_section_with_enemy(self,
+                                                                                              ship_id,
+                                                                                              move_now=False,
+                                                                                              docked_only=True)
                     heapq.heappush(heap, (planet_distance, enemy_distance, ship_id, target_planet_id, enemy_target_coord))
 
                     continue
@@ -289,13 +314,18 @@ class MyMoves():
 
                 elif target_coord is None:
                     ## DOCKING COORD NOT FOUND?
-                    logging.warning("Why is there no docking coord for ship_id: {} target_planet_id: {}".format(ship_id, target_planet_id))
+                    logging.warning("Why is there no docking coord for ship_id: {} target_planet_id: {}".format(ship_id,
+                                                                                                                target_planet_id))
                     angle = 0
                     safe_thrust = 0
 
                 else:
                     ## GET THRUST AND ANGLE
-                    thrust, angle = astar.get_thrust_angle_from_Astar(self, ship_id, target_coord, distance, target_planet_id)
+                    thrust, angle = astar.get_thrust_angle_from_Astar(self,
+                                                                      ship_id,
+                                                                      target_coord,
+                                                                      distance,
+                                                                      target_planet_id)
                     logging.debug("get_thrust_angle_from_Astar thrust: {} angle: {}".format(thrust, angle))
 
                     safe_thrust = thrust  ## NOT LOOKING FOR INTERMEDIATE COLLLISIONS
@@ -311,7 +341,14 @@ class MyMoves():
                 ## SET SHIP STATUSES
                 target_type = MyCommon.Target.PLANET
                 ship_task = MyCommon.ShipTasks.EXPANDING
-                self.set_ship_statuses(ship_id, target_type, target_planet_id, ship_coord, ship_task, angle, safe_thrust, target_coord)
+                self.set_ship_statuses(ship_id,
+                                       target_type,
+                                       target_planet_id,
+                                       ship_coord,
+                                       ship_task,
+                                       angle,
+                                       safe_thrust,
+                                       target_coord)
 
 
     def check_intermediate_collisions2(self, ship_id, angle, thrust):

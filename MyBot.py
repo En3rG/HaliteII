@@ -79,44 +79,35 @@ if __name__ == "__main__":
         while True:
 
             main_start = datetime.datetime.now()
-            logging.info("Turn # {} Calling update_map() at: {}".format(turn,datetime.datetime.now()))
 
             ## TURN START
             ## UPDATE THE MAP FOR THE NEW TURN AND GET THE LATEST VERSION
             game_map = game.update_map()
-            logging.info("hlt update_map time: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start)))
-            start = datetime.datetime.now()
 
             ## CONVERT game_map TO MY VERSION
             myMap = MyMap(game_map,myMap_prev)
-            logging.info("myMap completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
 
             ## GATHER MAP MATRIX
             ## THIS WILL BE USED FOR MODEL PREDICTION
             ## PREVIOUS MATRIX WILL BE USED FOR TRAINING (ALONG WITH CURRENT myMap)
-            myMatrix = MyMatrix(myMap,myMatrix_prev,EXP,MyCommon.Constants.INPUT_MATRIX_Y,MyCommon.Constants.INPUT_MATRIX_X)
-            logging.info("myMatrix completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
+            myMatrix = MyMatrix(myMap,
+                                myMatrix_prev,
+                                EXP,
+                                MyCommon.Constants.INPUT_MATRIX_Y,
+                                MyCommon.Constants.INPUT_MATRIX_X)
 
             ## FOR TRAINING/PREDICTING MODEL
             #predictions, turn = processors.model_handler(MP,turn, myMap, myMatrix)
             turn += 1
-            logging.info("model_handler completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
 
             ## TRANSLATE PREDICTIONS
             #predicted_moves = NeuralNet.translate_predictions(predictions)
             #myMatrix.fill_prediction_matrix(predicted_moves)
-            logging.info("Predictions completed: <<< {} >>>".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
 
             ## INTIALIZE COMMANDS TO BE SENT TO HALITE ENGINE
             command_queue = []
             myMoves = moves2.MyMoves(myMap, myMatrix, EXP, turn)
             command_queue = myMoves.command_queue
-            logging.info("myMoves completed in <<< {} >>>.  Copying files".format(datetime.timedelta.total_seconds(datetime.datetime.now() - start)))
-            start = datetime.datetime.now()
 
             ## SAVE OLD DATA FOR NEXT TURN
             ## WHEN USING DEEPCOPY SEEMS TO TIME OUT AFTER 7 TURNS
@@ -141,21 +132,20 @@ if __name__ == "__main__":
             log_all_ships(myMap)
             log_all_planets(myMap)
 
-            logging.info("Total Turn Elapse Time: <<< {} >>> at {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start), datetime.datetime.now()))
+            logging.info("Total Turn Elapse Time: <<< {} >>> at {}".format(datetime.timedelta.total_seconds(datetime.datetime.now() - main_start),
+                                                                           datetime.datetime.now()))
 
 
     ## DELETE THIS LATER (FOR DEBUGGING ONLY)
     except Exception as e:
         """
         ERROR: not enough values to unpack (expected at least 1, got 0)
-
         CAUSES: - Invalid command queue (ie thrust 8)
                 - Took over 2 secs
                 - Printing out somewhere
 
         """
         logging.error("Error found: ==> {}".format(e))
-
         for index, frame in enumerate(traceback.extract_tb(sys.exc_info()[2])):
             fname, lineno, fn, text = frame
             logging.error("Error in {} on line {}".format(fname, lineno))

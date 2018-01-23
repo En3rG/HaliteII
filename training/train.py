@@ -79,9 +79,13 @@ def generate_run_game_bat(data):
     num_players = data['num_players']
 
     if num_players == 2:
-        command = ".\halite -d \"{} {}\" -s \"{}\" \"python simulate_p0.py\" \"python simulate_p1.py\"".format(width, height, seed)
+        command = ".\halite -d \"{} {}\" -s \"{}\" \"python simulate_p0.py\" \"python simulate_p1.py\"".format(width,
+                                                                                                               height,
+                                                                                                               seed)
     elif num_players == 4:
-        command = ".\halite -d \"{} {}\" -s \"{}\" \"python simulate_p0.py\" \"python simulate_p1.py\" \"python simulate_p2.py\" \"python simulate_p3.py\"".format(width,height, seed)
+        command = ".\halite -d \"{} {}\" -s \"{}\" \"python simulate_p0.py\" \"python simulate_p1.py\" \"python simulate_p2.py\" \"python simulate_p3.py\"".format(width,
+                                                                                                                                                                   height,
+                                                                                                                                                                   seed)
 
     with open('run_game.bat', 'w') as outfile:
         outfile.write(command)

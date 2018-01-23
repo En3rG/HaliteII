@@ -1,6 +1,11 @@
 import MyCommon
 import logging
 
+"""
+CAN DELETE ENTIRE FILE
+NO LONGER USED
+"""
+
 class Groups():
     """
     WILL CONTAIN ALL THE GROUPS
@@ -15,7 +20,6 @@ class Groups():
     def add_group(self, new_member_ids, keep_location):
         """
         ADD A NEW GROUP
-
         new_member_ids IS A SET
         """
 
@@ -31,6 +35,7 @@ class Groups():
 
         ## ADD TO GROUP DICT
         self.groups_dict[Groups.COUNTER] = new_group
+
 
     def keep_members(self, group_id, alive_ship_ids):
         """
@@ -89,6 +94,7 @@ class Groups():
         for ship_id in self.groups_dict[group_id].members_id:
             self.myMap.data_ships[self.myMap.my_id][ship_id][key] = value
 
+
     def add_value_to_group(self, group_id, key, value):
         """
         ADD VALUE TO GROUP
@@ -113,9 +119,7 @@ class Group():
     def add_members(self, new_member_ids, keep_location):
         """
         ADD A NEW SHIP TO THE GROUP
-
         new_member_ids IS A SET OF SHIP IDs
-
         NEW MEMBERS GO TOWARDS THE CENTROID, THUS OLD MEMBERS DO NOT MOVE THIS TURN
         """
 
@@ -131,7 +135,6 @@ class Group():
 
         ## UPDATE member_points
         self.add_member_points(new_member_ids)
-
 
 
     def get_location(self, new_member_ids):

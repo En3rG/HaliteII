@@ -324,22 +324,45 @@ def get_new_angle_step1(MyMoves, ship_coord, angle):
     thrust = 1
 
     ##BEFORE BASE ON ANGLE PROVIDED
-    for _ in range(7):
-        new_angle = angle + 45
-        new_angle = new_angle - 360 if new_angle > 360 else new_angle ## LIMIT TO 360
+    # for _ in range(7):
+    #     new_angle = angle + 45
+    #     new_angle = new_angle - 360 if new_angle >= 360 else new_angle ## LIMIT TO 360
+    #     new_point = MyCommon.get_destination_coord(ship_coord, new_angle, thrust, rounding=True)
+    #
+    #     ## CHECK BOTH [7] AND [6] ARE FREE OF COLLISIONS
+    #     if not(MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value \
+    #          or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP_CORNER.value \
+    #          or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.PREDICTION_PLANET.value \
+    #          or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.PREDICTION_PLANET.value*2):
+    #         return new_angle, thrust
+    #
+    #     angle = new_angle
+    #
+    # logging.debug("THIS SHIP IS COMPLETELY SURROUNDED!! COLLIDING!!")
+    # return 0, 0 ## NO FREE ANGLE FOUND
+
+    ## GOING CLOCKWISE/COUNTER CLOCKWISE FIRST
+    #for a in [45, -45, 90, -90, 135, -135, 180]:
+    for a in [31, -31, 61, -61, 120, -120, 180]:
+        new_angle = angle + a
+        if new_angle < 0:
+            new_angle = 360 + new_angle
+        elif new_angle >= 360:
+            new_angle = new_angle - 360
+
         new_point = MyCommon.get_destination_coord(ship_coord, new_angle, thrust, rounding=True)
+        logging.debug("new_point {} new_angle {}".format(new_point, new_angle))
 
         ## CHECK BOTH [7] AND [6] ARE FREE OF COLLISIONS
-        if not(
-               MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value \
-               or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP_CORNER.value
-               ):
+        if not (MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP.value \
+                        or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.ALLY_SHIP_CORNER.value \
+                        or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.PREDICTION_PLANET.value \
+                        or MyMoves.position_matrix[7][new_point.y, new_point.x] == Matrix_val.PREDICTION_PLANET.value * 2):
             return new_angle, thrust
 
-        angle = new_angle
-
     logging.debug("THIS SHIP IS COMPLETELY SURROUNDED!! COLLIDING!!")
-    return 0, 0 ## NO FREE ANGLE FOUND
+    return 0, 0  ## NO FREE ANGLE FOUND
+
 
     ## JUST GO UP, DOWN, LEFT, RIGHT, THEN DIAGONALS
     # for new_angle in [0, 90, 180, 270, 45, 135, 225, 315]:

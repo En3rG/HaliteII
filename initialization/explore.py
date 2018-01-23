@@ -49,8 +49,12 @@ class Exploration():
         self.planet_matrix = {} ## FILLED BY FILL PLANETS FOR PATHS (INDIVIDUAL PLANETS ONLY)
         self.all_planet_matrix, self.all_planet_hp_matrix = self.fill_planets_for_paths()
 
-        self.distance_matrix_AxA = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, MyCommon.Constants.ATTACKING_RADIUS * 2 + 1)
-        self.distance_matrix_DxD = self.get_distance_matrix(MyCommon.Constants.DEFENDING_PERIMETER_CHECK, MyCommon.Constants.DEFENDING_PERIMETER_CHECK * 2 + 1)
+        self.distance_matrix_AxA = self.get_distance_matrix(MyCommon.Constants.ATTACKING_RADIUS, 
+                                                            MyCommon.Constants.ATTACKING_RADIUS * 2 + 1)
+        self.distance_matrix_DxD_perimeter = self.get_distance_matrix(MyCommon.Constants.DEFENDING_PERIMETER_CHECK,
+                                                                      MyCommon.Constants.DEFENDING_PERIMETER_CHECK * 2 + 1)
+        self.distance_matrix_DxD_backup = self.get_distance_matrix(MyCommon.Constants.DEFENDING_BACKUP_SQUARE_RADIUS,
+                                                            MyCommon.Constants.DEFENDING_BACKUP_SQUARE_RADIUS * 2 + 1)
         self.distance_matrix_backup = self.get_distance_matrix(MyCommon.Constants.BACKUP_SQUARE_RADIUS,
                                                                MyCommon.Constants.BACKUP_SQUARE_RADIUS * 2 + 1)
 

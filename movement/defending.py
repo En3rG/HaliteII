@@ -39,7 +39,7 @@ def defend_if_enemy_near(MyMoves, ship_id, ship_coord):
         ## ENEMY DETECTED, CALL FOR BACKUP
 
         seek_val = Matrix_val.ENEMY_SHIP.value
-        d_section = MyMoves.EXP.distance_matrix_DxD
+        d_section = MyMoves.EXP.distance_matrix_DxD_perimeter
         enemy_point, distance, enemy_val = MyCommon.get_coord_closest_seek_value(seek_val, v_section, d_section)
         enemy_coord = MyCommon.Coordinates(enemy_point[0], enemy_point[1])
         mid_coord = MyCommon.Coordinates(MyCommon.Constants.DEFENDING_PERIMETER_CHECK, MyCommon.Constants.DEFENDING_PERIMETER_CHECK)
@@ -78,7 +78,7 @@ def move_ships_towards_this_coord(MyMoves, ship_id, ship_task, defend_coord):
                                                 pad_values,
                                                 pad_outside_circle=True)
 
-    ships = MyCommon.get_ship_ids_in_array(area_matrix, MyMoves.EXP.distance_matrix_DxD)
+    ships = MyCommon.get_ship_ids_in_array(area_matrix, MyMoves.EXP.distance_matrix_DxD_backup)
 
     logging.debug("ships {}".format(ships))
 

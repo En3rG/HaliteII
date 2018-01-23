@@ -98,6 +98,7 @@ if __name__ == "__main__":
 
             ## FOR TRAINING/PREDICTING MODEL
             #predictions, turn = processors.model_handler(MP,turn, myMap, myMatrix)
+            logging.info("Turn # {}".format(turn))
             turn += 1
 
             ## TRANSLATE PREDICTIONS

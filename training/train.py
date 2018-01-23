@@ -142,7 +142,7 @@ def get_moves_per_player(data):
     save_moves_json("p2.txt", command_moves_p2)
     save_moves_json("p3.txt", command_moves_p3)
 
-filename = "8845594.hlt"
+filename = "8866052.hlt"
 data = load_hlt(filename)
 get_moves_per_player(data)
 generate_run_game_bat(data)
